@@ -1,7 +1,7 @@
 body {
     margin: 0;
     padding: 0;
-    background: rgb(245, 194, 202);
+    background: #fdc9d1;
     font-size: 12px;
     overflow: auto
 }
@@ -71,7 +71,7 @@ body {
     height: 400px;
     color: #333;
     font-family: "Consolas", "Monaco", "Bitstream Vera Sans Mono", "Courier New", "sans-serif";
-    font-size: 12px
+    font-size: 16px
 }
 
 #code .string {
