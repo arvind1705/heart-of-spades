@@ -19,16 +19,14 @@ YUBI Key PIN
 17051996
 ```
 
-HPE Apple ID
-
-```
-K%hrpEYWAB1
-```
-
+OLD HPE Password
 ```
 fly.cut.ate-79
 ```
 
+New HPE Password
 ```
-DriveFearChristmasSucceed5
+Stupid-Fever-West-Loyalty-8
 ```
+
+
