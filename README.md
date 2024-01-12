@@ -58,3 +58,16 @@ wr4sA2&mljE9od3k
 ssh devreaderk8s@18.223.107.115
 ```
 
+
+## Shared AWS Account:
+
+```
+1iH(J7|(
+```
+
+
+```
+https://777364958571.signin.aws.amazon.com/console
+```
+
+
