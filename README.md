@@ -21,15 +21,12 @@ Stupid-Fever-West-Loyalty-8
 
 ## Aruba
 
-# Bastion
+# US1 Bastion
 
 ```
-ssh Garavind@52.200.17.29
+ssh us1readerk8s@54.146.210.25
 ```
 
-```
-447@}Bzb!/
-```
 
 
 ## DEV US3 AWS Account: 
