@@ -1,7 +1,5 @@
 # ARUBA
-```
-Jn3NGR#247
-```
+
 ```
 K%hrpEYWAB1
 ```
