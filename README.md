@@ -2,33 +2,22 @@
 ```
 Jn3NGR#247
 ```
-
 ```
 K%hrpEYWAB1
 ```
-
 YUBI Key PIN
-
 ```
 17051996
 ```
-
-
-New HPE Password
+HPE Password
 ```
 Stupid-Fever-West-Loyalty-8
 ```
-
-## Aruba
-
 # US1 Bastion
 
 ```
 ssh us1readerk8s@54.146.210.25
 ```
-
-
-
 ## DEV US3 AWS Account: 
 
 Console sign-in URL: 
