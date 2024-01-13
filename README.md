@@ -10,6 +10,12 @@
 Stupid-Fever-West-Loyalty-8
 ```
 
+# THD Bastion
+
+```
+ssh readerk8s@ec2-54-156-135-60.compute-1.amazonaws.com
+```
+
 # US1 Bastion
 
 **SSH Command:**
