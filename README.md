@@ -32,7 +32,7 @@ https://660875420676.signin.aws.amazon.com/console
 
 **Credentials:**
 ```
-1iH(J7|(
+10RQ6A^QZb
 ```
 
 **Bastion SSH Command:**
@@ -59,5 +59,5 @@ https://777364958571.signin.aws.amazon.com/console
 
 **Credentials:**
 ```
-1iH(J7|(
+10RQ6A^QZb
 ```
