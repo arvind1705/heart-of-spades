@@ -62,8 +62,10 @@ https://777364958571.signin.aws.amazon.com/console
 10RQ6A^QZb
 ```
 
-
-
 ```
 aws codecommit create-pull-request --targets repositoryName=pl-airflow-dags,sourceReference=ops_danfoss_fix,destinationReference=ags-thd-prod-us1 --title 'Ops Fix'
+```
+
+```
+aws codecommit merge-pull-request-by-fast-forward --pull-request-id 47 --repository-name pl-airflow-dags
 ```
