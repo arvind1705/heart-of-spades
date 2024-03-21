@@ -69,3 +69,7 @@ aws codecommit create-pull-request --targets repositoryName=pl-airflow-dags,sour
 ```
 aws codecommit merge-pull-request-by-fast-forward --pull-request-id 47 --repository-name pl-airflow-dags
 ```
+
+```
+aws codecommit merge-pull-request-by-squash --pull-request-id 1202 --repository-name pl-airflow-dags
+```
