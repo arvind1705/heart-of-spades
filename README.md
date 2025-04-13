@@ -5,6 +5,11 @@
 17051996
 ```
 
+**Laptop Password:**
+```
+K%hrpEYWAB1
+```
+
 **HPE Password:**
 ```
 Stupid-Fever-West-Loyalty-8
