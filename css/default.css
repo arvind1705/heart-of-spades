@@ -1,116 +1,529 @@
+/* ============================================
+   HEART OF SPADES — Elegant Dark Romantic Theme
+   ============================================ */
+
+/* --- Google Fonts loaded in HTML --- */
+
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    font-size: 16px;
+    scroll-behavior: smooth;
+}
+
 body {
     margin: 0;
     padding: 0;
-    background: #fdc9d1;
-    font-size: 12px;
-    overflow: auto
-}
-
-#mainDiv {
-    width: 100%;
-    height: 100%
-}
-
-#loveHeart {
-    float: left;
-    width: 670px;
-    height: 620px;
+    background: linear-gradient(135deg, #0d0000 0%, #1a0a14 25%, #120818 50%, #1a0a14 75%, #0d0000 100%);
+    background-attachment: fixed;
+    font-family: 'Cormorant Garamond', 'Georgia', serif;
+    color: #e8d5c4;
+    min-height: 100vh;
+    overflow-x: hidden;
+    overflow-y: auto;
     position: relative;
+}
+
+/* iOS Safari doesn't support background-attachment: fixed */
+@supports (-webkit-touch-callout: none) {
+    body {
+        background-attachment: scroll;
+        background-size: cover;
+    }
+}
+
+/* Subtle vignette overlay */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.4) 100%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* --- Sparkle / Particle Canvas --- */
+#particleCanvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    pointer-events: none;
+}
+
+/* --- Main Layout --- */
+#mainDiv {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+}
+
+#content {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 60px;
+    max-width: 1280px;
+    width: 100%;
+}
+
+/* --- Code Panel (Left Side) --- */
+#code {
+    flex: 1 1 auto;
+    width: 100%;
+    max-width: 520px;
+    max-height: 85vh;
+    padding: 32px 36px;
+    background: rgba(10, 5, 15, 0.65);
+    border: 1px solid rgba(185, 130, 100, 0.15);
+    border-radius: 12px;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow:
+        0 0 40px rgba(180, 100, 80, 0.06),
+        inset 0 1px 0 rgba(255, 200, 170, 0.05);
+    font-family: 'Fira Code', 'Source Code Pro', 'Consolas', monospace;
+    font-size: 13.5px;
+    line-height: 1.9;
+    color: #c9b8a8;
+    position: relative;
+    overflow-y: auto;
+    overflow-x: hidden;
+    /* Allow long code lines to wrap on small screens */
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    animation: fadeInUp 1.2s ease-out both;
+    animation-delay: 0.3s;
+}
+
+/* Custom scrollbar for code panel */
+#code::-webkit-scrollbar {
+    width: 4px;
+}
+
+#code::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+#code::-webkit-scrollbar-thumb {
+    background: rgba(212, 175, 140, 0.2);
+    border-radius: 2px;
+}
+
+#code::-webkit-scrollbar-thumb:hover {
+    background: rgba(212, 175, 140, 0.35);
+}
+
+/* Subtle top-edge glow */
+#code::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 10%;
+    right: 10%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(212, 175, 140, 0.4), transparent);
+}
+
+#code .comments {
+    color: #6b7d6b;
+    font-style: italic;
+    opacity: 0.85;
+}
+
+#code .string {
+    color: #e8a87c;
+}
+
+#code .keyword {
+    color: #cf6679;
+    font-weight: 600;
+}
+
+#code .placeholder {
+    margin-left: 18px;
+}
+
+#code .space {
+    margin-left: 8px;
+}
+
+/* --- Section Dividers --- */
+#code .divider {
+    display: inline-block;
+    color: rgba(212, 175, 140, 0.25);
+    letter-spacing: 0.3em;
+    font-size: 11px;
+    margin: 4px 0;
+}
+
+/* --- Prose Lines (gradual shift from code) --- */
+#code .prose {
+    font-family: 'Cormorant Garamond', 'Georgia', serif;
+    font-size: 15px;
+    color: #d4c0ad;
+    font-style: italic;
+    letter-spacing: 0.02em;
+    line-height: 2;
+}
+
+#code .prose.finale {
+    color: #e0cbb8;
+    font-size: 16px;
+    font-weight: 400;
+}
+
+/* --- Daivik Name Reveal --- */
+#code .daivik-name {
+    font-family: 'Cormorant Garamond', 'Georgia', serif;
+    font-size: 26px;
+    font-weight: 600;
+    font-style: normal;
+    color: #e8c4a0;
+    letter-spacing: 0.1em;
+    display: inline-block;
+    transition: all 1.2s ease;
+}
+
+#code .daivik-name.revealed {
+    color: #f0d8b8;
+    text-shadow:
+        0 0 20px rgba(232, 196, 160, 0.5),
+        0 0 40px rgba(232, 196, 160, 0.25),
+        0 0 60px rgba(207, 102, 121, 0.15);
+}
+
+#code .daivik-line {
+    color: #d9c4b0;
+}
+
+/* Typewriter cursor */
+#code .cursor {
+    display: inline-block;
+    width: 2px;
+    height: 1.1em;
+    background: #d4af8c;
+    margin-left: 2px;
+    vertical-align: text-bottom;
+    animation: cursorBlink 1s ease-in-out infinite;
+}
+
+@keyframes cursorBlink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+}
+
+/* --- Heart Panel (Right Side) --- */
+#loveHeart {
+    flex: 0 0 auto;
+    width: 100%;
+    max-width: 620px;
+    /* Maintain roughly the aspect ratio of the original 620x580 */
+    aspect-ratio: 620 / 580;
+    position: relative;
+    animation: fadeInUp 1.2s ease-out both;
+    animation-delay: 0.6s;
 }
 
 #garden {
     width: 100%;
-    height: 100%
+    height: 100%;
+    filter: drop-shadow(0 0 20px rgba(200, 100, 80, 0.15));
 }
 
-#elapseClock {
-    text-align: right;
-    font-size: 18px;
-    margin-top: 10px;
-    margin-bottom: 10px
-}
-
+/* --- Words / Messages --- */
 #words {
-    font-family: "sans-serif";
-    width: 500px;
-    font-size: 24px;
-    color: #666
+    position: absolute;
+    width: 80%;
+    max-width: 480px;
+    font-family: 'Cormorant Garamond', 'Georgia', serif;
+    font-size: 22px;
+    font-weight: 400;
+    color: #e0cbb8;
+    letter-spacing: 0.02em;
+    line-height: 1.6;
+    text-shadow: 0 0 30px rgba(200, 140, 100, 0.15);
 }
 
 #messages {
-    display: none
+    display: none;
+    opacity: 0;
+}
+
+/* --- Elapsed Time Clock --- */
+#elapseClock {
+    text-align: right;
+    font-size: 16px;
+    margin-top: 14px;
+    margin-bottom: 14px;
+    color: #d4af8c;
+    letter-spacing: 0.03em;
 }
 
 #elapseClock .digit {
-    font-family: "digit";
-    font-size: 36px
+    font-family: 'Fira Code', 'digit', monospace;
+    font-size: 28px;
+    font-weight: 300;
+    color: #e8c4a0;
+    text-shadow: 0 0 12px rgba(232, 196, 160, 0.25);
 }
 
+#elapseClock .time-label {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 13px;
+    color: #9a8878;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    margin: 0 6px 0 2px;
+}
+
+/* --- Love You Section --- */
 #loveu {
-    padding: 5px;
+    padding: 10px 0;
     font-size: 22px;
-    margin-top: 80px;
-    margin-right: 120px;
+    font-style: italic;
+    margin-top: 50px;
     text-align: right;
-    display: none
+    display: none;
+    opacity: 0;
+    color: #e0cbb8;
+    text-shadow: 0 0 20px rgba(200, 140, 100, 0.1);
 }
 
 #loveu .signature {
-    margin-top: 10px;
+    margin-top: 16px;
     font-size: 20px;
+    font-style: normal;
+    font-weight: 600;
+    color: #d4af8c;
+    letter-spacing: 0.08em;
 }
 
-#clickSound {
-    display: none
+/* --- Floating Hearts (click interaction) --- */
+@keyframes heartFloat {
+    0% { opacity: 1; transform: scale(var(--heart-scale)) translateY(0); }
+    100% { opacity: 0; transform: scale(var(--heart-scale)) translateY(-120px); }
 }
 
-#code {
-    float: left;
-    width: 440px;
-    margin-top: 60px !important;
-    height: 400px;
-    color: #333;
-    font-family: "Consolas", "Monaco", "Bitstream Vera Sans Mono", "Courier New", "sans-serif";
-    font-size: 14px
+.heart {
+    z-index: 999;
+    position: absolute;
+    pointer-events: none;
+    animation: heartFloat 3.5s ease-out forwards;
 }
 
-#code .string {
-    color: #2a36ff
+.heart::before,
+.heart::after {
+    content: '';
+    position: absolute;
+    height: 22px;
+    width: 34px;
+    border-radius: 11px 0 0 11px;
+    background: linear-gradient(135deg, #e87d7d, #cf4a6e);
+    box-shadow: 0 0 12px rgba(207, 74, 110, 0.4);
 }
 
-#code .keyword {
-    color: #7f0055;
-    font-weight: bold
+.heart::before {
+    transform: rotate(45deg);
 }
 
-#code .placeholder {
-    margin-left: 15px
+.heart::after {
+    left: 8px;
+    transform: rotate(135deg);
 }
 
-#code .space {
-    margin-left: 7px
-}
-
-#code .comments {
-    color: #3f7f5f
-}
-
-#copyright {
-    margin-top: 40px;
-    text-align: center;
-    width: 100%;
-    color: #666
-}
-
+/* --- Error Message --- */
 #errorMsg {
     width: 100%;
     text-align: center;
-    font-size: 24px;
+    font-size: 20px;
     position: absolute;
     top: 100px;
-    left: 0
+    left: 0;
+    color: #cf6679;
 }
 
-#copyright a {
-    color: #666
+/* --- Smooth entrance animation --- */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* --- Responsive --- */
+
+/* Stack to vertical at tablets and below */
+@media (max-width: 1200px) {
+    #content {
+        flex-direction: column;
+        align-items: center;
+        gap: 40px;
+    }
+
+    #code {
+        flex: none;
+        max-width: 90vw;
+        width: 520px;
+        order: 1;
+    }
+
+    #loveHeart {
+        flex: none;
+        width: 90vw;
+        max-width: 580px;
+        order: 2;
+    }
+}
+
+/* Timer: wrap to two rows on narrow screens */
+@media (max-width: 640px) {
+    #elapseClock {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+        gap: 2px 0;
+    }
+
+    #elapseClock .digit {
+        font-size: 24px;
+    }
+
+    #elapseClock .time-label {
+        font-size: 11px;
+        margin: 0 4px 0 1px;
+    }
+}
+
+/* Main mobile breakpoint */
+@media (max-width: 520px) {
+    #mainDiv {
+        padding: 20px 8px;
+        /* Safe area for notch / home indicator */
+        padding-top: max(20px, env(safe-area-inset-top));
+        padding-bottom: max(20px, env(safe-area-inset-bottom));
+        padding-left: max(8px, env(safe-area-inset-left));
+        padding-right: max(8px, env(safe-area-inset-right));
+    }
+
+    #code {
+        width: calc(100vw - 16px);
+        max-width: none;
+        padding: 20px 16px;
+        font-size: 11.5px;
+        line-height: 1.75;
+        border-radius: 10px;
+        max-height: 75vh;
+    }
+
+    #code .comments {
+        /* Allow long comments to wrap */
+        word-break: break-word;
+        hyphens: auto;
+        -webkit-hyphens: auto;
+    }
+
+    #code .prose {
+        font-size: 13px;
+    }
+
+    #code .prose.finale {
+        font-size: 14px;
+    }
+
+    #code .daivik-name {
+        font-size: 20px;
+    }
+
+    #code .divider {
+        font-size: 9px;
+    }
+
+    #loveHeart {
+        width: calc(100vw - 16px);
+        max-width: none;
+    }
+
+    #words {
+        width: 85%;
+        font-size: 16px;
+    }
+
+    #elapseClock .digit {
+        font-size: 20px;
+    }
+
+    #elapseClock .time-label {
+        font-size: 10px;
+        letter-spacing: 0.08em;
+        margin: 0 3px 0 1px;
+    }
+
+    #loveu {
+        font-size: 16px;
+        margin-top: 24px;
+    }
+
+    #loveu .signature {
+        font-size: 16px;
+    }
+
+    /* Smaller floating hearts on mobile */
+    .heart::before,
+    .heart::after {
+        height: 16px;
+        width: 26px;
+        border-radius: 8px 0 0 8px;
+    }
+}
+
+/* Very small phones (iPhone SE, etc.) */
+@media (max-width: 375px) {
+    #code {
+        padding: 16px 12px;
+        font-size: 10.5px;
+        line-height: 1.7;
+    }
+
+    #code .prose {
+        font-size: 12px;
+    }
+
+    #code .prose.finale {
+        font-size: 13px;
+    }
+
+    #code .daivik-name {
+        font-size: 18px;
+    }
+
+    #words {
+        font-size: 14px;
+    }
+
+    #elapseClock .digit {
+        font-size: 18px;
+    }
+
+    #loveu {
+        font-size: 14px;
+    }
 }

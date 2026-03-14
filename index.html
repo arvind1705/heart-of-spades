@@ -1,53 +1,26 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
     <head>
-        <title>Aravind 💖 Sanjana</title>
-        <!-- <link rel="icon" type="image/x-icon" href="images/favicon.ico"> -->
+        <title>Aravind &hearts; Sanjana</title>
         <link rel="apple-touch-icon" sizes="180x180" href="images/apple-touch-icon.png" />
         <link rel="icon" type="image/png" sizes="32x32" href="images/favicon-32x32.png" />
         <link rel="icon" type="image/png" sizes="16x16" href="images/favicon-16x16.png" />
         <link rel="manifest" href="images/site.webmanifest" />
         <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+
+        <!-- Google Fonts: Elegant serif + Code font -->
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Fira+Code:wght@300;400&display=swap" rel="stylesheet" />
+
         <style type="text/css">
             @font-face {
                 font-family: digit;
                 src: url("digital.ttf") format("truetype");
             }
-
-            @keyframes heartfade {
-			0% {
-				opacity : 1;
-			}
-			50% {
-				opacity : 0;
-			}
-		}
-		.heart {
-			z-index : 999;
-			animation : heartfade 6s linear;
-			position : absolute; 
-		}
-		.heart:before,
-		.heart:after {
-			content : "";
-			background-color : #fc2a62;
-			position : absolute;
-			height : 30px;
-			width : 45px;
-			border-radius : 15px 0px 0px 15px;
-		}
-
-		.heart:before {
-			transform : rotate(45deg);
-		}
-
-		.heart:after {
-			left : 10.5px;
-			transform : rotate(135deg);
-		}
-
         </style>
+
         <link href="css/default.css" type="text/css" rel="stylesheet" />
         <script type="text/javascript" src="js/jquery.js"></script>
         <script type="text/javascript" src="js/garden.js"></script>
@@ -55,27 +28,35 @@
     </head>
 
     <body>
+        <!-- Background sparkle particles -->
+        <canvas id="particleCanvas"></canvas>
+
         <div id="mainDiv">
             <div id="content">
                 <div id="code">
                     <span class="comments">##</span> <br />
                     <span class="comments"># I am a software engineer,</span> <br />
-                    <span class="comments"># so I write code to celebrate Valentine's Day in engineer's way.</span> <br />
+                    <span class="comments"># so I write code to celebrate our love story in engineer's way.</span> <br />
                     <span class="comments">##</span> <br />
+                    <br />
                     i = Boy(<span class="string">"Aravind"</span>); <br />
                     u = Girl(<span class="string">"Sanjana"</span>); <br />
+                    <br />
                     <span class="comments"># Jan 21, 2022, I met you. </span> <br />
                     i.meet(u) <br />
                     <span class="comments"># Then, I fell for you. </span> <br />
                     i.confess(u) <br />
+                    <br />
                     <span class="comments"># Jan 27, 2022, I said I love you.</span> <br />
                     u.accepted(i) <br />
                     <span class="comments"># Since then, I've seen happiness in life every day.</span> <br />
                     happy(u, i) <br />
+                    <br />
                     <span class="comments"># We enjoy talking to each other.</span> <br />
                     talk(u, i) <br />
                     <span class="comments"># Feb 11, 2022, The moment I held your hand, I knew you were the one.</span> <br />
                     hold_hands(u, i) <br />
+                    <br />
                     <span class="comments"># We are falling in love with each other over and over again.</span> <br />
                     u.falling_in_love_with(i) <br />
                     i.falling_in_love_with(u)
@@ -87,156 +68,147 @@
                     <span class="placeholder"></span><span class="placeholder"></span>u = everything <br />
                     <span class="placeholder"></span><span class="keyword">else</span>: <br />
                     <span class="placeholder"></span><span class="placeholder"></span>everything = u <br />
-                    <span class="comments"># I simply can't wait to marry you and be yours forever.</span> <br />
-                    i.marry(u, in_the_future=<span class="keyword">True</span>) <br />
-                    i.live_happily_forever_with(u) <br />
-                    <span class="comments"># I love you forever.</span> <br />
+                    <br />
+                    <span class="divider">&mdash;&mdash;&mdash;</span> <br />
+                    <br />
+                    <span class="comments"># Dec 4, 2022 &mdash; She said yes.</span> <br />
+                    i.propose(u, ring=<span class="keyword">True</span>) <br />
+                    u.said(<span class="string">"Yes!"</span>) <br />
+                    <span class="comments"># My heart has never beaten this fast.</span> <br />
+                    our_future = <span class="keyword">Promise</span>(forever) <br />
+                    <br />
+                    <span class="divider">&mdash;&mdash;&mdash;</span> <br />
+                    <br />
+                    <span class="comments"># Jan 26, 2023 &mdash; The most beautiful day.</span> <br />
+                    <span class="prose">We stood together, hand in hand,</span> <br />
+                    <span class="prose">and made promises that will last a lifetime.</span> <br />
+                    i.marry(u) <br />
+                    <span class="prose">You were the most beautiful bride</span> <br />
+                    <span class="prose">I had ever seen.</span> <br />
+                    us = Family(<span class="string">"Aravind"</span>, <span class="string">"Sanjana"</span>) <br />
+                    <br />
+                    <span class="divider">&mdash;&mdash;&mdash;</span> <br />
+                    <br />
+                    <span class="comments"># Aug 3, 2024 &mdash; And then, a miracle.</span> <br />
+                    <span class="prose daivik-line">A tiny heartbeat. A new beginning.</span> <br />
+                    <span class="prose daivik-line">The universe gave us the greatest gift &mdash;</span> <br />
+                    <span id="daivikReveal" class="daivik-name">Daivik</span> <br />
+                    <span class="prose daivik-line">Our son. Our whole world.</span> <br />
+                    us.add(<span class="string">"Daivik"</span>) <br />
+                    <span class="prose daivik-line">In that moment, love multiplied infinitely.</span> <br />
+                    <br />
+                    <span class="divider">&mdash;&mdash;&mdash;</span> <br />
+                    <br />
+                    <span class="prose finale">From two strangers to soulmates,</span> <br />
+                    <span class="prose finale">from soulmates to a family &mdash;</span> <br />
+                    <span class="prose finale">this is our forever.</span> <br />
                 </div>
                 <div id="loveHeart">
                     <canvas id="garden"></canvas>
                     <div id="words">
                         <div id="messages">
-                            Sanjana, I have fallen in love with you from
+                            Sanjana, I have been in love with you for
                             <div id="elapseClock"></div>
                         </div>
                         <div id="loveu">
-                            Love you forever and ever.
+                            Our little family, my forever.
                             <br />
-                            <div class="signature">- Aravind</div>
+                            <div class="signature">&mdash; Aravind</div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+
         <script type="text/javascript">
-            var offsetX = $("#loveHeart").width() / 2;
-            var offsetY = $("#loveHeart").height() / 2 - 55;
+            /* offsetX, offsetY, heartScaleX, heartScaleY are now computed
+               dynamically in functions.js via computeHeartMetrics() */
             var together = new Date();
             together.setFullYear(2022, 0, 20);
             together.setHours(13);
             together.setMinutes(30);
             together.setSeconds(0);
             together.setMilliseconds(0);
+
             if (!document.createElement("canvas").getContext) {
                 var msg = document.createElement("div");
                 msg.id = "errorMsg";
-                msg.innerHTML = "Your browser doesn't support HTML5!<br/>Recommend use Chrome 14+/IE 9+/Firefox 7+/Safari 4+";
+                msg.innerHTML = "Your browser doesn't support HTML5!<br/>Please use a modern browser.";
                 document.body.appendChild(msg);
                 $("#code").css("display", "none");
-                $("#copyright").css("position", "absolute");
-                $("#copyright").css("bottom", "10px");
-                document.execCommand("stop");
             } else {
-                setTimeout(function () {
-                    startHeartAnimation();
-                }, 123000);
                 timeElapse(together);
                 setInterval(function () {
                     timeElapse(together);
                 }, 500);
-                adjustCodePosition();
                 $("#code").typewriter();
             }
 
-
-
+            /* --- Enhanced Floating Hearts on Click/Touch --- */
             var brd = document.createElement("DIV");
-		document.body.insertBefore(brd, document.getElementById("board"));
+            brd.style.cssText = "position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:998;";
+            document.body.appendChild(brd);
 
-		const duration = 3000;
-		const speed = 0.5;
-		const cursorXOffset = 0;
-		const cursorYOffset = -5;
+            var hearts = [];
+            var down = false;
+            var event = null;
 
-		var hearts = [];
-		
-		function generateHeart(x, y, xBound, xStart, scale)
-		{
-			var heart = document.createElement("DIV");
-			heart.setAttribute('class', 'heart');
-			brd.appendChild(heart);
-			heart.time = duration;
-			heart.x = x;
-			heart.y = y;
-			heart.bound = xBound;
-			heart.direction = xStart;
-			heart.style.left = heart.x + "px";
-			heart.style.top = heart.y + "px";
-			heart.scale = scale;
-			heart.style.transform = "scale(" + scale + "," + scale + ")";
-			if(hearts == null)
-				hearts = [];
-			hearts.push(heart);
-			return heart;
-		}
+            function generateHeart(x, y, xBound, xStart, scale) {
+                var heart = document.createElement("DIV");
+                heart.setAttribute('class', 'heart');
+                heart.style.setProperty('--heart-scale', scale);
+                brd.appendChild(heart);
+                heart.time = 3500;
+                heart.x = x;
+                heart.y = y;
+                heart.bound = xBound;
+                heart.direction = xStart;
+                heart.style.left = heart.x + "px";
+                heart.style.top = heart.y + "px";
+                heart.scale = scale;
+                heart.style.transform = "scale(" + scale + "," + scale + ")";
+                hearts.push(heart);
+                return heart;
+            }
 
-		var down = false;
-		var event = null;
+            document.onmousedown = function(e) { down = true; event = e; };
+            document.onmouseup = function(e) { down = false; };
+            document.onmousemove = function(e) { event = e; };
+            document.ontouchstart = function(e) { down = true; event = e.touches[0]; };
+            document.ontouchend = function(e) { down = false; };
+            document.ontouchmove = function(e) { event = e.touches[0]; };
 
-		document.onmousedown = function(e) {
-			down = true;
-			event = e;
-		}
+            var before = Date.now();
+            requestAnimationFrame(heartFrame);
 
-		document.onmouseup = function(e) {
-			down = false;
-		}
+            function heartFrame() {
+                var current = Date.now();
+                var deltaTime = current - before;
+                before = current;
+                for (var i = hearts.length - 1; i >= 0; i--) {
+                    var heart = hearts[i];
+                    heart.time -= deltaTime;
+                    if (heart.time > 0) {
+                        heart.y -= 0.6;
+                        heart.style.top = heart.y + "px";
+                        heart.style.left = heart.x + heart.direction * heart.bound * Math.sin(heart.y * heart.scale / 30) / heart.y * 200 + "px";
+                        heart.style.opacity = Math.max(0, heart.time / 3500);
+                    } else {
+                        heart.parentNode.removeChild(heart);
+                        hearts.splice(i, 1);
+                    }
+                }
+                requestAnimationFrame(heartFrame);
+            }
 
-		document.onmousemove = function(e) {
-			event = e;
-		}
-
-		document.ontouchstart = function(e) {
-			down = true;
-			event = e.touches[0];
-		}
-
-		document.ontouchend = function(e) {
-			down = false;
-		}
-
-		document.ontouchmove = function(e) {
-			event = e.touches[0];
-		}
-
-		var before = Date.now();
-		var id = setInterval(frame, 5);
-		var gr = setInterval(check, 100);
-
-		function frame()
-		{
-			var current = Date.now();
-			var deltaTime = current - before;
-			before = current;
-			for(i in hearts)
-			{
-				var heart = hearts[i];
-				heart.time -= deltaTime;
-				if(heart.time > 0)
-				{
-					heart.y -= speed;
-					heart.style.top = heart.y + "px";
-					heart.style.left = heart.x + heart.direction * heart.bound * Math.sin(heart.y * heart.scale / 30) / heart.y * 200 + "px";
-				}
-				else
-				{
-					heart.parentNode.removeChild(heart);
-					hearts.splice(i, 1);
-				}
-			}
-		}
-
-		function check()
-		{
-			if(down)
-			{
-				var start = 1 - Math.round(Math.random()) * 2;
-				var scale = Math.random() * Math.random() * 0.8 + 0.2;
-				var bound = 30 + Math.random() * 20;
-				generateHeart(event.pageX - brd.offsetLeft + cursorXOffset, event.pageY - brd.offsetTop + cursorYOffset, bound, start, scale);
-			}
-		}
-        
+            var gr = setInterval(function() {
+                if (down && event) {
+                    var start = 1 - Math.round(Math.random()) * 2;
+                    var scale = Math.random() * Math.random() * 0.6 + 0.3;
+                    var bound = 25 + Math.random() * 20;
+                    generateHeart(event.pageX, event.pageY - 5, bound, start, scale);
+                }
+            }, 100);
         </script>
     </body>
 </html>
