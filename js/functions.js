@@ -4,8 +4,6 @@
    ============================================ */
 
 var $window = $(window), gardenCtx, gardenCanvas, $garden, garden;
-var clientWidth = $(window).width();
-var clientHeight = $(window).height();
 
 /* --- Mobile Detection Helper --- */
 var isMobile = (function() {
@@ -15,6 +13,7 @@ var isMobile = (function() {
 /* --- Floating Particle / Sparkle System --- */
 var particleCanvas, particleCtx, particles = [];
 var particleBurstActive = false;
+var particleLastTime = 0;
 
 function initParticles() {
 	particleCanvas = document.getElementById('particleCanvas');
@@ -61,22 +60,34 @@ function createParticle(options) {
 	return defaults;
 }
 
-/* --- Daivik Particle Burst --- */
-function triggerDaivikBurst() {
+/* --- Shared Name-Reveal Particle Burst ---
+   hueOptions : array of hue values for the first wave
+   shimmerHueBase : base hue for the shimmer wave
+*/
+function triggerRevealBurst(elementId, hueOptions, shimmerHueBase) {
 	particleBurstActive = true;
-	var centerX = window.innerWidth / 2;
-	var centerY = window.innerHeight / 2;
-	var burstCount = isMobile ? 40 : 80;
 
+	// Origin: centre of the reveal element if available, else screen centre
+	var originX = window.innerWidth / 2;
+	var originY = window.innerHeight / 2;
+	if (elementId) {
+		var el = document.getElementById(elementId);
+		if (el) {
+			var rect = el.getBoundingClientRect();
+			originX = rect.left + rect.width / 2;
+			originY = rect.top + rect.height / 2 + window.pageYOffset;
+		}
+	}
+
+	var burstCount = isMobile ? 40 : 80;
 	for (var i = 0; i < burstCount; i++) {
 		var angle = (Math.PI * 2 / burstCount) * i + (Math.random() - 0.5) * 0.4;
 		var speed = Math.random() * 3 + 1.5;
-		var hueOptions = [340, 350, 0, 10, 20, 30, 40, 50]; // pinks, reds, golds
 		var hue = hueOptions[Math.floor(Math.random() * hueOptions.length)] + Math.random() * 15;
 
 		particles.push(createParticle({
-			x: centerX + (Math.random() - 0.5) * 60,
-			y: centerY + (Math.random() - 0.5) * 60,
+			x: originX + (Math.random() - 0.5) * 60,
+			y: originY + (Math.random() - 0.5) * 60,
 			size: Math.random() * 3.5 + 1,
 			speedX: Math.cos(angle) * speed,
 			speedY: Math.sin(angle) * speed - 0.5,
@@ -91,20 +102,21 @@ function triggerDaivikBurst() {
 
 	// Second wave — delayed gentle shimmer
 	var shimmerCount = isMobile ? 20 : 40;
+	var ox = originX, oy = originY;
 	setTimeout(function () {
 		for (var i = 0; i < shimmerCount; i++) {
 			var angle = Math.random() * Math.PI * 2;
 			var speed = Math.random() * 1.5 + 0.5;
 			particles.push(createParticle({
-				x: centerX + (Math.random() - 0.5) * 200,
-				y: centerY + (Math.random() - 0.5) * 200,
+				x: ox + (Math.random() - 0.5) * 200,
+				y: oy + (Math.random() - 0.5) * 200,
 				size: Math.random() * 2 + 0.8,
 				speedX: Math.cos(angle) * speed * 0.3,
 				speedY: -Math.random() * 0.8 - 0.3,
 				opacity: 0.6 + Math.random() * 0.3,
 				opacitySpeed: -0.004 - Math.random() * 0.003,
 				type: 'star',
-				hue: Math.random() * 50 + 20,
+				hue: shimmerHueBase + Math.random() * 40,
 				life: 4000 + Math.random() * 2000,
 				isBurst: true
 			}));
@@ -112,8 +124,46 @@ function triggerDaivikBurst() {
 	}, 800);
 }
 
-function animateParticles() {
+function triggerDaivikBurst() {
+	// Warm: pinks, reds, golds
+	triggerRevealBurst('daivikReveal', [340, 350, 0, 10, 20, 30, 40, 50], 15);
+}
+
+function triggerBabyBurst() {
+	// Lavender / mauve — bridges rose palette and stays distinct from Daivik gold
+	triggerRevealBurst('babyReveal', [280, 290, 300, 310, 320, 330], 290);
+}
+
+/* --- Finale shimmer: gentle gold-rose shower across the full screen --- */
+function triggerFinaleShimmer() {
+	var shimmerCount = isMobile ? 30 : 70;
+	for (var i = 0; i < shimmerCount; i++) {
+		setTimeout(function() {
+			var hueOpts = [340, 350, 0, 20, 40, 300, 310];
+			var hue = hueOpts[Math.floor(Math.random() * hueOpts.length)];
+			particles.push(createParticle({
+				x: Math.random() * window.innerWidth,
+				y: Math.random() * window.innerHeight,
+				size: Math.random() * 3 + 0.8,
+				speedX: (Math.random() - 0.5) * 0.6,
+				speedY: -Math.random() * 0.6 - 0.2,
+				opacity: 0.7 + Math.random() * 0.3,
+				opacitySpeed: -0.003 - Math.random() * 0.003,
+				type: 'star',
+				hue: hue,
+				life: 5000 + Math.random() * 3000,
+				isBurst: true
+			}));
+		}, Math.random() * 2000);
+	}
+}
+
+function animateParticles(timestamp) {
 	if (!particleCtx) return;
+
+	var delta = particleLastTime ? Math.min(timestamp - particleLastTime, 64) : 16;
+	particleLastTime = timestamp;
+
 	particleCtx.clearRect(0, 0, particleCanvas.width, particleCanvas.height);
 
 	for (var i = particles.length - 1; i >= 0; i--) {
@@ -122,14 +172,16 @@ function animateParticles() {
 		p.x += p.speedX;
 		p.y += p.speedY;
 
-		// Burst particles decelerate and fade
+		// Burst particles decelerate and fade using real delta time
 		if (p.isBurst) {
 			p.speedX *= 0.985;
 			p.speedY *= 0.985;
-			p.life -= 16; // approx 1 frame at 60fps
-			p.opacity += p.opacitySpeed;
+			p.life -= delta;
+			p.opacity += p.opacitySpeed * (delta / 16);
 			if (p.life <= 0 || p.opacity <= 0) {
-				particles.splice(i, 1);
+				// swap-with-last for O(1) removal
+				particles[i] = particles[particles.length - 1];
+				particles.pop();
 				continue;
 			}
 		} else {
@@ -197,12 +249,28 @@ var heartScaleX, heartScaleY, offsetX, offsetY;
 function computeHeartMetrics() {
 	var w = gardenCanvas.width;
 	var h = gardenCanvas.height;
-	// Original design: canvas 620x580, scaleX=19.5, scaleY=20, offsetY shift=-55
-	// Scale proportionally from that reference
-	heartScaleX = w / 620 * 19.5;
-	heartScaleY = h / 580 * 20;
+
+	// Exact bounding box of the parametric heart curve
+	// (b = c/PI, x = 16*sin^3(b), y = -(13cos(b)-5cos(2b)-2cos(3b)-cos(4b)))
+	// X is symmetric: [-16, 16], Y range: [-11.9233, 17.0]
+	var normHalfW = 16;          // half-width of normalised heart
+	var normMinY  = -11.9233;    // top of normalised heart
+	var normMaxY  =  17.0;       // bottom of normalised heart
+	var normH     = normMaxY - normMinY; // 28.9233
+
+	var pad = Math.min(w, h) * 0.04; // ~4% of the shorter side as margin
+
+	// Scale uniformly so the heart fills the canvas while preserving its shape
+	var scaleByW = (w - 2 * pad) / (2 * normHalfW);
+	var scaleByH = (h - 2 * pad) / normH;
+	var s = Math.min(scaleByW, scaleByH);
+
+	heartScaleX = s;
+	heartScaleY = s;
+
+	// Centre horizontally; pin top of heart to the top padding
 	offsetX = w / 2;
-	offsetY = h / 2 - (55 * h / 580);
+	offsetY = pad - s * normMinY; // maps normMinY → pad (top edge)
 }
 
 function sizeCanvas() {
@@ -228,9 +296,13 @@ $(function () {
 	// Size canvas to match the CSS-laid-out container
 	sizeCanvas();
 
-	setInterval(function () {
+	// Use rAF instead of setInterval so render syncs with display refresh
+	// and pauses automatically when the tab is backgrounded
+	function gardenRenderLoop() {
 		garden.render();
-	}, Garden.options.growSpeed);
+		requestAnimationFrame(gardenRenderLoop);
+	}
+	requestAnimationFrame(gardenRenderLoop);
 });
 
 /* Replace page-reload-on-resize with proper recalculation */
@@ -242,9 +314,7 @@ $(window).resize(function () {
 		isMobile = window.innerWidth <= 768 || ('ontouchstart' in window);
 		// Resize particle canvas
 		resizeParticleCanvas();
-		// Re-measure the heart panel and recalc metrics (canvas won't re-render
-		// existing blooms at new positions, but new blooms will be correct;
-		// also adjustWordsPosition will use correct values)
+		// Re-measure the heart panel and recalc metrics
 		if (gardenCanvas) {
 			sizeCanvas();
 		}
@@ -286,20 +356,102 @@ function startHeartAnimation() {
 	}, c);
 }
 
-/* --- Enhanced Typewriter with pause support & Daivik detection --- */
+/* --- Typewriter with pause support, milestone detection, skip & replay --- */
 (function (a) {
 	a.fn.typewriter = function () {
 		this.each(function () {
-			var d = a(this), c = d.html(), b = 0;
-			var totalVisibleChars = c.replace(/<[^>]*>/g, '').length;
+			var d = a(this);
+			var originalHTML = d.html();
+			var b = 0;
 			d.html("");
 
 			var daivikTriggered = false;
+			var babyTriggered = false;
+			var whileTrueTriggered = false;
+			var proposeTriggered = false;
+			var marryTriggered = false;
 			var heartAnimStarted = false;
 			var speed = 30;
 			var pauseUntil = 0;
+			var intervalId = null;
+			var finished = false;
 
-			var e = setInterval(function () {
+			/* --- Skip: jump to end instantly --- */
+			function skipToEnd() {
+				if (finished) return;
+				if (intervalId) clearInterval(intervalId);
+				finished = true;
+				d.html(originalHTML);
+				// Fire all milestone effects that haven't triggered yet
+				if (!daivikTriggered) {
+					triggerDaivikBurst();
+					var elD = document.getElementById('daivikReveal');
+					if (elD) elD.classList.add('revealed');
+				}
+				if (!babyTriggered) {
+					triggerBabyBurst();
+					var elB = document.getElementById('babyReveal');
+					if (elB) elB.classList.add('revealed');
+				}
+				triggerFinaleShimmer();
+				if (!heartAnimStarted) {
+					heartAnimStarted = true;
+					setTimeout(startHeartAnimation, 800);
+				}
+				showSkipReplayBtn('replay');
+			}
+
+			/* --- Replay: reset and retype --- */
+			function replay() {
+				b = 0;
+				finished = false;
+				daivikTriggered = false;
+				babyTriggered = false;
+				whileTrueTriggered = false;
+				proposeTriggered = false;
+				marryTriggered = false;
+				heartAnimStarted = false;
+				pauseUntil = 0;
+				garden.clear();
+				$("#messages").css({ display: 'none', opacity: 0 });
+				$("#loveu").css({ display: 'none', opacity: 0 });
+				d.html("");
+				showSkipReplayBtn('skip');
+				intervalId = setInterval(tick, speed);
+			}
+
+			function showSkipReplayBtn(mode) {
+				var btn = document.getElementById('skipBtn');
+				if (!btn) return;
+				if (mode === 'skip') {
+					btn.innerHTML = '&#8595; Skip';
+					btn.onclick = skipToEnd;
+					btn.style.display = 'block';
+				} else {
+					btn.innerHTML = '&#8635; Replay';
+					btn.onclick = replay;
+					btn.style.display = 'block';
+				}
+			}
+
+			// Wire the skip button immediately
+			showSkipReplayBtn('skip');
+
+			/* --- Scroll throttle --- */
+			var scrollPending = false;
+			function scheduleScroll(el) {
+				if (scrollPending) return;
+				scrollPending = true;
+				requestAnimationFrame(function() {
+					scrollPending = false;
+					if (el.scrollHeight > el.clientHeight) {
+						el.scrollTop = el.scrollHeight - el.clientHeight;
+					}
+				});
+			}
+
+			function tick() {
+				var c = originalHTML;
 				var now = Date.now();
 				if (now < pauseUntil) return;
 
@@ -313,43 +465,75 @@ function startHeartAnimation() {
 				var currentHTML = c.substring(0, b);
 				d.html(currentHTML + '<span class="cursor"></span>');
 
-				// Auto-scroll to keep cursor visible
-				var codeEl = d[0];
-				if (codeEl.scrollHeight > codeEl.clientHeight) {
-					codeEl.scrollTop = codeEl.scrollHeight - codeEl.clientHeight;
+				// Throttled auto-scroll
+				scheduleScroll(d[0]);
+
+				// while True block — pause to let the moment breathe
+				if (!whileTrueTriggered && currentHTML.indexOf('id="whileTrue"') !== -1 &&
+					b > c.indexOf('whileTrue') + 10) {
+					whileTrueTriggered = true;
+					pauseUntil = now + 900;
 				}
 
-				// Detect when Daivik's name appears
+				// Proposal — pause
+				if (!proposeTriggered && currentHTML.indexOf('id="proposeReveal"') !== -1 &&
+					b > c.indexOf('proposeReveal') + 10) {
+					proposeTriggered = true;
+					pauseUntil = now + 1000;
+				}
+
+				// Wedding — pause
+				if (!marryTriggered && currentHTML.indexOf('id="marryReveal"') !== -1 &&
+					b > c.indexOf('marryReveal') + 10) {
+					marryTriggered = true;
+					pauseUntil = now + 1000;
+				}
+
+				// Daivik reveal
 				if (!daivikTriggered && currentHTML.indexOf('id="daivikReveal"') !== -1 &&
 					currentHTML.indexOf('Daivik') !== -1 &&
 					b > c.indexOf('Daivik') + 5) {
 					daivikTriggered = true;
-					// Trigger the burst effect
 					triggerDaivikBurst();
-					// Add glow class to the name
 					setTimeout(function() {
 						var el = document.getElementById('daivikReveal');
 						if (el) el.classList.add('revealed');
 					}, 100);
-					// Pause briefly to let the moment breathe
+					pauseUntil = now + 1200;
+				}
+
+				// Baby #2 reveal
+				if (!babyTriggered && currentHTML.indexOf('id="babyReveal"') !== -1 &&
+					currentHTML.indexOf('Baby #2') !== -1 &&
+					b > c.indexOf('Baby #2') + 5) {
+					babyTriggered = true;
+					triggerBabyBurst();
+					setTimeout(function() {
+						var el = document.getElementById('babyReveal');
+						if (el) el.classList.add('revealed');
+					}, 100);
 					pauseUntil = now + 1200;
 				}
 
 				if (b >= c.length) {
-					clearInterval(e);
+					clearInterval(intervalId);
+					finished = true;
 					// Remove cursor
 					setTimeout(function () {
 						d.find('.cursor').fadeOut(600);
 					}, 1500);
-					// Start heart animation after typing finishes
+					// Finale shimmer
+					setTimeout(triggerFinaleShimmer, 600);
+					// Start heart animation
 					if (!heartAnimStarted) {
 						heartAnimStarted = true;
-						setTimeout(function() {
-							startHeartAnimation();
-						}, 1500);
+						setTimeout(startHeartAnimation, 1500);
 					}
+					showSkipReplayBtn('replay');
 				}
-			}, speed);
+			}
+
+			intervalId = setInterval(tick, speed);
 		});
 		return this;
 	};
@@ -369,37 +553,23 @@ function timeElapse(c) {
 	f = f % 60;
 	if (f < 10) f = "0" + f;
 
-	var a = '<span class="digit">' + g + '</span><span class="time-label">days</span>'
+	var a = '<span class="digit heartbeat">' + g + '</span><span class="time-label">days</span>'
 		+ '<span class="digit">' + b + '</span><span class="time-label">hrs</span>'
 		+ '<span class="digit">' + d + '</span><span class="time-label">min</span>'
-		+ '<span class="digit">' + f + '</span><span class="time-label">sec</span>';
+		+ '<span class="digit heartbeat">' + f + '</span><span class="time-label">sec</span>';
 	$("#elapseClock").html(a);
 }
 
 /* --- Enhanced Message Reveal --- */
 function showMessages() {
 	adjustWordsPosition();
-	$("#messages").css("display", "block").animate({ opacity: 1 }, 5000, function () {
+	$("#messages").css("display", "block").animate({ opacity: 1 }, 2500, function () {
 		showLoveU();
 	});
 }
 
 function adjustWordsPosition() {
-	var $gardenEl = $("#garden");
-	var $words = $("#words");
-	var canvasW = $gardenEl.width();
-	var canvasH = $gardenEl.height();
-	// Position text centered in the heart — proportional to canvas size
-	// Original: canvas 620x580, top offset +195, left offset +55
-	var topRatio = 195 / 580;
-	var leftRatio = 55 / 620;
-	$words.css("position", "absolute");
-	$words.css("top", $gardenEl.position().top + canvasH * topRatio);
-	$words.css("left", $gardenEl.position().left + canvasW * leftRatio);
-}
-
-function adjustCodePosition() {
-	// No longer needed — CSS flexbox handles vertical alignment
+	// no-op: #words is in normal document flow below the heart
 }
 
 function showLoveU() {

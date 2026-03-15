@@ -7,7 +7,11 @@
         <link rel="icon" type="image/png" sizes="16x16" href="images/favicon-16x16.png" />
         <link rel="manifest" href="images/site.webmanifest" />
         <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="description" content="A love story written in code — Aravind &amp; Sanjana, forever." />
+        <meta property="og:title" content="Aravind &hearts; Sanjana" />
+        <meta property="og:description" content="A love story written in code — our forever." />
+        <meta property="og:type" content="website" />
 
         <!-- Google Fonts: Elegant serif + Code font -->
         <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -29,7 +33,10 @@
 
     <body>
         <!-- Background sparkle particles -->
-        <canvas id="particleCanvas"></canvas>
+        <canvas id="particleCanvas" aria-hidden="true"></canvas>
+
+        <!-- Skip / Replay button -->
+        <button id="skipBtn" aria-label="Skip to end">&#8595; Skip</button>
 
         <div id="mainDiv">
             <div id="content">
@@ -42,7 +49,7 @@
                     i = Boy(<span class="string">"Aravind"</span>); <br />
                     u = Girl(<span class="string">"Sanjana"</span>); <br />
                     <br />
-                    <span class="comments"># Jan 21, 2022, I met you. </span> <br />
+                    <span class="comments"># Jan 20, 2022, I met you. </span> <br />
                     i.meet(u) <br />
                     <span class="comments"># Then, I fell for you. </span> <br />
                     i.confess(u) <br />
@@ -62,7 +69,7 @@
                     i.falling_in_love_with(u)
                     <br />
                     <br />
-                    <span class="comments"># You are the greatest love of my life.</span> <br />
+                    <span id="whileTrue" class="comments"># You are the greatest love of my life.</span> <br />
                     while <span class="keyword">True</span>: <br />
                     <span class="placeholder"></span><span class="keyword">if</span> u.with(i): <br />
                     <span class="placeholder"></span><span class="placeholder"></span>u = everything <br />
@@ -72,7 +79,7 @@
                     <span class="divider">&mdash;&mdash;&mdash;</span> <br />
                     <br />
                     <span class="comments"># Dec 4, 2022 &mdash; She said yes.</span> <br />
-                    i.propose(u, ring=<span class="keyword">True</span>) <br />
+                    <span id="proposeReveal"></span>i.propose(u, ring=<span class="keyword">True</span>) <br />
                     u.said(<span class="string">"Yes!"</span>) <br />
                     <span class="comments"># My heart has never beaten this fast.</span> <br />
                     our_future = <span class="keyword">Promise</span>(forever) <br />
@@ -82,7 +89,7 @@
                     <span class="comments"># Jan 26, 2023 &mdash; The most beautiful day.</span> <br />
                     <span class="prose">We stood together, hand in hand,</span> <br />
                     <span class="prose">and made promises that will last a lifetime.</span> <br />
-                    i.marry(u) <br />
+                    <span id="marryReveal"></span>i.marry(u) <br />
                     <span class="prose">You were the most beautiful bride</span> <br />
                     <span class="prose">I had ever seen.</span> <br />
                     us = Family(<span class="string">"Aravind"</span>, <span class="string">"Sanjana"</span>) <br />
@@ -99,22 +106,35 @@
                     <br />
                     <span class="divider">&mdash;&mdash;&mdash;</span> <br />
                     <br />
-                    <span class="prose finale">From two strangers to soulmates,</span> <br />
+                    <span class="comments"># Coming soon &mdash; Another miracle, already on their way.</span> <br />
+                    <span class="prose baby-line">The universe isn't done surprising us.</span> <br />
+                    <span class="prose baby-line">We haven't met you yet &mdash; but we already love you.</span> <br />
+                    <span id="babyReveal" class="baby-name">Baby #2</span> <br />
+                    <span class="prose baby-line">A chapter we are writing one heartbeat at a time.</span> <br />
+                    us.expecting(<span class="string">"Baby #2"</span>) <br />
+                    <span class="prose baby-line">Love doesn't split &mdash; it only grows.</span> <br />
+                    <br />
+                    <span class="divider">&mdash;&mdash;&mdash;</span> <br />
+                    <br />
+                    <span id="finaleReveal" class="prose finale">From two strangers to soulmates,</span> <br />
                     <span class="prose finale">from soulmates to a family &mdash;</span> <br />
-                    <span class="prose finale">this is our forever.</span> <br />
+                    <span class="prose finale">this is our forever, Sanjana.</span> <br />
                 </div>
-                <div id="loveHeart">
-                    <canvas id="garden"></canvas>
-                    <div id="words">
-                        <div id="messages">
-                            Sanjana, I have been in love with you for
-                            <div id="elapseClock"></div>
+                <div id="heartCol">
+                    <div id="loveHeart">
+                        <canvas id="garden" aria-hidden="true"></canvas>
+                        <div id="words">
+                            <div id="messages" aria-live="polite">
+                                Sanjana, I have been in love with you for
+                                <div id="elapseClock"></div>
+                            </div>
                         </div>
-                        <div id="loveu">
-                            Our little family, my forever.
-                            <br />
-                            <div class="signature">&mdash; Aravind</div>
-                        </div>
+                    </div>
+                    <div id="loveu" aria-live="polite">
+                        Our little family &mdash; Daivik, Baby #2, and you &mdash;
+                        <br />my entire world.
+                        <br />
+                        <div class="signature">&mdash; Aravind</div>
                     </div>
                 </div>
             </div>
@@ -144,14 +164,15 @@
                 $("#code").typewriter();
             }
 
-            /* --- Enhanced Floating Hearts on Click/Touch --- */
+            /* --- Floating Hearts on Click/Touch + Idle --- */
             var brd = document.createElement("DIV");
             brd.style.cssText = "position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:998;";
             document.body.appendChild(brd);
 
             var hearts = [];
             var down = false;
-            var event = null;
+            var heartEvent = null;
+            var heartFrameRunning = false;
 
             function generateHeart(x, y, xBound, xStart, scale) {
                 var heart = document.createElement("DIV");
@@ -168,23 +189,26 @@
                 heart.scale = scale;
                 heart.style.transform = "scale(" + scale + "," + scale + ")";
                 hearts.push(heart);
+                if (!heartFrameRunning) {
+                    heartFrameRunning = true;
+                    requestAnimationFrame(heartFrame);
+                }
                 return heart;
             }
 
-            document.onmousedown = function(e) { down = true; event = e; };
-            document.onmouseup = function(e) { down = false; };
-            document.onmousemove = function(e) { event = e; };
-            document.ontouchstart = function(e) { down = true; event = e.touches[0]; };
-            document.ontouchend = function(e) { down = false; };
-            document.ontouchmove = function(e) { event = e.touches[0]; };
+            document.addEventListener('mousedown', function(e) { down = true; heartEvent = e; });
+            document.addEventListener('mouseup', function(e) { down = false; });
+            document.addEventListener('mousemove', function(e) { heartEvent = e; });
+            document.addEventListener('touchstart', function(e) { down = true; heartEvent = e.touches[0]; }, { passive: true });
+            document.addEventListener('touchend', function(e) { down = false; });
+            document.addEventListener('touchmove', function(e) { heartEvent = e.touches[0]; }, { passive: true });
 
-            var before = Date.now();
-            requestAnimationFrame(heartFrame);
+            var heartBefore = Date.now();
 
             function heartFrame() {
                 var current = Date.now();
-                var deltaTime = current - before;
-                before = current;
+                var deltaTime = current - heartBefore;
+                heartBefore = current;
                 for (var i = hearts.length - 1; i >= 0; i--) {
                     var heart = hearts[i];
                     heart.time -= deltaTime;
@@ -198,17 +222,42 @@
                         hearts.splice(i, 1);
                     }
                 }
-                requestAnimationFrame(heartFrame);
+                if (hearts.length > 0 || down) {
+                    requestAnimationFrame(heartFrame);
+                } else {
+                    heartFrameRunning = false;
+                }
             }
 
-            var gr = setInterval(function() {
-                if (down && event) {
+            /* Generate click/hold hearts */
+            setInterval(function() {
+                if (down && heartEvent) {
                     var start = 1 - Math.round(Math.random()) * 2;
                     var scale = Math.random() * Math.random() * 0.6 + 0.3;
                     var bound = 25 + Math.random() * 20;
-                    generateHeart(event.pageX, event.pageY - 5, bound, start, scale);
+                    generateHeart(heartEvent.pageX, heartEvent.pageY - 5, bound, start, scale);
                 }
             }, 100);
+
+            /* Idle ambient hearts — one every ~10 seconds from a random edge */
+            setInterval(function() {
+                var edge = Math.floor(Math.random() * 3); // 0=bottom, 1=left, 2=right
+                var x, y;
+                if (edge === 0) {
+                    x = Math.random() * window.innerWidth;
+                    y = window.innerHeight - 10;
+                } else if (edge === 1) {
+                    x = 10;
+                    y = Math.random() * window.innerHeight;
+                } else {
+                    x = window.innerWidth - 10;
+                    y = Math.random() * window.innerHeight;
+                }
+                var scale = Math.random() * 0.4 + 0.2;
+                var start = 1 - Math.round(Math.random()) * 2;
+                var bound = 20 + Math.random() * 15;
+                generateHeart(x, y, bound, start, scale);
+            }, 10000);
         </script>
     </body>
 </html>
