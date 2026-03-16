@@ -425,20 +425,31 @@ function startHeartAnimation() {
 				if (!btn) return;
 				if (mode === 'skip') {
 					btn.innerHTML = '&#8595; Skip';
+					btn.setAttribute('aria-label', 'Skip to end');
 					btn.onclick = skipToEnd;
-					btn.style.display = 'block';
 				} else {
 					btn.innerHTML = '&#8635; Replay';
+					btn.setAttribute('aria-label', 'Replay from the beginning');
 					btn.onclick = replay;
-					btn.style.display = 'block';
 				}
+				// Defer class add so the opacity transition fires after paint
+				setTimeout(function() { btn.classList.add('visible'); }, 16);
 			}
 
 			// Wire the skip button immediately
 			showSkipReplayBtn('skip');
 
-			/* --- Scroll throttle --- */
+			/* --- Scroll throttle + bottom-fade indicator --- */
 			var scrollPending = false;
+			function updateScrollFade(el) {
+				var atBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 4;
+				if (atBottom) {
+					el.classList.add('at-bottom');
+				} else {
+					el.classList.remove('at-bottom');
+				}
+			}
+			d[0].addEventListener('scroll', function() { updateScrollFade(d[0]); }, { passive: true });
 			function scheduleScroll(el) {
 				if (scrollPending) return;
 				scrollPending = true;
@@ -447,6 +458,7 @@ function startHeartAnimation() {
 					if (el.scrollHeight > el.clientHeight) {
 						el.scrollTop = el.scrollHeight - el.clientHeight;
 					}
+					updateScrollFade(el);
 				});
 			}
 

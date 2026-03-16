@@ -77,8 +77,16 @@ body::before {
     cursor: pointer;
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
-    transition: background 0.3s ease, border-color 0.3s ease, color 0.3s ease;
-    display: none;
+    transition: background 0.3s ease, border-color 0.3s ease, color 0.3s ease,
+                opacity 0.5s ease;
+    /* Hidden by default via opacity — allows CSS transition on show */
+    opacity: 0;
+    pointer-events: none;
+}
+
+#skipBtn.visible {
+    opacity: 1;
+    pointer-events: auto;
 }
 
 #skipBtn:hover {
@@ -164,6 +172,24 @@ body::before {
     right: 10%;
     height: 1px;
     background: linear-gradient(90deg, transparent, rgba(212, 175, 140, 0.4), transparent);
+}
+
+/* Bottom-edge fade — signals the panel is scrollable */
+#code::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 48px;
+    background: linear-gradient(to bottom, transparent, rgba(10, 5, 15, 0.85));
+    border-radius: 0 0 12px 12px;
+    pointer-events: none;
+    transition: opacity 0.4s ease;
+}
+
+#code.at-bottom::after {
+    opacity: 0;
 }
 
 #code .comments {
@@ -301,7 +327,6 @@ body::before {
 #garden {
     width: 100%;
     height: 100%;
-    filter: drop-shadow(0 0 20px rgba(200, 100, 80, 0.15));
 }
 
 /* --- Words / Messages (inside heart, absolutely positioned) --- */
@@ -391,32 +416,37 @@ body::before {
 }
 
 /* --- Floating Hearts (click interaction) ---
-   The rAF loop in index.html drives all movement via top/left/opacity.
-   The CSS animation is removed to avoid conflicts with JS-driven properties. */
+   The rAF loop in index.html drives all movement via top/left/opacity. */
 .heart {
     z-index: 999;
     position: absolute;
     pointer-events: none;
+    width: 20px;
+    height: 18px;
 }
 
 .heart::before,
 .heart::after {
     content: '';
     position: absolute;
-    height: 22px;
-    width: 34px;
-    border-radius: 11px 0 0 11px;
+    top: 0;
+    width: 10px;
+    height: 16px;
+    border-radius: 10px 10px 0 0;
     background: linear-gradient(135deg, #e87d7d, #cf4a6e);
-    box-shadow: 0 0 12px rgba(207, 74, 110, 0.4);
+    box-shadow: 0 0 10px rgba(207, 74, 110, 0.4);
 }
 
 .heart::before {
-    transform: rotate(45deg);
+    left: 10px;
+    transform-origin: 0 100%;
+    transform: rotate(-45deg);
 }
 
 .heart::after {
-    left: 8px;
-    transform: rotate(135deg);
+    left: 0;
+    transform-origin: 100% 100%;
+    transform: rotate(45deg);
 }
 
 /* --- Error Message --- */
@@ -561,11 +591,20 @@ body::before {
     }
 
     /* Smaller floating hearts on mobile */
+    .heart {
+        width: 14px;
+        height: 13px;
+    }
+
     .heart::before,
     .heart::after {
-        height: 16px;
-        width: 26px;
-        border-radius: 8px 0 0 8px;
+        width: 7px;
+        height: 11px;
+        border-radius: 7px 7px 0 0;
+    }
+
+    .heart::before {
+        left: 7px;
     }
 }
 
