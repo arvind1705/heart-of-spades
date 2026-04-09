@@ -28,3 +28,6 @@ js/jquery.js        - Vendored jQuery
 digital.ttf         - Custom font for timer digits
 images/             - Favicons and PWA manifest
 ```
+
+
+https://www.youtube.com/watch?v=WAUnmQt2Z7Y
