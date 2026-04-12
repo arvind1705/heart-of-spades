@@ -5,13 +5,13 @@ A personal love letter webpage featuring a typewriter-animated pseudo-code narra
 ## Features
 
 - Typewriter effect that types out a love story in Python-style pseudo-code, gradually shifting to romantic prose for later milestones
-- Blooming heart animation rendered on HTML5 Canvas with a romantic color palette
+- Blooming heart animation rendered on HTML5 Canvas with a romantic colour palette
 - Live elapsed-time counter from the relationship start date
 - Floating sparkle particle system with warm gold tones
 - Special particle burst effect for key moments
 - Floating hearts on click/touch interaction
 - Dark romantic theme with glassmorphic UI elements
-- Mobile-optimized with responsive scaling, reduced GPU effects, and safe area support
+- Mobile-optimised with responsive scaling, reduced GPU effects, and safe area support
 
 ## Tech
 
@@ -28,6 +28,3 @@ js/jquery.js        - Vendored jQuery
 digital.ttf         - Custom font for timer digits
 images/             - Favicons and PWA manifest
 ```
-
-
-https://www.youtube.com/watch?v=WAUnmQt2Z7Y
