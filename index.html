@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
-        <title>Aravind &hearts; Sanjana</title>
+        <title>For Sanjana — Our Love Story</title>
         <link rel="apple-touch-icon" sizes="180x180" href="images/apple-touch-icon.png" />
         <link rel="icon" type="image/png" sizes="32x32" href="images/favicon-32x32.png" />
         <link rel="icon" type="image/png" sizes="16x16" href="images/favicon-16x16.png" />
@@ -9,7 +9,7 @@
         <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
         <meta name="description" content="A love story written in code — Aravind &amp; Sanjana, forever." />
-        <meta property="og:title" content="Aravind &hearts; Sanjana" />
+        <meta property="og:title" content="For Sanjana — Our Love Story" />
         <meta property="og:description" content="A love story written in code — our forever." />
         <meta property="og:type" content="website" />
         <meta property="og:image" content="images/android-chrome-512x512.png" />
@@ -31,9 +31,12 @@
         <script type="text/javascript" src="js/functions.js"></script>
     </head>
 
-    <body>
+    <body data-theme="rose" data-tint="intro">
         <!-- Background sparkle particles -->
         <canvas id="particleCanvas" aria-hidden="true"></canvas>
+
+        <!-- Film grain over the night sky -->
+        <div id="grain" aria-hidden="true"></div>
 
         <!-- Cover: the story starts when she opens it -->
         <div id="cover">
@@ -51,11 +54,6 @@
             <div id="content">
                 <div id="heartCol">
                     <div id="loveHeart">
-                        <!-- Optional photos (images/photos/*.jpg) show inside the heart -->
-                        <div id="heartPhoto" aria-hidden="true">
-                            <div class="photo-layer"></div>
-                            <div class="photo-layer"></div>
-                        </div>
                         <canvas id="garden" aria-hidden="true"></canvas>
                         <div id="heartDate" aria-hidden="true">
                             <div id="dateDay"></div>
@@ -78,72 +76,72 @@
 
                 <div id="storyCol">
                     <!-- One .scene per moment. data-day / data-year show inside the heart;
-                         data-photo="name" shows images/photos/name.jpg there if the file exists. -->
+                         data-tint colour-grades the ambient glow for that chapter. -->
                     <div id="stage" aria-live="polite">
-                        <div class="scene">
+                        <div class="scene" data-tint="intro">
                             <h2 class="headline">I'm a software engineer,</h2>
                             <p class="body">so I wrote our love story<br />the only way I know how.</p>
                             <div class="code"><div>i = Boy(<span class="string">"Aravind"</span>)</div><div>u = Girl(<span class="string">"Sanjana"</span>)</div></div>
                         </div>
 
-                        <div class="scene" data-day="Jan 20" data-year="2022" data-photo="met">
+                        <div class="scene" data-day="Jan 20" data-year="2022" data-tint="met">
                             <h2 class="headline">I met you.</h2>
                             <p class="body">And just like that, I fell for you.</p>
                             <div class="code"><div>i.meet(u)</div></div>
                         </div>
 
-                        <div class="scene" data-day="Jan 27" data-year="2022" data-photo="love">
+                        <div class="scene" data-day="Jan 27" data-year="2022" data-tint="love">
                             <h2 class="headline">I said &ldquo;I love you.&rdquo;</h2>
                             <p class="body">Since then, I have found happiness<br />in every single day.</p>
                             <div class="code"><div>i.confess(u)</div><div>u.accepted(i)</div></div>
                         </div>
 
-                        <div class="scene" data-day="Feb 11" data-year="2022" data-photo="hands">
+                        <div class="scene" data-day="Feb 11" data-year="2022" data-tint="hands">
                             <h2 class="headline">I held your hand.</h2>
                             <p class="body">And in that moment,<br />I knew you were the one.</p>
                             <div class="code"><div>hold_hands(u, i)</div></div>
                         </div>
 
-                        <div class="scene" data-day="Every day" data-year="&infin;" data-photo="us">
+                        <div class="scene" data-day="Every day" data-year="&infin;" data-tint="everyday">
                             <h2 class="headline">You are the greatest love of my life.</h2>
                             <p class="body">We keep falling in love with each other,<br />over and over again.</p>
                             <div class="code"><div><span class="keyword">while</span> <span class="keyword">True</span>:</div><div><span class="indent"></span><span class="keyword">if</span> u.with(i):</div><div><span class="indent"></span><span class="indent"></span>u = everything</div><div><span class="indent"></span><span class="keyword">else</span>:</div><div><span class="indent"></span><span class="indent"></span>everything = u</div></div>
                         </div>
 
-                        <div class="scene" data-day="Dec 4" data-year="2022" data-photo="proposal">
+                        <div class="scene" data-day="Dec 4" data-year="2022" data-tint="proposal">
                             <h2 class="headline">I asked. You said yes.</h2>
                             <p class="body">My heart has never beaten this fast.</p>
                             <div class="code"><div>i.propose(u, ring=<span class="keyword">True</span>)</div><div>our_future = <span class="keyword">Promise</span>(forever)</div></div>
                         </div>
 
-                        <div class="scene" data-day="Jan 26" data-year="2023" data-photo="wedding">
+                        <div class="scene" data-day="Jan 26" data-year="2023" data-tint="wedding">
                             <h2 class="headline">The most beautiful day.</h2>
                             <p class="body">We stood together, hand in hand, and made promises that will last a lifetime.</p>
                             <p class="body">You were the most beautiful bride<br />I had ever seen.</p>
                             <div class="code"><div>us = Family(<span class="string">"Aravind"</span>, <span class="string">"Sanjana"</span>)</div></div>
                         </div>
 
-                        <div class="scene" data-day="Aug 3" data-year="2024" data-photo="daivik">
+                        <div class="scene" data-day="Aug 3" data-year="2024" data-tint="daivik">
                             <p class="eyebrow">And then, a miracle</p>
                             <h2 id="daivikReveal" class="name daivik-name" data-reveal="daivik">Daivik</h2>
                             <p class="body">A tiny heartbeat. A new beginning.<br />Our son. Our whole world.</p>
                             <div class="code"><div>us.add(<span class="string">"Daivik"</span>)</div></div>
                         </div>
 
-                        <div class="scene" data-day="Sep 9" data-year="2026" data-photo="deeyan">
+                        <div class="scene" data-day="Sep 9" data-year="2026" data-tint="deeyan">
                             <p class="eyebrow">And then, there were four</p>
                             <h2 id="deeyanReveal" class="name deeyan-name" data-reveal="deeyan">Deeyan</h2>
                             <p class="body">We loved you long before we met you.<br />Love didn't divide &mdash; it only grew.</p>
                             <div class="code"><div>us.add(<span class="string">"Deeyan"</span>)</div></div>
                         </div>
 
-                        <div class="scene" data-photo="family">
+                        <div class="scene" data-tint="finale">
                             <p class="body finale">From two strangers to soulmates,</p>
                             <p class="body finale">from soulmates to a family of four &mdash;</p>
                             <h2 class="headline">this is our forever, Sanjana.</h2>
                         </div>
 
-                        <div class="scene" data-photo="family">
+                        <div class="scene" data-tint="finale">
                             <div id="loveu">
                                 You, Daivik and Deeyan &mdash;
                                 <br />my entire world.
@@ -169,6 +167,7 @@
 
                     <div id="stageFoot">
                         <div id="hint"></div>
+                        <div id="progress" aria-hidden="true"><div id="progressFill"></div></div>
                         <div id="dots" aria-hidden="true"></div>
                     </div>
                 </div>
@@ -186,7 +185,7 @@
             /* The cover greets her differently on these days (month is 1-12 here) */
             var specialDays = [
                 { month: 1, day: 20, note: "It all began on this day" },
-                { month: 1, day: 26, note: "Happy anniversary, my love" },
+                { month: 1, day: 26, note: "Happy anniversary, my love", theme: "champagne" },
                 { month: 2, day: 14, note: "Happy Valentine's Day, my love" }
             ];
 

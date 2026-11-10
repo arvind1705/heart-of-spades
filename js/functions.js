@@ -359,9 +359,9 @@ function sizeCanvas() {
 
 	// Keep the flowers in proportion to the heart
 	var bloomScale = Math.max(0.5, w / HEART_REF_WIDTH);
-	Garden.options.bloomRadius.min = 8 * bloomScale;
-	Garden.options.bloomRadius.max = 12 * bloomScale;
-	Garden.options.lineWidth = Math.max(0.8, 1.2 * bloomScale);
+	Garden.options.bloomRadius.min = 7 * bloomScale;
+	Garden.options.bloomRadius.max = 15 * bloomScale;
+	Garden.options.lineWidth = Math.max(1.0, 1.5 * bloomScale);
 
 	if (snapshot) {
 		gardenCtx.drawImage(snapshot, 0, 0, w, h);
@@ -373,26 +373,6 @@ function sizeCanvas() {
 	}
 
 	adjustWordsPosition();
-	updateHeartClip();
-}
-
-/* Clip the photo layer to the same curve the flowers follow, pulled in
-   slightly so its edge sits under the blooms. */
-function updateHeartClip() {
-	var el = document.getElementById("heartPhoto");
-	if (!el || !heartW) return;
-	var inset = 0.97;
-	var centreY = offsetY + heartScaleY * 2.54; // middle of the curve's bounding box
-	var points = [];
-	for (var i = 0; i < 72; i++) {
-		var p = getHeartPoint(Math.PI * 2 * i / 72);
-		var x = offsetX + (p[0] - offsetX) * inset;
-		var y = centreY + (p[1] - centreY) * inset;
-		points.push((x / heartW * 100).toFixed(2) + '% ' + (y / heartH * 100).toFixed(2) + '%');
-	}
-	var value = 'polygon(' + points.join(', ') + ')';
-	el.style.webkitClipPath = value;
-	el.style.clipPath = value;
 }
 
 /* Point on the heart curve. b is the curve angle in radians:
@@ -414,7 +394,7 @@ var heartComplete = false;
 
 function plantBloom(b) {
 	var h = getHeartPoint(b);
-	var minGap = Garden.options.bloomRadius.max * 1.3;
+	var minGap = Garden.options.bloomRadius.max * 0.85;
 	for (var i = 0; i < heartPoints.length; i++) {
 		var g = heartPoints[i];
 		if (Math.sqrt(Math.pow(g[0] - h[0], 2) + Math.pow(g[1] - h[1], 2)) < minGap) {
@@ -458,6 +438,9 @@ function completeHeart() {
 	showMessages();
 }
 
+var finaleCounting = false;
+var finaleCountToken = 0;
+
 function resetHeart() {
 	if (heartTimer) clearInterval(heartTimer);
 	heartTimer = null;
@@ -465,8 +448,10 @@ function resetHeart() {
 	heartTarget = 0;
 	heartPoints = [];
 	heartComplete = false;
+	finaleCounting = false;
+	finaleCountToken++;
 	garden.clear();
-	$loveHeart.removeClass("complete");
+	$loveHeart.removeClass("complete").removeClass("thump");
 	$("body").removeClass("finished");
 }
 
@@ -479,6 +464,7 @@ $(function () {
 	$garden = $("#garden");
 	gardenCanvas = $garden[0];
 	gardenCtx = gardenCanvas.getContext("2d");
+	Garden.theme = document.body.getAttribute("data-theme") === "champagne" ? "champagne" : "rose";
 	garden = new Garden(gardenCtx, gardenCanvas);
 
 	// Size canvas to match the CSS-laid-out container
@@ -504,12 +490,20 @@ $(window).resize(function () {
 	}, 250);
 });
 
+/* --- Themes: Midnight Rose by default, Champagne Dawn on special days --- */
+function applyTheme(name) {
+	if (name !== "champagne") name = "rose";
+	document.body.setAttribute("data-theme", name);
+	if (typeof Garden !== "undefined") Garden.theme = name;
+}
+
 /* --- Cover: the story waits until it is opened --- */
 function initCover(specialDays, onOpen) {
 	var today = new Date();
 	for (var i = 0; i < specialDays.length; i++) {
 		if (specialDays[i].month === today.getMonth() + 1 && specialDays[i].day === today.getDate()) {
 			$("#coverNote").text(specialDays[i].note);
+			if (specialDays[i].theme) applyTheme(specialDays[i].theme);
 		}
 	}
 
@@ -533,8 +527,7 @@ function initCover(specialDays, onOpen) {
    Markup contract, inside #stage:
      .scene                  one moment; its children appear one after another
      data-day / data-year    on a .scene — the date shown inside the heart
-     data-photo="name"       on a .scene — images/photos/name.jpg, shown inside
-                             the heart if that file exists (silently skipped if not)
+     data-tint="name"        on a .scene — colour-grades the ambient glow
      .code                   typed out character by character
      [data-reveal="name"]    glow + particle burst when it appears
 */
@@ -546,9 +539,6 @@ var sceneBusy = false;
 var sceneTimer = null;
 var hintTimer = null;
 var storyStarted = false;
-var photoCache = {};
-var photoShown = null;
-var photoFront = 0;
 
 /* Remember each text node of a code block so it can be typed back in */
 function prepareCode(el) {
@@ -630,38 +620,6 @@ function setHeartDate(day, year) {
 	}, 450);
 }
 
-/* --- Optional photos inside the heart --- */
-function preloadPhotos() {
-	$("#stage .scene").each(function () {
-		var name = this.getAttribute("data-photo");
-		if (!name || photoCache[name] !== undefined) return;
-		photoCache[name] = null;
-		var img = new Image();
-		img.onload = function () {
-			photoCache[name] = img.src;
-			// It may have arrived while its scene is already on screen
-			var scene = storyScenes[sceneIndex];
-			if (scene && scene.getAttribute("data-photo") === name) setHeartPhoto(name);
-		};
-		img.src = "images/photos/" + name + ".jpg";
-	});
-}
-
-function setHeartPhoto(name) {
-	var src = (name && photoCache[name]) || null;
-	if (src === photoShown) return;
-	photoShown = src;
-	var $layers = $("#heartPhoto .photo-layer");
-	$layers.eq(photoFront).removeClass("show");
-	if (src) {
-		photoFront = 1 - photoFront;
-		$layers.eq(photoFront).css("background-image", 'url("' + src + '")').addClass("show");
-		$loveHeart.addClass("has-photo");
-	} else {
-		$loveHeart.removeClass("has-photo");
-	}
-}
-
 /* --- Moving between scenes --- */
 function showHint() {
 	clearTimeout(hintTimer);
@@ -713,6 +671,18 @@ function rushScene() {
 	showHint();
 }
 
+/* One thump from the heart as a new chapter lands */
+function thumpHeart() {
+	if (reducedMotion || !$loveHeart) return;
+	$loveHeart.removeClass("thump");
+	/* Restart the animation even if a thump is already running */
+	if ($loveHeart[0]) void $loveHeart[0].offsetWidth;
+	$loveHeart.addClass("thump");
+	setTimeout(function () {
+		$loveHeart.removeClass("thump");
+	}, 950);
+}
+
 function goToScene(index) {
 	if (index < 0 || index >= storyScenes.length || index === sceneIndex) return;
 	clearTimeout(sceneTimer);
@@ -733,9 +703,11 @@ function goToScene(index) {
 	resetScene(scene);
 	$(scene).removeClass("leaving").addClass("active");
 	$("#dots span").removeClass("on").eq(index).addClass("on");
+	$("#progressFill").css("width", (storyScenes.length > 1 ? index / (storyScenes.length - 1) * 100 : 100) + "%");
+	document.body.setAttribute("data-tint", scene.getAttribute("data-tint") || "intro");
+	thumpHeart();
 
 	setHeartDate(scene.getAttribute("data-day"), scene.getAttribute("data-year"));
-	setHeartPhoto(scene.getAttribute("data-photo"));
 	// The heart closes on the second-to-last scene; the last one is the sign-off
 	growHeartTo(Math.min(1, (index + 1) / (storyScenes.length - 1)));
 
@@ -772,7 +744,6 @@ function initStory() {
 		prepareCode(this);
 		setCode(this, false);
 	});
-	preloadPhotos();
 
 	// Anywhere on the page moves the story on (buttons look after themselves)
 	$("#mainDiv").click(function (e) {
@@ -812,7 +783,10 @@ function timeElapse(start) {
 	var minutes = Math.floor(seconds / 60);
 	seconds = seconds % 60;
 
-	setText("elapseDays", String(days).replace(/\B(?=(\d{3})+$)/g, ","));
+	/* The finale count-up owns the day number while it is running */
+	if (!finaleCounting) {
+		setText("elapseDays", String(days).replace(/\B(?=(\d{3})+$)/g, ","));
+	}
 	setText("elapseHrs", padTwo(hours));
 	setText("elapseMin", padTwo(minutes));
 	setText("elapseSec", padTwo(seconds));
@@ -852,10 +826,39 @@ function updateMilestones(list) {
 }
 
 /* --- Finale --- */
+function formatDays(days) {
+	return String(days).replace(/\B(?=(\d{3})+$)/g, ",");
+}
+
+/* Roll the day count up from zero, then hand it back to timeElapse() */
+function countUpDays() {
+	if (typeof together === 'undefined' || reducedMotion) return;
+	var target = Math.max(0, Math.floor((new Date().getTime() - together.getTime()) / 86400000));
+	var token = ++finaleCountToken;
+	var startTime = null;
+	finaleCounting = true;
+	setText("elapseDays", "0");
+	function step(timestamp) {
+		if (token !== finaleCountToken) return;
+		if (!startTime) startTime = timestamp;
+		var t = Math.min((timestamp - startTime) / 1800, 1);
+		var eased = 1 - Math.pow(1 - t, 3);
+		setText("elapseDays", formatDays(Math.round(target * eased)));
+		if (t < 1) {
+			requestAnimationFrame(step);
+		} else {
+			finaleCounting = false;
+			timeElapse(together);
+		}
+	}
+	requestAnimationFrame(step);
+}
+
 function showMessages() {
 	adjustWordsPosition();
 	// CSS takes it from here: the date gives way to the running count
 	$("body").addClass("finished");
+	countUpDays();
 }
 
 /* Scale the words inside the heart with the heart itself (proportional, no fixed pixels) */

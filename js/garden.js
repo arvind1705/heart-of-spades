@@ -104,8 +104,22 @@ Bloom.prototype = {
 		}
 		this.garden.ctx.restore();
 		if (b == true) {
+			this.drawCentre();
 			this.garden.removeBloom(this);
 		}
+	},
+	/* One soft glow at the heart of each finished bloom */
+	drawCentre: function () {
+		var ctx = this.garden.ctx;
+		ctx.save();
+		ctx.translate(this.p.x, this.p.y);
+		ctx.beginPath();
+		ctx.arc(0, 0, Math.max(1.2, this.r * 0.16), 0, Garden.circle);
+		ctx.fillStyle = this.glowColor;
+		ctx.shadowColor = this.glowColor;
+		ctx.shadowBlur = (typeof isMobile !== 'undefined' && isMobile) ? 3 : 8;
+		ctx.fill();
+		ctx.restore();
 	},
 	init: function () {
 		var c = 360 / this.pc;
@@ -222,15 +236,48 @@ Garden.rgba = function (f, e, c, d) {
 
 /* Enhanced color palette for dark romantic theme */
 Garden.romanticPalette = [
-	{ r: [180, 230], g: [80, 130], b: [100, 150], o: 0.18 },   // rose pink
-	{ r: [200, 245], g: [120, 170], b: [100, 140], o: 0.15 },   // peach / rose gold
-	{ r: [190, 240], g: [60, 100], b: [90, 140], o: 0.16 },     // deep rose
-	{ r: [210, 255], g: [140, 190], b: [130, 170], o: 0.12 },   // soft blush
-	{ r: [170, 220], g: [90, 130], b: [120, 170], o: 0.14 },    // mauve
+	{ r: [180, 230], g: [80, 130], b: [100, 150], o: 0.30 },   // rose pink
+	{ r: [200, 245], g: [120, 170], b: [100, 140], o: 0.25 },   // peach / rose gold
+	{ r: [190, 240], g: [60, 100], b: [90, 140], o: 0.28 },     // deep rose
+	{ r: [210, 255], g: [140, 190], b: [130, 170], o: 0.20 },   // soft blush
+	{ r: [170, 220], g: [90, 130], b: [120, 170], o: 0.24 },    // mauve
+	{ r: [215, 255], g: [165, 205], b: [95, 135], o: 0.22 },    // warm gold
 ];
 
+/* Bloom palettes per theme (mirrors body[data-theme] in default.css) */
+Garden.theme = "rose";
+
+Garden.palettes = {
+	rose: Garden.romanticPalette,
+	champagne: [
+		{ r: [225, 255], g: [170, 205], b: [110, 150], o: 0.28 },   // champagne gold
+		{ r: [210, 245], g: [130, 170], b: [95, 130], o: 0.26 },     // peach coral
+		{ r: [235, 255], g: [190, 220], b: [140, 175], o: 0.22 },    // cream blush
+		{ r: [200, 240], g: [110, 150], b: [90, 125], o: 0.27 },     // coral
+		{ r: [220, 250], g: [160, 195], b: [105, 140], o: 0.24 }     // apricot
+	]
+};
+
+Garden.glowPalettes = {
+	rose: [
+		"rgba(232, 168, 124, 0.45)",
+		"rgba(212, 175, 140, 0.38)",
+		"rgba(207, 102, 121, 0.45)",
+		"rgba(200, 140, 160, 0.38)",
+		"rgba(230, 180, 150, 0.32)"
+	],
+	champagne: [
+		"rgba(247, 227, 184, 0.45)",
+		"rgba(244, 196, 120, 0.42)",
+		"rgba(232, 138, 106, 0.42)",
+		"rgba(240, 178, 132, 0.38)",
+		"rgba(250, 214, 150, 0.34)"
+	]
+};
+
 Garden.randomRomanticColor = function () {
-	var p = Garden.romanticPalette[Garden.randomInt(0, Garden.romanticPalette.length - 1)];
+	var palette = Garden.palettes[Garden.theme] || Garden.romanticPalette;
+	var p = palette[Garden.randomInt(0, palette.length - 1)];
 	var r = Garden.randomInt(p.r[0], p.r[1]);
 	var g = Garden.randomInt(p.g[0], p.g[1]);
 	var b = Garden.randomInt(p.b[0], p.b[1]);
@@ -238,13 +285,7 @@ Garden.randomRomanticColor = function () {
 };
 
 Garden.randomGlowColor = function () {
-	var glows = [
-		"rgba(232, 168, 124, 0.3)",
-		"rgba(212, 175, 140, 0.25)",
-		"rgba(207, 102, 121, 0.3)",
-		"rgba(200, 140, 160, 0.25)",
-		"rgba(230, 180, 150, 0.2)"
-	];
+	var glows = Garden.glowPalettes[Garden.theme] || Garden.glowPalettes.rose;
 	return glows[Garden.randomInt(0, glows.length - 1)];
 };
 

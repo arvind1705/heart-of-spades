@@ -45,7 +45,6 @@ js/garden.js         Canvas bloom engine (Vector, Petal, Bloom, Garden construct
 js/functions.js      App logic: particles, cover, story engine, heart, timers, floating hearts
 digital.ttf          Legacy font, no longer referenced
 images/              Favicons, PWA manifest, icons
-images/photos/       Optional. name.jpg matching a scene's data-photo shows inside the heart
 ```
 
 **Script load order** (defined in `<head>`): `jquery.js` → `garden.js` → `functions.js`.
@@ -55,8 +54,12 @@ starts everything.
 
 **Scene markup** (inside `#stage`): each `.scene` is one moment and its direct
 children appear one after another. `data-day` / `data-year` set the date shown
-in the heart, `data-photo="name"` an optional photo, `.code` blocks are typed,
-`[data-reveal]` gets the glow + burst. Adding a scene needs no JS changes.
+in the heart, `data-tint="name"` colour-grades the ambient glow for that
+chapter, `.code` blocks are typed, `[data-reveal]` gets the glow + burst.
+Adding a scene needs no JS changes. Colour themes live in `body[data-theme]`
+(`rose` default, `champagne` on the anniversary via `specialDays[].theme` in
+the inline script); a theme only overrides CSS tokens and the `Garden`
+bloom palettes, never rules.
 
 **Dependency direction**: `functions.js` depends on `garden.js` (instantiates
 `Garden`, uses `Garden.options`) and jQuery. `garden.js` is self-contained.

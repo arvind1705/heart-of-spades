@@ -10,25 +10,10 @@ A personal love letter webpage: a tap-through story told one moment at a time, w
 - The date of each moment shown inside the heart; at the end it becomes a live days/hours/minutes/seconds counter
 - Live ages for the marriage and both boys
 - Particle bursts for the boys' names, drifting sparkles, shooting stars, floating hearts on tap/hold
+- Each chapter colour-grades the ambient glow (scene `data-tint`), with a heart thump on every tap
+- Two colour themes: Midnight Rose by default, Champagne Dawn automatically on the anniversary (Jan 26) — blooms follow the theme
+- Finale counts the days up from zero; a gold progress line tracks the story under the scenes
 - Designed for phones first (portrait, Safari/Chrome); also works in landscape and on desktop
-
-## Adding photos (optional)
-
-Drop JPEGs into `images/photos/` and they appear inside the heart on the matching scene. Missing files are simply skipped.
-
-| File | Scene |
-| --- | --- |
-| `met.jpg` | Jan 20, 2022 — I met you |
-| `love.jpg` | Jan 27, 2022 — I love you |
-| `hands.jpg` | Feb 11, 2022 — holding hands |
-| `us.jpg` | Every day |
-| `proposal.jpg` | Dec 4, 2022 |
-| `wedding.jpg` | Jan 26, 2023 |
-| `daivik.jpg` | Aug 3, 2024 |
-| `deeyan.jpg` | Sep 9, 2026 |
-| `family.jpg` | Finale |
-
-Square-ish photos with faces in the upper half work best (the heart narrows toward the bottom). Keep each under ~300 KB.
 
 ## Editing the story
 
@@ -44,5 +29,5 @@ css/default.css     - All styles
 js/functions.js     - Particles, story engine, heart growth, timers
 js/garden.js        - Canvas bloom engine (Vector, Petal, Bloom, Garden)
 js/jquery.js        - Vendored jQuery
-images/             - Favicons, PWA manifest, optional photos
+images/             - Favicons, PWA manifest, icons
 ```
