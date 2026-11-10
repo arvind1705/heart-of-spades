@@ -1,48 +1,61 @@
 /* ============================================
    Functions.js — App Logic
-   Enhanced with smooth animations & particles
+   Cover, particles, tap-through story, growing
+   heart, timers and floating hearts
    ============================================ */
 
-var $window = $(window), gardenCtx, gardenCanvas, $garden, garden;
+var $window = $(window), gardenCtx, gardenCanvas, $garden, $loveHeart, garden;
 
-/* --- Mobile Detection Helper --- */
-var isMobile = (function() {
+/* --- Environment Helpers --- */
+var isMobile = (function () {
 	return window.innerWidth <= 768 || ('ontouchstart' in window);
 })();
 
+var reducedMotion = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+
+/* Cap at 2x — sharp on retina without quadrupling the pixels on 3x phones */
+var pixelRatio = Math.min(window.devicePixelRatio || 1, 2);
+
 /* --- Floating Particle / Sparkle System --- */
 var particleCanvas, particleCtx, particles = [];
-var particleBurstActive = false;
 var particleLastTime = 0;
+var viewW = window.innerWidth, viewH = window.innerHeight;
 
 function initParticles() {
-	particleCanvas = document.getElementById('particleCanvas');
+	particleCanvas = document.getElementById("particleCanvas");
 	if (!particleCanvas) return;
-	particleCtx = particleCanvas.getContext('2d');
+	particleCtx = particleCanvas.getContext("2d");
 	resizeParticleCanvas();
-	window.addEventListener('resize', resizeParticleCanvas);
 
 	// Create initial particles — fewer on mobile for performance
 	var maxParticles = isMobile ? 50 : 120;
-	var count = Math.min(Math.floor(window.innerWidth * window.innerHeight / 8000), maxParticles);
+	if (reducedMotion) maxParticles = 30;
+	var count = Math.min(Math.floor(viewW * viewH / 8000), maxParticles);
 	for (var i = 0; i < count; i++) {
 		particles.push(createParticle());
 	}
 	requestAnimationFrame(animateParticles);
+
+	if (!reducedMotion) {
+		setTimeout(spawnComet, 5000);
+	}
 }
 
 function resizeParticleCanvas() {
 	if (!particleCanvas) return;
-	particleCanvas.width = window.innerWidth;
-	particleCanvas.height = window.innerHeight;
+	viewW = window.innerWidth;
+	viewH = window.innerHeight;
+	particleCanvas.width = Math.round(viewW * pixelRatio);
+	particleCanvas.height = Math.round(viewH * pixelRatio);
+	particleCtx.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
 }
 
 function createParticle(options) {
 	var types = ['circle', 'star'];
 	var defaults = {
-		x: Math.random() * window.innerWidth,
-		y: Math.random() * window.innerHeight,
-		size: Math.random() * 2.5 + 0.5,
+		x: Math.random() * viewW,
+		y: Math.random() * viewH,
+		size: Math.random() * 2.2 + 0.4,
 		speedX: (Math.random() - 0.5) * 0.3,
 		speedY: -Math.random() * 0.4 - 0.1,
 		opacity: Math.random() * 0.5 + 0.1,
@@ -50,6 +63,7 @@ function createParticle(options) {
 		type: types[Math.floor(Math.random() * types.length)],
 		hue: Math.random() * 40 + 15, // warm gold range (15-55)
 		life: -1, // -1 = infinite
+		drag: 0.985,
 		isBurst: false
 	};
 	if (options) {
@@ -60,25 +74,12 @@ function createParticle(options) {
 	return defaults;
 }
 
-/* --- Shared Name-Reveal Particle Burst ---
-   hueOptions : array of hue values for the first wave
-   shimmerHueBase : base hue for the shimmer wave
+/* --- Particle Burst ---
+   x, y           : origin in viewport coordinates (the canvas is fixed)
+   hueOptions     : array of hue values for the first wave
+   shimmerHueBase : base hue for the delayed shimmer wave
 */
-function triggerRevealBurst(elementId, hueOptions, shimmerHueBase) {
-	particleBurstActive = true;
-
-	// Origin: centre of the reveal element if available, else screen centre
-	var originX = window.innerWidth / 2;
-	var originY = window.innerHeight / 2;
-	if (elementId) {
-		var el = document.getElementById(elementId);
-		if (el) {
-			var rect = el.getBoundingClientRect();
-			originX = rect.left + rect.width / 2;
-			originY = rect.top + rect.height / 2 + window.pageYOffset;
-		}
-	}
-
+function triggerBurstAt(x, y, hueOptions, shimmerHueBase) {
 	var burstCount = isMobile ? 40 : 80;
 	for (var i = 0; i < burstCount; i++) {
 		var angle = (Math.PI * 2 / burstCount) * i + (Math.random() - 0.5) * 0.4;
@@ -86,8 +87,8 @@ function triggerRevealBurst(elementId, hueOptions, shimmerHueBase) {
 		var hue = hueOptions[Math.floor(Math.random() * hueOptions.length)] + Math.random() * 15;
 
 		particles.push(createParticle({
-			x: originX + (Math.random() - 0.5) * 60,
-			y: originY + (Math.random() - 0.5) * 60,
+			x: x + (Math.random() - 0.5) * 60,
+			y: y + (Math.random() - 0.5) * 30,
 			size: Math.random() * 3.5 + 1,
 			speedX: Math.cos(angle) * speed,
 			speedY: Math.sin(angle) * speed - 0.5,
@@ -102,14 +103,13 @@ function triggerRevealBurst(elementId, hueOptions, shimmerHueBase) {
 
 	// Second wave — delayed gentle shimmer
 	var shimmerCount = isMobile ? 20 : 40;
-	var ox = originX, oy = originY;
 	setTimeout(function () {
 		for (var i = 0; i < shimmerCount; i++) {
 			var angle = Math.random() * Math.PI * 2;
 			var speed = Math.random() * 1.5 + 0.5;
 			particles.push(createParticle({
-				x: ox + (Math.random() - 0.5) * 200,
-				y: oy + (Math.random() - 0.5) * 200,
+				x: x + (Math.random() - 0.5) * 200,
+				y: y + (Math.random() - 0.5) * 200,
 				size: Math.random() * 2 + 0.8,
 				speedX: Math.cos(angle) * speed * 0.3,
 				speedY: -Math.random() * 0.8 - 0.3,
@@ -124,26 +124,39 @@ function triggerRevealBurst(elementId, hueOptions, shimmerHueBase) {
 	}, 800);
 }
 
-function triggerDaivikBurst() {
-	// Warm: pinks, reds, golds
-	triggerRevealBurst('daivikReveal', [340, 350, 0, 10, 20, 30, 40, 50], 15);
+/* Burst from the centre of an element (screen centre if it is missing) */
+function triggerRevealBurst(elementId, hueOptions, shimmerHueBase) {
+	var x = viewW / 2;
+	var y = viewH / 2;
+	var el = elementId ? document.getElementById(elementId) : null;
+	if (el) {
+		var rect = el.getBoundingClientRect();
+		x = rect.left + rect.width / 2;
+		y = rect.top + rect.height / 2;
+	}
+	triggerBurstAt(x, y, hueOptions, shimmerHueBase);
 }
 
-function triggerBabyBurst() {
-	// Lavender / mauve — bridges rose palette and stays distinct from Daivik gold
-	triggerRevealBurst('babyReveal', [280, 290, 300, 310, 320, 330], 290);
+function triggerDaivikBurst() {
+	// Warm: pinks, reds, golds
+	triggerRevealBurst("daivikReveal", [340, 350, 0, 10, 20, 30, 40, 50], 15);
+}
+
+function triggerDeeyanBurst() {
+	// Lavender / mauve — bridges the rose palette and stays distinct from Daivik's gold
+	triggerRevealBurst("deeyanReveal", [250, 262, 275, 288, 300, 315], 265);
 }
 
 /* --- Finale shimmer: gentle gold-rose shower across the full screen --- */
 function triggerFinaleShimmer() {
 	var shimmerCount = isMobile ? 30 : 70;
 	for (var i = 0; i < shimmerCount; i++) {
-		setTimeout(function() {
+		setTimeout(function () {
 			var hueOpts = [340, 350, 0, 20, 40, 300, 310];
 			var hue = hueOpts[Math.floor(Math.random() * hueOpts.length)];
 			particles.push(createParticle({
-				x: Math.random() * window.innerWidth,
-				y: Math.random() * window.innerHeight,
+				x: Math.random() * viewW,
+				y: Math.random() * viewH,
 				size: Math.random() * 3 + 0.8,
 				speedX: (Math.random() - 0.5) * 0.6,
 				speedY: -Math.random() * 0.6 - 0.2,
@@ -158,26 +171,49 @@ function triggerFinaleShimmer() {
 	}
 }
 
+/* --- Shooting star: one crosses the upper sky every so often --- */
+function spawnComet() {
+	if (!document.hidden) {
+		var dir = Math.random() > 0.5 ? 1 : -1;
+		particles.push(createParticle({
+			x: viewW * (0.5 - dir * (0.1 + Math.random() * 0.4)),
+			y: Math.random() * viewH * 0.3,
+			size: 1.4,
+			speedX: dir * (7 + Math.random() * 4),
+			speedY: 2.5 + Math.random() * 2,
+			opacity: 0.9,
+			opacitySpeed: -0.014,
+			type: 'comet',
+			hue: 35,
+			life: 1500,
+			drag: 1,
+			isBurst: true
+		}));
+	}
+	setTimeout(spawnComet, 8000 + Math.random() * 10000);
+}
+
 function animateParticles(timestamp) {
 	if (!particleCtx) return;
 
 	var delta = particleLastTime ? Math.min(timestamp - particleLastTime, 64) : 16;
+	var step = delta / 16;
 	particleLastTime = timestamp;
 
-	particleCtx.clearRect(0, 0, particleCanvas.width, particleCanvas.height);
+	particleCtx.clearRect(0, 0, viewW, viewH);
 
 	for (var i = particles.length - 1; i >= 0; i--) {
 		var p = particles[i];
 
-		p.x += p.speedX;
-		p.y += p.speedY;
+		p.x += p.speedX * step;
+		p.y += p.speedY * step;
 
 		// Burst particles decelerate and fade using real delta time
 		if (p.isBurst) {
-			p.speedX *= 0.985;
-			p.speedY *= 0.985;
+			p.speedX *= p.drag;
+			p.speedY *= p.drag;
 			p.life -= delta;
-			p.opacity += p.opacitySpeed * (delta / 16);
+			p.opacity += p.opacitySpeed * step;
 			if (p.life <= 0 || p.opacity <= 0) {
 				// swap-with-last for O(1) removal
 				particles[i] = particles[particles.length - 1];
@@ -190,9 +226,9 @@ function animateParticles(timestamp) {
 				p.opacitySpeed *= -1;
 			}
 			// Wrap around
-			if (p.y < -10) { p.y = particleCanvas.height + 10; p.x = Math.random() * particleCanvas.width; }
-			if (p.x < -10) p.x = particleCanvas.width + 10;
-			if (p.x > particleCanvas.width + 10) p.x = -10;
+			if (p.y < -10) { p.y = viewH + 10; p.x = Math.random() * viewW; }
+			if (p.x < -10) p.x = viewW + 10;
+			if (p.x > viewW + 10) p.x = -10;
 		}
 
 		// Draw
@@ -201,6 +237,8 @@ function animateParticles(timestamp) {
 
 		if (p.type === 'star') {
 			drawStar(particleCtx, p.x, p.y, p.size, p.hue);
+		} else if (p.type === 'comet') {
+			drawComet(particleCtx, p);
 		} else {
 			particleCtx.beginPath();
 			particleCtx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
@@ -241,24 +279,43 @@ function drawStar(ctx, x, y, size, hue) {
 	ctx.fill();
 }
 
-/* --- Main Initialization --- */
+function drawComet(ctx, p) {
+	var tailX = p.x - p.speedX * 12;
+	var tailY = p.y - p.speedY * 12;
+	var gradient = ctx.createLinearGradient(p.x, p.y, tailX, tailY);
+	gradient.addColorStop(0, 'hsla(' + p.hue + ', 70%, 90%, 1)');
+	gradient.addColorStop(1, 'hsla(' + p.hue + ', 70%, 90%, 0)');
+	ctx.beginPath();
+	ctx.moveTo(p.x, p.y);
+	ctx.lineTo(tailX, tailY);
+	ctx.strokeStyle = gradient;
+	ctx.lineWidth = p.size;
+	ctx.lineCap = 'round';
+	ctx.stroke();
+}
 
-/* Dynamic heart scale factors — computed from actual canvas size */
+/* --- Heart: canvas sizing + curve --- */
+
+/* Dynamic heart scale factors — computed from the laid-out canvas size */
 var heartScaleX, heartScaleY, offsetX, offsetY;
+var heartW = 0, heartH = 0;
+
+/* Bloom sizes were tuned for the 620x580 reference design */
+var HEART_REF_WIDTH = 620;
 
 function computeHeartMetrics() {
-	var w = gardenCanvas.width;
-	var h = gardenCanvas.height;
+	var w = heartW;
+	var h = heartH;
 
 	// Exact bounding box of the parametric heart curve
-	// (b = c/PI, x = 16*sin^3(b), y = -(13cos(b)-5cos(2b)-2cos(3b)-cos(4b)))
+	// (x = 16*sin^3(b), y = -(13cos(b)-5cos(2b)-2cos(3b)-cos(4b)))
 	// X is symmetric: [-16, 16], Y range: [-11.9233, 17.0]
 	var normHalfW = 16;          // half-width of normalised heart
 	var normMinY  = -11.9233;    // top of normalised heart
 	var normMaxY  =  17.0;       // bottom of normalised heart
 	var normH     = normMaxY - normMinY; // 28.9233
 
-	var pad = Math.min(w, h) * 0.04; // ~4% of the shorter side as margin
+	var pad = Math.min(w, h) * 0.05; // ~5% of the shorter side as margin
 
 	// Scale uniformly so the heart fills the canvas while preserving its shape
 	var scaleByW = (w - 2 * pad) / (2 * normHalfW);
@@ -273,31 +330,161 @@ function computeHeartMetrics() {
 	offsetY = pad - s * normMinY; // maps normMinY → pad (top edge)
 }
 
+/* Size the canvas from the CSS-laid-out #loveHeart box. Whatever has
+   already bloomed is carried over, so rotating a phone or resizing the
+   window never wipes the heart. */
 function sizeCanvas() {
-	var $lh = $("#loveHeart");
-	var w = $lh.width();
-	var h = $lh.height();
-	gardenCanvas.width = w;
-	gardenCanvas.height = h;
+	var w = $loveHeart.width();
+	var h = $loveHeart.height();
+	if (!w || !h || (w === heartW && h === heartH)) return;
+
+	var snapshot = null;
+	var ratio = 1;
+	if (heartW && gardenCanvas.width) {
+		snapshot = document.createElement("canvas");
+		snapshot.width = gardenCanvas.width;
+		snapshot.height = gardenCanvas.height;
+		snapshot.getContext("2d").drawImage(gardenCanvas, 0, 0);
+		ratio = w / heartW;
+	}
+
+	heartW = w;
+	heartH = h;
+	gardenCanvas.width = Math.round(w * pixelRatio);
+	gardenCanvas.height = Math.round(h * pixelRatio);
+	// Setting width/height resets the context, so state is (re)applied here
+	gardenCtx.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
+	gardenCtx.globalCompositeOperation = "lighter";
 	computeHeartMetrics();
+
+	// Keep the flowers in proportion to the heart
+	var bloomScale = Math.max(0.5, w / HEART_REF_WIDTH);
+	Garden.options.bloomRadius.min = 8 * bloomScale;
+	Garden.options.bloomRadius.max = 12 * bloomScale;
+	Garden.options.lineWidth = Math.max(0.8, 1.2 * bloomScale);
+
+	if (snapshot) {
+		gardenCtx.drawImage(snapshot, 0, 0, w, h);
+		garden.rescale(ratio);
+		for (var i = 0; i < heartPoints.length; i++) {
+			heartPoints[i][0] *= ratio;
+			heartPoints[i][1] *= ratio;
+		}
+	}
+
+	adjustWordsPosition();
+	updateHeartClip();
 }
 
+/* Clip the photo layer to the same curve the flowers follow, pulled in
+   slightly so its edge sits under the blooms. */
+function updateHeartClip() {
+	var el = document.getElementById("heartPhoto");
+	if (!el || !heartW) return;
+	var inset = 0.97;
+	var centreY = offsetY + heartScaleY * 2.54; // middle of the curve's bounding box
+	var points = [];
+	for (var i = 0; i < 72; i++) {
+		var p = getHeartPoint(Math.PI * 2 * i / 72);
+		var x = offsetX + (p[0] - offsetX) * inset;
+		var y = centreY + (p[1] - centreY) * inset;
+		points.push((x / heartW * 100).toFixed(2) + '% ' + (y / heartH * 100).toFixed(2) + '%');
+	}
+	var value = 'polygon(' + points.join(', ') + ')';
+	el.style.webkitClipPath = value;
+	el.style.clipPath = value;
+}
+
+/* Point on the heart curve. b is the curve angle in radians:
+   PI is the bottom tip, 0 (and 2*PI) the dip at the top. */
+function getHeartPoint(b) {
+	var a = heartScaleX * (16 * Math.pow(Math.sin(b), 3));
+	var d = -heartScaleY * (13 * Math.cos(b) - 5 * Math.cos(2 * b) - 2 * Math.cos(3 * b) - Math.cos(4 * b));
+	return new Array(offsetX + a, offsetY + d);
+}
+
+/* --- Heart: grows with the story ---
+   Two lines of flowers start at the bottom tip and climb either side,
+   a little further with every scene, and meet at the top at the finale. */
+var heartProgress = 0;   // how much is planted, 0..1
+var heartTarget = 0;     // how much the story has asked for, 0..1
+var heartPoints = [];
+var heartTimer = null;
+var heartComplete = false;
+
+function plantBloom(b) {
+	var h = getHeartPoint(b);
+	var minGap = Garden.options.bloomRadius.max * 1.3;
+	for (var i = 0; i < heartPoints.length; i++) {
+		var g = heartPoints[i];
+		if (Math.sqrt(Math.pow(g[0] - h[0], 2) + Math.pow(g[1] - h[1], 2)) < minGap) {
+			return;
+		}
+	}
+	heartPoints.push(h);
+	garden.createRandomBloom(h[0], h[1]);
+}
+
+function heartTick() {
+	if (heartProgress < heartTarget) {
+		heartProgress = Math.min(heartProgress + 0.004, heartTarget, 1);
+		var sweep = Math.PI * heartProgress;
+		plantBloom(Math.PI + sweep);
+		plantBloom(Math.PI - sweep);
+	}
+	if (heartProgress >= 1 && !heartComplete) {
+		heartComplete = true;
+		completeHeart();
+	}
+	if (heartProgress >= heartTarget || heartComplete) {
+		clearInterval(heartTimer);
+		heartTimer = null;
+	}
+}
+
+function growHeartTo(target) {
+	if (target > heartTarget) heartTarget = Math.min(target, 1);
+	if (!heartTimer && !heartComplete && heartProgress < heartTarget) {
+		heartTimer = setInterval(heartTick, 50);
+	}
+}
+
+function completeHeart() {
+	// A burst where the two sides meet
+	var rect = gardenCanvas.getBoundingClientRect();
+	var top = getHeartPoint(0);
+	triggerBurstAt(rect.left + top[0], rect.top + top[1], [340, 350, 0, 15, 30, 45], 20);
+	$loveHeart.addClass("complete");
+	showMessages();
+}
+
+function resetHeart() {
+	if (heartTimer) clearInterval(heartTimer);
+	heartTimer = null;
+	heartProgress = 0;
+	heartTarget = 0;
+	heartPoints = [];
+	heartComplete = false;
+	garden.clear();
+	$loveHeart.removeClass("complete");
+	$("body").removeClass("finished");
+}
+
+/* --- Main Initialization --- */
 $(function () {
-	// Init particles
 	initParticles();
+	initFloatingHearts();
 
 	$loveHeart = $("#loveHeart");
 	$garden = $("#garden");
 	gardenCanvas = $garden[0];
 	gardenCtx = gardenCanvas.getContext("2d");
-	gardenCtx.globalCompositeOperation = "lighter";
 	garden = new Garden(gardenCtx, gardenCanvas);
 
 	// Size canvas to match the CSS-laid-out container
 	sizeCanvas();
 
-	// Use rAF instead of setInterval so render syncs with display refresh
-	// and pauses automatically when the tab is backgrounded
+	// rAF so rendering syncs with display refresh and pauses in a background tab
 	function gardenRenderLoop() {
 		garden.render();
 		requestAnimationFrame(gardenRenderLoop);
@@ -305,285 +492,470 @@ $(function () {
 	requestAnimationFrame(gardenRenderLoop);
 });
 
-/* Replace page-reload-on-resize with proper recalculation */
 var resizeTimer;
 $(window).resize(function () {
 	clearTimeout(resizeTimer);
-	resizeTimer = setTimeout(function() {
-		// Update mobile detection
+	resizeTimer = setTimeout(function () {
 		isMobile = window.innerWidth <= 768 || ('ontouchstart' in window);
-		// Resize particle canvas
 		resizeParticleCanvas();
-		// Re-measure the heart panel and recalc metrics
 		if (gardenCanvas) {
 			sizeCanvas();
 		}
 	}, 250);
 });
 
-function getHeartPoint(c) {
-	var b = c / Math.PI;
-	var a = heartScaleX * (16 * Math.pow(Math.sin(b), 3));
-	var d = -heartScaleY * (13 * Math.cos(b) - 5 * Math.cos(2 * b) - 2 * Math.cos(3 * b) - Math.cos(4 * b));
-	return new Array(offsetX + a, offsetY + d);
-}
-
-function startHeartAnimation() {
-	var c = 50;
-	var d = 10;
-	var b = new Array();
-	var a = setInterval(function () {
-		var h = getHeartPoint(d);
-		var e = true;
-		for (var f = 0; f < b.length; f++) {
-			var g = b[f];
-			var j = Math.sqrt(Math.pow(g[0] - h[0], 2) + Math.pow(g[1] - h[1], 2));
-			if (j < Garden.options.bloomRadius.max * 1.3) {
-				e = false;
-				break;
-			}
+/* --- Cover: the story waits until it is opened --- */
+function initCover(specialDays, onOpen) {
+	var today = new Date();
+	for (var i = 0; i < specialDays.length; i++) {
+		if (specialDays[i].month === today.getMonth() + 1 && specialDays[i].day === today.getDate()) {
+			$("#coverNote").text(specialDays[i].note);
 		}
-		if (e) {
-			b.push(h);
-			garden.createRandomBloom(h[0], h[1]);
-		}
-		if (d >= 30) {
-			clearInterval(a);
-			showMessages();
-		} else {
-			d += 0.2;
-		}
-	}, c);
-}
+	}
 
-/* --- Typewriter with pause support, milestone detection, skip & replay --- */
-(function (a) {
-	a.fn.typewriter = function () {
-		this.each(function () {
-			var d = a(this);
-			var originalHTML = d.html();
-			var b = 0;
-			d.html("");
-
-			var daivikTriggered = false;
-			var babyTriggered = false;
-			var whileTrueTriggered = false;
-			var proposeTriggered = false;
-			var marryTriggered = false;
-			var heartAnimStarted = false;
-			var speed = 30;
-			var pauseUntil = 0;
-			var intervalId = null;
-			var finished = false;
-
-			/* --- Skip: jump to end instantly --- */
-			function skipToEnd() {
-				if (finished) return;
-				if (intervalId) clearInterval(intervalId);
-				finished = true;
-				d.html(originalHTML);
-				// Fire all milestone effects that haven't triggered yet
-				if (!daivikTriggered) {
-					triggerDaivikBurst();
-					var elD = document.getElementById('daivikReveal');
-					if (elD) elD.classList.add('revealed');
-				}
-				if (!babyTriggered) {
-					triggerBabyBurst();
-					var elB = document.getElementById('babyReveal');
-					if (elB) elB.classList.add('revealed');
-				}
-				triggerFinaleShimmer();
-				if (!heartAnimStarted) {
-					heartAnimStarted = true;
-					setTimeout(startHeartAnimation, 800);
-				}
-				showSkipReplayBtn('replay');
-			}
-
-			/* --- Replay: reset and retype --- */
-			function replay() {
-				b = 0;
-				finished = false;
-				daivikTriggered = false;
-				babyTriggered = false;
-				whileTrueTriggered = false;
-				proposeTriggered = false;
-				marryTriggered = false;
-				heartAnimStarted = false;
-				pauseUntil = 0;
-				garden.clear();
-				$("#messages").css({ display: 'none', opacity: 0 });
-				$("#loveu").css({ display: 'none', opacity: 0 });
-				d.html("");
-				showSkipReplayBtn('skip');
-				intervalId = setInterval(tick, speed);
-			}
-
-			function showSkipReplayBtn(mode) {
-				var btn = document.getElementById('skipBtn');
-				if (!btn) return;
-				if (mode === 'skip') {
-					btn.innerHTML = '&#8595; Skip';
-					btn.setAttribute('aria-label', 'Skip to end');
-					btn.onclick = skipToEnd;
-				} else {
-					btn.innerHTML = '&#8635; Replay';
-					btn.setAttribute('aria-label', 'Replay from the beginning');
-					btn.onclick = replay;
-				}
-				// Defer class add so the opacity transition fires after paint
-				setTimeout(function() { btn.classList.add('visible'); }, 16);
-			}
-
-			// Wire the skip button immediately
-			showSkipReplayBtn('skip');
-
-			/* --- Scroll throttle + bottom-fade indicator --- */
-			var scrollPending = false;
-			function updateScrollFade(el) {
-				var atBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 4;
-				if (atBottom) {
-					el.classList.add('at-bottom');
-				} else {
-					el.classList.remove('at-bottom');
-				}
-			}
-			d[0].addEventListener('scroll', function() { updateScrollFade(d[0]); }, { passive: true });
-			function scheduleScroll(el) {
-				if (scrollPending) return;
-				scrollPending = true;
-				requestAnimationFrame(function() {
-					scrollPending = false;
-					if (el.scrollHeight > el.clientHeight) {
-						el.scrollTop = el.scrollHeight - el.clientHeight;
-					}
-					updateScrollFade(el);
-				});
-			}
-
-			function tick() {
-				var c = originalHTML;
-				var now = Date.now();
-				if (now < pauseUntil) return;
-
-				var f = c.substr(b, 1);
-				if (f == "<") {
-					b = c.indexOf(">", b) + 1;
-				} else {
-					b++;
-				}
-
-				var currentHTML = c.substring(0, b);
-				d.html(currentHTML + '<span class="cursor"></span>');
-
-				// Throttled auto-scroll
-				scheduleScroll(d[0]);
-
-				// while True block — pause to let the moment breathe
-				if (!whileTrueTriggered && currentHTML.indexOf('id="whileTrue"') !== -1 &&
-					b > c.indexOf('whileTrue') + 10) {
-					whileTrueTriggered = true;
-					pauseUntil = now + 900;
-				}
-
-				// Proposal — pause
-				if (!proposeTriggered && currentHTML.indexOf('id="proposeReveal"') !== -1 &&
-					b > c.indexOf('proposeReveal') + 10) {
-					proposeTriggered = true;
-					pauseUntil = now + 1000;
-				}
-
-				// Wedding — pause
-				if (!marryTriggered && currentHTML.indexOf('id="marryReveal"') !== -1 &&
-					b > c.indexOf('marryReveal') + 10) {
-					marryTriggered = true;
-					pauseUntil = now + 1000;
-				}
-
-				// Daivik reveal
-				if (!daivikTriggered && currentHTML.indexOf('id="daivikReveal"') !== -1 &&
-					currentHTML.indexOf('Daivik') !== -1 &&
-					b > c.indexOf('Daivik') + 5) {
-					daivikTriggered = true;
-					triggerDaivikBurst();
-					setTimeout(function() {
-						var el = document.getElementById('daivikReveal');
-						if (el) el.classList.add('revealed');
-					}, 100);
-					pauseUntil = now + 1200;
-				}
-
-				// Baby #2 reveal
-				if (!babyTriggered && currentHTML.indexOf('id="babyReveal"') !== -1 &&
-					currentHTML.indexOf('Baby #2') !== -1 &&
-					b > c.indexOf('Baby #2') + 5) {
-					babyTriggered = true;
-					triggerBabyBurst();
-					setTimeout(function() {
-						var el = document.getElementById('babyReveal');
-						if (el) el.classList.add('revealed');
-					}, 100);
-					pauseUntil = now + 1200;
-				}
-
-				if (b >= c.length) {
-					clearInterval(intervalId);
-					finished = true;
-					// Remove cursor
-					setTimeout(function () {
-						d.find('.cursor').fadeOut(600);
-					}, 1500);
-					// Finale shimmer
-					setTimeout(triggerFinaleShimmer, 600);
-					// Start heart animation
-					if (!heartAnimStarted) {
-						heartAnimStarted = true;
-						setTimeout(startHeartAnimation, 1500);
-					}
-					showSkipReplayBtn('replay');
-				}
-			}
-
-			intervalId = setInterval(tick, speed);
-		});
-		return this;
-	};
-})(jQuery);
-
-/* --- Enhanced Time Elapsed --- */
-function timeElapse(c) {
-	var e = Date();
-	var f = (Date.parse(e) - Date.parse(c)) / 1000;
-	var g = Math.floor(f / (3600 * 24));
-	f = f % (3600 * 24);
-	var b = Math.floor(f / 3600);
-	if (b < 10) b = "0" + b;
-	f = f % 3600;
-	var d = Math.floor(f / 60);
-	if (d < 10) d = "0" + d;
-	f = f % 60;
-	if (f < 10) f = "0" + f;
-
-	var a = '<span class="digit heartbeat">' + g + '</span><span class="time-label">days</span>'
-		+ '<span class="digit">' + b + '</span><span class="time-label">hrs</span>'
-		+ '<span class="digit">' + d + '</span><span class="time-label">min</span>'
-		+ '<span class="digit heartbeat">' + f + '</span><span class="time-label">sec</span>';
-	$("#elapseClock").html(a);
-}
-
-/* --- Enhanced Message Reveal --- */
-function showMessages() {
-	adjustWordsPosition();
-	$("#messages").css("display", "block").animate({ opacity: 1 }, 2500, function () {
-		showLoveU();
+	var opened = false;
+	$("#openBtn").click(function () {
+		if (opened) return;
+		opened = true;
+		$("body").addClass("opened");
+		// The heart column may have been laid out differently behind the cover
+		sizeCanvas();
+		setTimeout(onOpen, 1300);
+		setTimeout(function () {
+			$("#cover").css("display", "none");
+		}, 1400);
 	});
 }
 
-function adjustWordsPosition() {
-	// no-op: #words is in normal document flow below the heart
+/* --- Story ---
+   A tap-through sequence of scenes, one moment per screen.
+
+   Markup contract, inside #stage:
+     .scene                  one moment; its children appear one after another
+     data-day / data-year    on a .scene — the date shown inside the heart
+     data-photo="name"       on a .scene — images/photos/name.jpg, shown inside
+                             the heart if that file exists (silently skipped if not)
+     .code                   typed out character by character
+     [data-reveal="name"]    glow + particle burst when it appears
+*/
+var storyScenes = [];
+var sceneIndex = -1;
+var scenePieces = [];
+var pieceIndex = 0;
+var sceneBusy = false;
+var sceneTimer = null;
+var hintTimer = null;
+var storyStarted = false;
+var photoCache = {};
+var photoShown = null;
+var photoFront = 0;
+
+/* Remember each text node of a code block so it can be typed back in */
+function prepareCode(el) {
+	var steps = [];
+	function collect(node) {
+		for (var i = 0; i < node.childNodes.length; i++) {
+			var child = node.childNodes[i];
+			if (child.nodeType === 3 && child.nodeValue.length) {
+				steps.push({ node: child, text: child.nodeValue });
+			} else if (child.nodeType === 1) {
+				collect(child);
+			}
+		}
+	}
+	collect(el);
+	el.typeSteps = steps;
+	el.typeCursor = document.createElement("span");
+	el.typeCursor.className = "cursor";
 }
 
-function showLoveU() {
-	$("#loveu").css("display", "block").animate({ opacity: 1 }, 3000);
+function setCode(el, full) {
+	for (var i = 0; i < el.typeSteps.length; i++) {
+		el.typeSteps[i].node.nodeValue = full ? el.typeSteps[i].text : '';
+	}
+	if (full && el.typeSteps.length) {
+		var last = el.typeSteps[el.typeSteps.length - 1].node;
+		last.parentNode.insertBefore(el.typeCursor, last.nextSibling);
+	}
+}
+
+function typeCode(el, done) {
+	var stepIndex = 0;
+	var charIndex = 0;
+	function tick() {
+		if (stepIndex >= el.typeSteps.length) {
+			done();
+			return;
+		}
+		var step = el.typeSteps[stepIndex];
+		if (charIndex === 0) {
+			step.node.parentNode.insertBefore(el.typeCursor, step.node.nextSibling);
+		}
+		charIndex++;
+		step.node.nodeValue = step.text.substring(0, charIndex);
+		if (charIndex >= step.text.length) {
+			stepIndex++;
+			charIndex = 0;
+		}
+		sceneTimer = setTimeout(tick, 22 + Math.random() * 30);
+	}
+	setCode(el, false);
+	tick();
+}
+
+function revealName(el) {
+	if ($(el).hasClass("revealed")) return;
+	$(el).addClass("revealed");
+	var name = el.getAttribute("data-reveal");
+	if (name === 'daivik') triggerDaivikBurst();
+	if (name === 'deeyan') triggerDeeyanBurst();
+}
+
+function resetScene(scene) {
+	$(scene).children().removeClass("in");
+	$(scene).find("[data-reveal]").removeClass("revealed");
+	$(scene).find(".code").each(function () {
+		setCode(this, false);
+	});
+}
+
+/* --- The date inside the heart --- */
+function setHeartDate(day, year) {
+	var $date = $("#heartDate");
+	$date.addClass("changing");
+	setTimeout(function () {
+		$("#dateDay").html(day || '');
+		$("#dateYear").html(year || '');
+		if (day || year) $date.removeClass("changing");
+	}, 450);
+}
+
+/* --- Optional photos inside the heart --- */
+function preloadPhotos() {
+	$("#stage .scene").each(function () {
+		var name = this.getAttribute("data-photo");
+		if (!name || photoCache[name] !== undefined) return;
+		photoCache[name] = null;
+		var img = new Image();
+		img.onload = function () {
+			photoCache[name] = img.src;
+			// It may have arrived while its scene is already on screen
+			var scene = storyScenes[sceneIndex];
+			if (scene && scene.getAttribute("data-photo") === name) setHeartPhoto(name);
+		};
+		img.src = "images/photos/" + name + ".jpg";
+	});
+}
+
+function setHeartPhoto(name) {
+	var src = (name && photoCache[name]) || null;
+	if (src === photoShown) return;
+	photoShown = src;
+	var $layers = $("#heartPhoto .photo-layer");
+	$layers.eq(photoFront).removeClass("show");
+	if (src) {
+		photoFront = 1 - photoFront;
+		$layers.eq(photoFront).css("background-image", 'url("' + src + '")').addClass("show");
+		$loveHeart.addClass("has-photo");
+	} else {
+		$loveHeart.removeClass("has-photo");
+	}
+}
+
+/* --- Moving between scenes --- */
+function showHint() {
+	clearTimeout(hintTimer);
+	if (sceneIndex >= storyScenes.length - 1) {
+		$("#hint").text("hold anywhere to send hearts");
+	} else {
+		$("#hint").text(isMobile ? "tap to continue" : "click to continue");
+	}
+	hintTimer = setTimeout(function () {
+		$("#hint").addClass("show");
+	}, sceneIndex === 0 ? 600 : 2200);
+}
+
+function nextPiece() {
+	if (pieceIndex >= scenePieces.length) {
+		sceneBusy = false;
+		showHint();
+		return;
+	}
+	var el = scenePieces[pieceIndex++];
+	$(el).addClass("in");
+	if (el.getAttribute("data-reveal")) {
+		setTimeout(function () {
+			if ($(el).hasClass("in")) revealName(el);
+		}, 500);
+		sceneTimer = setTimeout(nextPiece, 1700);
+	} else if ($(el).hasClass("code")) {
+		sceneTimer = setTimeout(function () {
+			typeCode(el, function () {
+				sceneTimer = setTimeout(nextPiece, 300);
+			});
+		}, 500);
+	} else {
+		sceneTimer = setTimeout(nextPiece, 800);
+	}
+}
+
+/* A tap while a scene is still arriving shows the rest of it at once */
+function rushScene() {
+	clearTimeout(sceneTimer);
+	for (var i = 0; i < scenePieces.length; i++) {
+		var el = scenePieces[i];
+		$(el).addClass("in");
+		if ($(el).hasClass("code")) setCode(el, true);
+		if (el.getAttribute("data-reveal")) revealName(el);
+	}
+	pieceIndex = scenePieces.length;
+	sceneBusy = false;
+	showHint();
+}
+
+function goToScene(index) {
+	if (index < 0 || index >= storyScenes.length || index === sceneIndex) return;
+	clearTimeout(sceneTimer);
+	clearTimeout(hintTimer);
+	$("#hint").removeClass("show");
+
+	var old = storyScenes[sceneIndex];
+	if (old) {
+		$(old).removeClass("active").addClass("leaving");
+		setTimeout(function () {
+			$(old).removeClass("leaving");
+			if (storyScenes[sceneIndex] !== old) resetScene(old);
+		}, 600);
+	}
+
+	sceneIndex = index;
+	var scene = storyScenes[index];
+	resetScene(scene);
+	$(scene).removeClass("leaving").addClass("active");
+	$("#dots span").removeClass("on").eq(index).addClass("on");
+
+	setHeartDate(scene.getAttribute("data-day"), scene.getAttribute("data-year"));
+	setHeartPhoto(scene.getAttribute("data-photo"));
+	// The heart closes on the second-to-last scene; the last one is the sign-off
+	growHeartTo(Math.min(1, (index + 1) / (storyScenes.length - 1)));
+
+	scenePieces = $(scene).children().get();
+	pieceIndex = 0;
+	sceneBusy = true;
+	sceneTimer = setTimeout(nextPiece, reducedMotion ? 0 : 650);
+	if (reducedMotion) rushScene();
+}
+
+function advanceStory() {
+	if (!storyStarted) return;
+	if (sceneBusy) {
+		rushScene();
+	} else {
+		goToScene(sceneIndex + 1);
+	}
+}
+
+function replayStory() {
+	resetHeart();
+	goToScene(0);
+}
+
+function initStory() {
+	var dots = '';
+	$("#stage .scene").each(function () {
+		storyScenes.push(this);
+		$(this).children().addClass("piece");
+		dots += "<span></span>";
+	});
+	$("#dots").html(dots);
+	$("#stage .code").each(function () {
+		prepareCode(this);
+		setCode(this, false);
+	});
+	preloadPhotos();
+
+	// Anywhere on the page moves the story on (buttons look after themselves)
+	$("#mainDiv").click(function (e) {
+		if ($(e.target).closest("button").length) return;
+		advanceStory();
+	});
+	$(document).keydown(function (e) {
+		if (!storyStarted) return;
+		if (e.keyCode === 39 || e.keyCode === 32) advanceStory();
+		if (e.keyCode === 37 && sceneIndex > 0) goToScene(sceneIndex - 1);
+	});
+	$("#replayBtn").click(replayStory);
+}
+
+function startStory() {
+	storyStarted = true;
+	goToScene(0);
+}
+
+/* --- Time Elapsed --- */
+function setText(id, value) {
+	var el = document.getElementById(id);
+	// Only touch the DOM when the value actually changed
+	if (el && el.innerHTML !== String(value)) el.innerHTML = value;
+}
+
+function padTwo(n) {
+	return n < 10 ? "0" + n : String(n);
+}
+
+function timeElapse(start) {
+	var seconds = Math.max(0, Math.floor((new Date().getTime() - start.getTime()) / 1000));
+	var days = Math.floor(seconds / 86400);
+	seconds = seconds % 86400;
+	var hours = Math.floor(seconds / 3600);
+	seconds = seconds % 3600;
+	var minutes = Math.floor(seconds / 60);
+	seconds = seconds % 60;
+
+	setText("elapseDays", String(days).replace(/\B(?=(\d{3})+$)/g, ","));
+	setText("elapseHrs", padTwo(hours));
+	setText("elapseMin", padTwo(minutes));
+	setText("elapseSec", padTwo(seconds));
+}
+
+/* Calendar difference as [years, months, days] */
+function calendarDiff(from, to) {
+	var years = to.getFullYear() - from.getFullYear();
+	var months = to.getMonth() - from.getMonth();
+	var days = to.getDate() - from.getDate();
+	if (days < 0) {
+		months--;
+		days += new Date(to.getFullYear(), to.getMonth(), 0).getDate();
+	}
+	if (months < 0) {
+		years--;
+		months += 12;
+	}
+	return [years, months, days];
+}
+
+/* Fills each milestone element with e.g. "3y 9m 15d" */
+function updateMilestones(list) {
+	var now = new Date();
+	var units = ['y', 'm', 'd'];
+	for (var i = 0; i < list.length; i++) {
+		var diff = calendarDiff(list[i].date, now);
+		var parts = [];
+		for (var j = 0; j < 3; j++) {
+			// Skip leading zeros ("2m 1d", not "0y 2m 1d") but always show days
+			if (diff[j] > 0 || parts.length || j === 2) {
+				parts.push("<b>" + diff[j] + "</b>" + units[j]);
+			}
+		}
+		setText(list[i].id, parts.join(" "));
+	}
+}
+
+/* --- Finale --- */
+function showMessages() {
+	adjustWordsPosition();
+	// CSS takes it from here: the date gives way to the running count
+	$("body").addClass("finished");
+}
+
+/* Scale the words inside the heart with the heart itself (proportional, no fixed pixels) */
+function adjustWordsPosition() {
+	if (!heartW) return;
+	$("#words, #heartDate").css("font-size", Math.max(10.5, heartW * 0.042) + "px");
+}
+
+/* --- Floating Hearts on Click / Touch + Idle --- */
+var heartLayer, floatingHearts = [];
+var pointerDown = false, pointerX = 0, pointerY = 0;
+var heartFrameRunning = false, heartLastTime = 0;
+var HEART_LIFE = 3500;
+
+function generateHeart(x, y) {
+	if (!heartLayer) return;
+	var el = document.createElement("div");
+	el.className = "heart";
+	heartLayer.appendChild(el);
+	floatingHearts.push({
+		el: el,
+		x: x,
+		y: y,
+		age: 0,
+		scale: (Math.random() * Math.random() * 0.6 + 0.35) * (isMobile ? 0.8 : 1),
+		sway: 10 + Math.random() * 16,
+		phase: Math.random() * Math.PI * 2,
+		rise: 0.03 + Math.random() * 0.03
+	});
+	if (!heartFrameRunning) {
+		heartFrameRunning = true;
+		// Restart the clock so the first frame after idling isn't one huge step
+		heartLastTime = Date.now();
+		requestAnimationFrame(heartFrame);
+	}
+}
+
+function heartFrame() {
+	var now = Date.now();
+	var delta = Math.min(now - heartLastTime, 64);
+	heartLastTime = now;
+	for (var i = floatingHearts.length - 1; i >= 0; i--) {
+		var heart = floatingHearts[i];
+		heart.age += delta;
+		if (heart.age < HEART_LIFE) {
+			var x = heart.x + Math.sin(heart.age / 450 + heart.phase) * heart.sway;
+			var y = heart.y - heart.age * heart.rise;
+			var value = 'translate(' + x + 'px,' + y + 'px) scale(' + heart.scale + ')';
+			heart.el.style.webkitTransform = value;
+			heart.el.style.transform = value;
+			heart.el.style.opacity = 1 - heart.age / HEART_LIFE;
+		} else {
+			heartLayer.removeChild(heart.el);
+			floatingHearts.splice(i, 1);
+		}
+	}
+	if (floatingHearts.length > 0) {
+		requestAnimationFrame(heartFrame);
+	} else {
+		heartFrameRunning = false;
+	}
+}
+
+function initFloatingHearts() {
+	heartLayer = document.createElement("div");
+	heartLayer.id = "heartLayer";
+	document.body.appendChild(heartLayer);
+
+	function press(point) {
+		pointerDown = true;
+		pointerX = point.clientX;
+		pointerY = point.clientY;
+		generateHeart(pointerX, pointerY - 5);
+	}
+	function move(point) {
+		pointerX = point.clientX;
+		pointerY = point.clientY;
+	}
+	function release() {
+		pointerDown = false;
+	}
+
+	document.addEventListener("mousedown", press);
+	document.addEventListener("mousemove", move);
+	document.addEventListener("mouseup", release);
+	document.addEventListener("touchstart", function (e) { press(e.touches[0]); }, { passive: true });
+	document.addEventListener("touchmove", function (e) { move(e.touches[0]); }, { passive: true });
+	document.addEventListener("touchend", release);
+	document.addEventListener("touchcancel", release);
+
+	// A stream of hearts while holding down
+	setInterval(function () {
+		if (pointerDown) generateHeart(pointerX, pointerY - 5);
+	}, 110);
+
+	// Idle ambient hearts — one drifts up from the bottom every ~10 seconds
+	if (!reducedMotion) {
+		setInterval(function () {
+			if (document.hidden) return;
+			generateHeart(Math.random() * window.innerWidth, window.innerHeight + 10);
+		}, 10000);
+	}
 }

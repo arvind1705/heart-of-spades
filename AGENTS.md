@@ -2,7 +2,9 @@
 
 ## Project Overview
 
-Static vanilla HTML/CSS/JavaScript Valentine's Day webpage. No build tools, no
+Static vanilla HTML/CSS/JavaScript love-letter webpage, designed phone-first
+(mobile Safari / Chrome in portrait). It is a tap-through story: a cover, then
+one scene per milestone, with a flower heart that grows a little each scene. No build tools, no
 package manager, no frameworks (except vendored jQuery 1.4.2). All JS runs as
 global scripts loaded via `<script>` tags — load order matters.
 
@@ -20,30 +22,41 @@ npx serve .
 ```
 
 To verify changes: open `index.html` in a browser and confirm:
-1. Sparkle particles render on the background canvas
-2. Typewriter types out the code panel content at ~30ms/char
-3. Daivik name triggers a particle burst + glow effect
-4. Heart bloom animation starts after typewriter finishes
-5. Timer displays and updates every 500ms
-6. Floating hearts appear on click/touch
+1. Sparkle particles render on the canvas; the cover shows "For Sanjana" + Open
+2. Open starts the story; each tap shows the next scene (a tap mid-scene
+   finishes that scene first). Arrow keys / space work on desktop
+3. Each scene's `.code` block types itself; the date shows inside the heart
+4. The heart grows from the bottom tip up both sides and closes on the
+   second-to-last scene, then beats and shows the day counter (updates every 500ms)
+5. The Daivik and Deeyan names trigger a particle burst + glow
+6. Floating hearts appear on tap / hold
+7. Nothing scrolls — every scene must fit one screen
 
-Test on mobile widths (375px, 520px) using browser DevTools device emulation.
+Test in DevTools device emulation at 390x844 and 375x667 first, then landscape
+and desktop.
 
 ## File Structure & Dependencies
 
 ```
-index.html           Main page + inline init script (sets start date, floating hearts)
+index.html           Cover, scenes (the story text) + inline script with the dates
 css/default.css      All styles and responsive breakpoints
 js/jquery.js         Vendored jQuery 1.4.2 — DO NOT MODIFY
 js/garden.js         Canvas bloom engine (Vector, Petal, Bloom, Garden constructors)
-js/functions.js      App logic: particles, typewriter, heart animation, timer
-digital.ttf          Custom font for timer digits
+js/functions.js      App logic: particles, cover, story engine, heart, timers, floating hearts
+digital.ttf          Legacy font, no longer referenced
 images/              Favicons, PWA manifest, icons
+images/photos/       Optional. name.jpg matching a scene's data-photo shows inside the heart
 ```
 
 **Script load order** (defined in `<head>`): `jquery.js` → `garden.js` → `functions.js`.
 The inline `<script>` at the bottom of `<body>` in `index.html` runs after all
-three are loaded and handles page-specific initialization.
+three are loaded and holds the personal data (dates, special-day greetings) and
+starts everything.
+
+**Scene markup** (inside `#stage`): each `.scene` is one moment and its direct
+children appear one after another. `data-day` / `data-year` set the date shown
+in the heart, `data-photo="name"` an optional photo, `.code` blocks are typed,
+`[data-reveal]` gets the glow + burst. Adding a scene needs no JS changes.
 
 **Dependency direction**: `functions.js` depends on `garden.js` (instantiates
 `Garden`, uses `Garden.options`) and jQuery. `garden.js` is self-contained.
@@ -118,7 +131,9 @@ three are loaded and handles page-specific initialization.
 ### Architecture
 - Single CSS file (`default.css`) — no preprocessor, no CSS modules
 - Global reset at top, then components by DOM order, responsive at bottom
-- Four responsive breakpoints: `1200px`, `640px`, `520px`, `375px`
+- Phone portrait is the base design. Adjustments: `max-width: 520px`, `375px`,
+  `max-height: 620px`, and landscape with `max-height: 520px`
+- Scene type scales with `clamp()` + `svh` so every scene fits one screen
 - Uses modern CSS: `aspect-ratio`, `backdrop-filter`, flexbox, `env()` safe
   areas, `@supports` for iOS detection, CSS custom properties
 - Google Fonts loaded via `<link>` in HTML, not `@import` in CSS
@@ -151,9 +166,13 @@ three are loaded and handles page-specific initialization.
    CSS-laid-out `#loveHeart` container. Never hardcode pixel dimensions.
 5. **Heart curve scale factors** (`heartScaleX`, `heartScaleY`) are computed
    proportionally from canvas size. The reference design is 620x580.
-6. **`adjustWordsPosition()`** uses proportional ratios — do not use hardcoded
-   pixel offsets
-7. **iOS Safari**: `background-attachment: fixed` is broken — handled by
-   `@supports (-webkit-touch-callout: none)` fallback
-8. **Performance**: `shadowBlur` on canvas is GPU-expensive. Always gate behind
+6. **`adjustWordsPosition()`** sets the font size of the text inside the heart
+   from the heart's width — size that text in `em`, never fixed pixels
+7. **iOS Safari**: taps only reach non-button elements that have
+   `cursor: pointer` (set on `#mainDiv`). The background uses fixed
+   pseudo-elements because `background-attachment: fixed` is broken there
+8. **Setting canvas width/height resets the 2D context** — transform and
+   `globalCompositeOperation` are re-applied in `sizeCanvas()`, which also
+   carries the already-drawn heart over on resize
+9. **Performance**: `shadowBlur` on canvas is GPU-expensive. Always gate behind
    `isMobile` checks and keep values low

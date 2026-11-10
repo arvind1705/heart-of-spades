@@ -1,8 +1,25 @@
 /* ============================================
-   HEART OF SPADES — Elegant Dark Romantic Theme
+   HEART OF SPADES — A love story, written in code
+   Night-sky romantic theme
    ============================================ */
 
 /* --- Google Fonts loaded in HTML --- */
+
+:root {
+    --bg: #0b0509;
+    --ink: #eadbcb;
+    --ink-soft: #b5a294;
+    --gold: #d9b48f;
+    --gold-bright: #f4dcbc;
+    --rose: #d9667f;
+    --lavender: #c9b3e6;
+    --sage: #9db09a;
+    --panel: rgba(15, 7, 17, 0.74);
+    --hairline: rgba(217, 180, 143, 0.16);
+    --serif: 'Cormorant Garamond', 'Georgia', serif;
+    --mono: 'Fira Code', 'Source Code Pro', 'Consolas', monospace;
+    --script: 'Pinyon Script', 'Cormorant Garamond', cursive;
+}
 
 *, *::before, *::after {
     box-sizing: border-box;
@@ -12,292 +29,628 @@
 
 html {
     font-size: 16px;
-    scroll-behavior: smooth;
+    background: var(--bg);
+}
+
+html,
+body {
+    height: 100%;
+    overflow: hidden;
 }
 
 body {
-    margin: 0;
-    padding: 0;
-    background: linear-gradient(135deg, #0d0000 0%, #1a0a14 25%, #120818 50%, #1a0a14 75%, #0d0000 100%);
-    background-attachment: fixed;
-    font-family: 'Cormorant Garamond', 'Georgia', serif;
-    color: #e8d5c4;
-    min-height: 100vh;
-    overflow-x: hidden;
-    overflow-y: auto;
+    background: var(--bg);
+    font-family: var(--serif);
+    color: var(--ink);
     position: relative;
+    overscroll-behavior: none;
+    /* Taps and long-presses drive the story — never select text or zoom */
+    touch-action: manipulation;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+    -webkit-font-smoothing: antialiased;
+    -webkit-tap-highlight-color: transparent;
 }
 
-/* iOS Safari doesn't support background-attachment: fixed */
-@supports (-webkit-touch-callout: none) {
-    body {
-        background-attachment: scroll;
-        background-size: cover;
-    }
-}
-
-/* Subtle vignette overlay */
+/* --- Background: slow-drifting glows + vignette ---
+   Fixed pseudo-elements instead of background-attachment: fixed,
+   which is broken on iOS Safari. */
 body::before {
+    content: '';
+    position: fixed;
+    top: -20%;
+    left: -20%;
+    width: 140%;
+    height: 140%;
+    background:
+        radial-gradient(ellipse 45% 40% at 22% 24%, rgba(150, 40, 82, 0.34), transparent 70%),
+        radial-gradient(ellipse 42% 42% at 80% 76%, rgba(92, 52, 150, 0.26), transparent 70%),
+        radial-gradient(ellipse 50% 36% at 62% 30%, rgba(214, 130, 90, 0.10), transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+    animation: glowDrift 26s ease-in-out infinite alternate;
+}
+
+body::after {
     content: '';
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.4) 100%);
+    background: radial-gradient(ellipse at center, transparent 45%, rgba(0, 0, 0, 0.55) 100%);
     pointer-events: none;
     z-index: 0;
 }
 
-/* --- Sparkle / Particle Canvas --- */
+@keyframes glowDrift {
+    from { transform: translate3d(-3%, -2%, 0) scale(1); }
+    to   { transform: translate3d(3%, 3%, 0) scale(1.08); }
+}
+
+/* --- Sparkle / Particle Canvas (above the page so bursts are never hidden) --- */
 #particleCanvas {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    z-index: 0;
+    z-index: 5;
     pointer-events: none;
 }
 
-/* --- Skip / Replay Button --- */
-#skipBtn {
+/* --- Cover --- */
+#cover {
+    display: none;
     position: fixed;
-    bottom: 24px;
-    right: 24px;
-    z-index: 1000;
-    background: rgba(20, 8, 25, 0.75);
-    border: 1px solid rgba(212, 175, 140, 0.25);
-    border-radius: 8px;
-    color: #d4af8c;
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 14px;
-    letter-spacing: 0.08em;
-    padding: 8px 16px;
-    cursor: pointer;
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    transition: background 0.3s ease, border-color 0.3s ease, color 0.3s ease,
-                opacity 0.5s ease;
-    /* Hidden by default via opacity — allows CSS transition on show */
-    opacity: 0;
-    pointer-events: none;
-}
-
-#skipBtn.visible {
-    opacity: 1;
-    pointer-events: auto;
-}
-
-#skipBtn:hover {
-    background: rgba(212, 175, 140, 0.12);
-    border-color: rgba(212, 175, 140, 0.5);
-    color: #f0d8b8;
-}
-
-/* --- Main Layout --- */
-#mainDiv {
-    position: relative;
-    z-index: 1;
+    top: 0;
+    left: 0;
     width: 100%;
-    min-height: 100vh;
-    display: flex;
+    height: 100%;
+    z-index: 20;
     align-items: center;
     justify-content: center;
-    padding: 40px 20px;
+    padding: 24px;
+    text-align: center;
+    transition: opacity 1.2s ease, transform 1.2s ease;
+}
+
+.js #cover {
+    display: flex;
+}
+
+.opened #cover {
+    opacity: 0;
+    transform: scale(1.06);
+    pointer-events: none;
+}
+
+.cover-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.cover-heart {
+    width: 64px;
+    height: 58px;
+    overflow: visible;
+    filter: drop-shadow(0 0 12px rgba(217, 102, 127, 0.55));
+    animation: coverBeat 1.8s ease-in-out 2.6s infinite;
+}
+
+.cover-heart path {
+    fill: none;
+    stroke: var(--rose);
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    animation: coverDraw 2.4s ease-in-out 0.3s forwards;
+}
+
+.cover-note {
+    margin-top: 34px;
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--gold);
+    animation: fadeInUp 1.4s ease-out 0.9s both;
+}
+
+.cover-name {
+    margin-top: 6px;
+    font-family: var(--script);
+    font-size: 104px;
+    font-weight: 400;
+    line-height: 1.25;
+    color: var(--gold-bright);
+    text-shadow: 0 0 40px rgba(217, 150, 110, 0.35);
+    animation: fadeInUp 1.6s ease-out 1.4s both;
+}
+
+#openBtn {
+    margin-top: 28px;
+    min-width: 168px;
+    padding: 14px 40px;
+    background: rgba(217, 180, 143, 0.06);
+    border: 1px solid rgba(217, 180, 143, 0.5);
+    border-radius: 999px;
+    color: var(--gold-bright);
+    font-family: var(--serif);
+    font-size: 17px;
+    font-weight: 500;
+    letter-spacing: 0.32em;
+    text-indent: 0.32em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
+    animation: fadeInUp 1.6s ease-out 2.3s both;
+}
+
+#openBtn:hover,
+#openBtn:focus-visible {
+    background: rgba(217, 180, 143, 0.16);
+    border-color: var(--gold-bright);
+    box-shadow: 0 0 36px rgba(217, 150, 110, 0.3);
+    outline: none;
+}
+
+@keyframes coverDraw {
+    to { stroke-dashoffset: 0; }
+}
+
+@keyframes coverBeat {
+    0%, 100% { transform: scale(1); }
+    12%      { transform: scale(1.12); }
+    24%      { transform: scale(1); }
+    36%      { transform: scale(1.07); }
+    52%      { transform: scale(1); }
+}
+
+/* --- Main Layout ---
+   The whole story fits one screen: heart on top, the current scene
+   beneath it. Nothing scrolls. */
+#mainDiv {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    /* iOS Safari only delivers taps on non-buttons that look clickable */
+    cursor: pointer;
+}
+
+.js #mainDiv {
+    opacity: 0;
+    transition: opacity 1.6s ease 0.5s;
+}
+
+.js .opened #mainDiv {
+    opacity: 1;
 }
 
 #content {
     display: flex;
-    align-items: flex-start;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    max-width: 600px;
+    height: 100%;
+    margin: 0 auto;
+    padding: 14px 20px 10px;
+    padding-top: max(14px, env(safe-area-inset-top));
+    padding-bottom: max(10px, env(safe-area-inset-bottom));
+    padding-left: max(20px, env(safe-area-inset-left));
+    padding-right: max(20px, env(safe-area-inset-right));
+}
+
+#heartCol {
+    flex: none;
+    display: flex;
     justify-content: center;
-    gap: 60px;
-    max-width: 1280px;
     width: 100%;
 }
 
-/* --- Code Panel (Left Side) --- */
-#code {
-    flex: 1 1 auto;
+#storyCol {
+    flex: 1 1 0;
+    display: flex;
+    flex-direction: column;
     width: 100%;
-    max-width: 520px;
-    max-height: 85vh;
-    padding: 32px 36px;
-    background: rgba(10, 5, 15, 0.65);
-    border: 1px solid rgba(185, 130, 100, 0.15);
-    border-radius: 12px;
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    box-shadow:
-        0 0 40px rgba(180, 100, 80, 0.06),
-        inset 0 1px 0 rgba(255, 200, 170, 0.05);
-    font-family: 'Fira Code', 'Source Code Pro', 'Consolas', monospace;
-    font-size: 13.5px;
-    line-height: 1.9;
-    color: #c9b8a8;
+    min-height: 0;
+}
+
+/* --- Heart Panel --- */
+#loveHeart {
     position: relative;
-    overflow-y: auto;
-    overflow-x: hidden;
-    /* Allow long code lines to wrap on small screens */
-    word-wrap: break-word;
-    overflow-wrap: break-word;
-    animation: fadeInUp 1.2s ease-out both;
-    animation-delay: 0.3s;
+    width: min(90vw, 540px);
+    max-width: calc(46vh * 1.069);
+    max-width: calc(46svh * 1.069);
+    aspect-ratio: 620 / 580;
 }
 
-/* Custom scrollbar for code panel */
-#code::-webkit-scrollbar {
-    width: 4px;
+/* Soft glow that wakes up once the heart is whole */
+#loveHeart::before {
+    content: '';
+    position: absolute;
+    top: 8%;
+    left: 8%;
+    right: 8%;
+    bottom: 14%;
+    background: radial-gradient(ellipse at 50% 45%, rgba(217, 102, 127, 0.24), rgba(217, 140, 110, 0.08) 45%, transparent 70%);
+    opacity: 0;
+    transition: opacity 3s ease;
+    pointer-events: none;
 }
 
-#code::-webkit-scrollbar-track {
-    background: transparent;
+#loveHeart.complete::before {
+    opacity: 1;
 }
 
-#code::-webkit-scrollbar-thumb {
-    background: rgba(212, 175, 140, 0.2);
-    border-radius: 2px;
+#garden {
+    position: relative;
+    display: block;
+    width: 100%;
+    height: 100%;
 }
 
-#code::-webkit-scrollbar-thumb:hover {
-    background: rgba(212, 175, 140, 0.35);
+#loveHeart.complete #garden {
+    animation: heartBeat 1.9s ease-in-out infinite;
 }
 
-/* Subtle top-edge glow */
-#code::before {
+@keyframes heartBeat {
+    0%, 100% { transform: scale(1); }
+    10%      { transform: scale(1.028); }
+    22%      { transform: scale(1); }
+    34%      { transform: scale(1.016); }
+    50%      { transform: scale(1); }
+}
+
+/* --- Photos inside the heart (optional) ---
+   clip-path is set from the heart curve in updateHeartClip(). */
+#heartPhoto {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+#heartPhoto .photo-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-position: center 30%;
+    background-size: cover;
+    opacity: 0;
+    transform: scale(1);
+    transition: opacity 1.4s ease, transform 9s ease-out;
+}
+
+#heartPhoto .photo-layer.show {
+    opacity: 0.9;
+    transform: scale(1.08);
+}
+
+/* Darkens the lower half so the date stays readable over a photo */
+#heartPhoto::after {
     content: '';
     position: absolute;
     top: 0;
-    left: 10%;
-    right: 10%;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(212, 175, 140, 0.4), transparent);
-}
-
-/* Bottom-edge fade — signals the panel is scrollable */
-#code::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
     left: 0;
-    right: 0;
-    height: 48px;
-    background: linear-gradient(to bottom, transparent, rgba(10, 5, 15, 0.85));
-    border-radius: 0 0 12px 12px;
-    pointer-events: none;
-    transition: opacity 0.4s ease;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to bottom, transparent 40%, rgba(11, 5, 9, 0.8) 78%);
+    opacity: 0;
+    transition: opacity 1.4s ease, background-color 1.4s ease;
 }
 
-#code.at-bottom::after {
+#loveHeart.has-photo #heartPhoto::after {
+    opacity: 1;
+}
+
+/* Behind the running count the photo becomes a faint memory */
+.finished #heartPhoto .photo-layer.show {
+    opacity: 0.28;
+}
+
+/* --- The date inside the heart ---
+   font-size comes from adjustWordsPosition(), so sizes here are in em. */
+#heartDate,
+#words {
+    position: absolute;
+    left: 50%;
+    width: 62%;
+    transform: translateX(-50%);
+    font-size: 17px;
+    line-height: 1.3;
+    text-align: center;
+    color: var(--ink);
+    pointer-events: none;
+}
+
+#heartDate {
+    top: 27%;
+    transition: opacity 0.45s ease, top 0.9s ease;
+}
+
+#heartDate.changing,
+.finished #heartDate {
     opacity: 0;
 }
 
-#code .comments {
-    color: #6b7d6b;
-    font-style: italic;
-    opacity: 0.85;
+#dateDay {
+    font-size: 0.95em;
+    font-weight: 500;
+    font-variant-numeric: lining-nums;
+    letter-spacing: 0.42em;
+    text-indent: 0.42em;
+    text-transform: uppercase;
+    color: var(--gold);
 }
 
-#code .string {
-    color: #e8a87c;
+#dateYear {
+    font-size: 4.4em;
+    font-weight: 300;
+    font-variant-numeric: lining-nums;
+    line-height: 1.1;
+    letter-spacing: 0.03em;
+    color: var(--gold-bright);
+    text-shadow: 0 0 30px rgba(232, 180, 130, 0.4);
+    transition: font-size 0.9s ease;
 }
 
-#code .keyword {
-    color: #cf6679;
-    font-weight: 600;
+/* With a photo, the date steps down out of the way of faces */
+#loveHeart.has-photo #heartDate {
+    top: 58%;
+    text-shadow: 0 1px 10px rgba(0, 0, 0, 0.9);
 }
 
-#code .placeholder {
-    margin-left: 18px;
+#loveHeart.has-photo #dateYear {
+    font-size: 2.2em;
 }
 
-#code .space {
-    margin-left: 8px;
+/* --- The running count (finale) --- */
+#words {
+    top: 25%;
 }
 
-/* --- Section Dividers --- */
-#code .divider {
-    display: inline-block;
-    color: rgba(212, 175, 140, 0.25);
-    letter-spacing: 0.3em;
-    font-size: 11px;
-    margin: 4px 0;
+#messages {
+    opacity: 0;
+    transition: opacity 2.6s ease 0.6s;
 }
 
-/* --- Prose Lines (gradual shift from code) --- */
-#code .prose {
-    font-family: 'Cormorant Garamond', 'Georgia', serif;
-    font-size: 15px;
-    color: #d4c0ad;
+.finished #messages {
+    opacity: 1;
+}
+
+#messages .lead {
+    font-size: 1.05em;
     font-style: italic;
     letter-spacing: 0.02em;
-    line-height: 2;
 }
 
-#code .prose.finale {
-    color: #e0cbb8;
-    font-size: 16px;
-    font-weight: 400;
+#elapseDays {
+    font-size: 3.9em;
+    font-weight: 300;
+    font-variant-numeric: lining-nums;
+    line-height: 1.1;
+    letter-spacing: 0.02em;
+    color: var(--gold-bright);
+    text-shadow: 0 0 30px rgba(232, 180, 130, 0.45);
 }
 
-/* --- Daivik Name Reveal --- */
-#code .daivik-name {
-    font-family: 'Cormorant Garamond', 'Georgia', serif;
-    font-size: 26px;
-    font-weight: 600;
-    font-style: normal;
-    color: #e8c4a0;
-    letter-spacing: 0.1em;
+#messages .days-label {
+    font-size: 0.85em;
+    font-weight: 500;
+    letter-spacing: 0.42em;
+    text-indent: 0.42em;
+    text-transform: uppercase;
+    color: var(--gold);
+}
+
+#elapseClock {
+    margin-top: 0.5em;
+    font-size: 0.9em;
+    white-space: nowrap;
+}
+
+#elapseClock .digit {
     display: inline-block;
+    min-width: 1.3em;
+    font-family: var(--mono);
+    font-size: 1em;
+    font-weight: 300;
+    color: var(--gold-bright);
+}
+
+#elapseClock .time-label {
+    margin: 0 0.5em 0 0.2em;
+    font-size: 0.72em;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+}
+
+#elapseClock .time-label:last-child {
+    margin-right: 0;
+}
+
+/* --- Stage + Scenes --- */
+#stage {
+    position: relative;
+    flex: 1 1 0;
+    min-height: 0;
+}
+
+#stage .scene {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    visibility: hidden;
+    opacity: 0;
+}
+
+#stage .scene.active {
+    visibility: visible;
+    opacity: 1;
+}
+
+#stage .scene.leaving {
+    visibility: visible;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+}
+
+/* Each child of a scene arrives on its own */
+.js #stage .piece {
+    opacity: 0;
+    transform: translateY(16px);
+    transition: opacity 1s ease, transform 1s ease;
+}
+
+.js #stage .piece.in {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+#stage .piece + .piece {
+    margin-top: 14px;
+    margin-top: clamp(8px, 1.8svh, 18px);
+}
+
+#stage .headline {
+    font-size: 30px;
+    font-size: clamp(24px, 4.2svh, 40px);
+    font-weight: 500;
+    line-height: 1.2;
+    letter-spacing: 0.01em;
+    color: var(--gold-bright);
+    text-shadow: 0 0 34px rgba(217, 150, 110, 0.3);
+    text-wrap: balance;
+}
+
+#stage .body {
+    font-size: 19px;
+    font-size: clamp(16px, 2.6svh, 23px);
+    font-style: italic;
+    line-height: 1.4;
+    letter-spacing: 0.015em;
+    color: var(--ink);
+    text-wrap: balance;
+}
+
+#stage .body.finale {
+    font-size: clamp(19px, 3.1svh, 28px);
+}
+
+#stage .body.finale + .body.finale {
+    margin-top: 2px;
+}
+
+#stage .eyebrow {
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.3em;
+    text-indent: 0.3em;
+    text-transform: uppercase;
+    color: var(--gold);
+}
+
+/* --- The boys' names --- */
+#stage .name {
+    margin-top: 2px;
+    font-size: 64px;
+    font-size: clamp(50px, 9.4svh, 88px);
+    font-weight: 600;
+    line-height: 1.1;
+    letter-spacing: 0.06em;
     /* Only transition the properties that actually change — avoids layout thrash */
-    transition: color 1.2s ease, text-shadow 1.2s ease;
+    transition: opacity 1s ease, transform 1s ease, color 1.6s ease, text-shadow 1.6s ease;
 }
 
-#code .daivik-name.revealed {
-    color: #f0d8b8;
+#stage .daivik-name {
+    color: #c79f7a;
+}
+
+#stage .daivik-name.revealed {
+    color: var(--gold-bright);
     text-shadow:
-        0 0 20px rgba(232, 196, 160, 0.5),
-        0 0 40px rgba(232, 196, 160, 0.25),
-        0 0 60px rgba(207, 102, 121, 0.15);
+        0 0 18px rgba(240, 200, 150, 0.6),
+        0 0 44px rgba(232, 180, 130, 0.4),
+        0 0 80px rgba(217, 102, 127, 0.25);
 }
 
-#code .daivik-line {
-    color: #d9c4b0;
+/* Deeyan — lavender, distinct from Daivik's gold */
+#stage .deeyan-name {
+    color: #a48ec4;
 }
 
-/* --- Baby #2 Name Reveal (lavender/mauve — bridges rose palette) --- */
-#code .baby-name {
-    font-family: 'Cormorant Garamond', 'Georgia', serif;
-    font-size: 26px;
-    font-weight: 600;
-    font-style: normal;
-    color: #c4a8d8;
-    letter-spacing: 0.1em;
+#stage .deeyan-name.revealed {
+    color: #e6d8f8;
+    text-shadow:
+        0 0 18px rgba(201, 179, 230, 0.65),
+        0 0 44px rgba(190, 160, 230, 0.4),
+        0 0 80px rgba(170, 120, 220, 0.3);
+}
+
+/* --- Code: his signature on every moment --- */
+#stage .code {
     display: inline-block;
-    transition: color 1.2s ease, text-shadow 1.2s ease;
+    min-height: 2.2em;
+    padding: 8px 16px;
+    background: rgba(15, 7, 17, 0.6);
+    border: 1px solid var(--hairline);
+    border-radius: 10px;
+    font-family: var(--mono);
+    font-size: 13px;
+    font-size: clamp(11.5px, 1.75svh, 14px);
+    line-height: 1.6;
+    text-align: left;
+    white-space: nowrap;
+    color: #d6c5b6;
 }
 
-#code .baby-name.revealed {
-    color: #ddc8f0;
-    text-shadow:
-        0 0 20px rgba(196, 168, 216, 0.5),
-        0 0 40px rgba(196, 168, 216, 0.25),
-        0 0 60px rgba(180, 120, 210, 0.2);
+#stage .code > div {
+    min-height: 1.6em;
 }
 
-#code .baby-line {
-    color: #c8b4d4;
+#stage .code .string {
+    color: #efb088;
 }
 
-/* Typewriter cursor */
-#code .cursor {
+#stage .code .keyword {
+    color: #e5718a;
+    font-weight: 500;
+}
+
+#stage .code .indent {
+    display: inline-block;
+    width: 2.4em;
+}
+
+#stage .code .cursor {
     display: inline-block;
     width: 2px;
     height: 1.1em;
-    background: #d4af8c;
     margin-left: 2px;
+    background: var(--gold);
     vertical-align: text-bottom;
-    animation: cursorBlink 1s ease-in-out infinite;
+    animation: cursorBlink 1s steps(1) infinite;
 }
 
 @keyframes cursorBlink {
@@ -305,124 +658,162 @@ body::before {
     50% { opacity: 0; }
 }
 
-/* --- Heart Column (Right Side: heart + text below) --- */
-#heartCol {
-    flex: 0 0 auto;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 100%;
-    max-width: 620px;
-    animation: fadeInUp 1.2s ease-out both;
-    animation-delay: 0.6s;
-}
-
-/* --- Heart Panel --- */
-#loveHeart {
-    width: 100%;
-    aspect-ratio: 620 / 580;
-    position: relative;
-}
-
-#garden {
-    width: 100%;
-    height: 100%;
-}
-
-/* --- Words / Messages (inside heart, absolutely positioned) --- */
-#words {
-    position: absolute;
-    top: 38%;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 70%;
-    font-family: 'Cormorant Garamond', 'Georgia', serif;
-    font-size: 18px;
-    font-weight: 400;
-    color: #e0cbb8;
-    letter-spacing: 0.02em;
-    line-height: 1.6;
-    text-align: center;
-    text-shadow: 0 0 30px rgba(200, 140, 100, 0.15);
-}
-
-#messages {
-    display: none;
-    opacity: 0;
-}
-
-/* --- Elapsed Time Clock --- */
-#elapseClock {
-    text-align: center;
-    font-size: 16px;
-    margin-top: 14px;
-    margin-bottom: 14px;
-    color: #d4af8c;
-    letter-spacing: 0.03em;
-}
-
-#elapseClock .digit {
-    font-family: 'Fira Code', 'digit', monospace;
-    font-size: 28px;
-    font-weight: 300;
-    color: #e8c4a0;
-    text-shadow: 0 0 12px rgba(232, 196, 160, 0.25);
-    display: inline-block;
-}
-
-/* Heartbeat pulse on the seconds (and days) digit */
-#elapseClock .digit.heartbeat {
-    animation: heartbeatPulse 1s ease-in-out infinite;
-}
-
-@keyframes heartbeatPulse {
-    0%   { transform: scale(1); }
-    14%  { transform: scale(1.08); }
-    28%  { transform: scale(1); }
-    42%  { transform: scale(1.05); }
-    70%  { transform: scale(1); }
-    100% { transform: scale(1); }
-}
-
-#elapseClock .time-label {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 13px;
-    color: #9a8878;
-    text-transform: uppercase;
-    letter-spacing: 0.12em;
-    margin: 0 6px 0 2px;
-}
-
-/* --- Love You Section (below heart, normal flow) --- */
+/* --- Sign-off scene --- */
 #loveu {
-    width: 100%;
-    padding: 16px 12px 8px;
-    font-size: 20px;
+    font-size: 22px;
+    font-size: clamp(19px, 3svh, 26px);
     font-style: italic;
-    text-align: center;
-    display: none;
-    opacity: 0;
-    color: #e0cbb8;
-    text-shadow: 0 0 20px rgba(200, 140, 100, 0.1);
+    line-height: 1.35;
+    color: var(--ink);
 }
 
 #loveu .signature {
-    margin-top: 10px;
-    font-size: 18px;
+    margin-top: 2px;
+    font-family: var(--script);
+    font-size: 2em;
     font-style: normal;
-    font-weight: 600;
-    color: #d4af8c;
-    letter-spacing: 0.08em;
+    line-height: 1.2;
+    color: var(--gold-bright);
+    text-shadow: 0 0 24px rgba(217, 150, 110, 0.3);
 }
 
-/* --- Floating Hearts (click interaction) ---
-   The rAF loop in index.html drives all movement via top/left/opacity. */
-.heart {
-    z-index: 999;
-    position: absolute;
+#family {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    max-width: 440px;
+    padding-top: 14px;
+    border-top: 1px solid var(--hairline);
+}
+
+#family .stat {
+    flex: 1 1 0;
+    text-align: center;
+}
+
+#family .stat + .stat {
+    border-left: 1px solid var(--hairline);
+}
+
+#family .stat-label {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+}
+
+#family .stat-value {
+    margin-top: 2px;
+    font-size: 14px;
+    letter-spacing: 0.04em;
+    color: var(--ink-soft);
+}
+
+#family .stat-value b {
+    font-variant-numeric: lining-nums;
+    font-size: 22px;
+    font-weight: 500;
+    color: var(--gold-bright);
+}
+
+#replayBtn {
+    padding: 8px 20px;
+    background: transparent;
+    border: 1px solid rgba(217, 180, 143, 0.3);
+    border-radius: 999px;
+    color: var(--gold);
+    font-family: var(--serif);
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.2em;
+    text-indent: 0.2em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: opacity 1s ease, transform 1s ease, background 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+}
+
+#replayBtn:hover,
+#replayBtn:focus-visible {
+    background: rgba(217, 180, 143, 0.14);
+    border-color: rgba(217, 180, 143, 0.6);
+    color: var(--gold-bright);
+    outline: none;
+}
+
+/* --- Footer: hint + progress dots --- */
+#stageFoot {
+    flex: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    height: 44px;
+}
+
+#hint {
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.26em;
+    text-indent: 0.26em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+}
+
+#hint.show {
+    opacity: 1;
+    transition: opacity 1.2s ease;
+    animation: hintPulse 2.6s ease-in-out 1.2s infinite;
+}
+
+@keyframes hintPulse {
+    0%, 100% { opacity: 1; }
+    50%      { opacity: 0.35; }
+}
+
+#dots {
+    display: flex;
+    gap: 6px;
+    margin-top: 10px;
+    padding-bottom: 4px;
+}
+
+#dots span {
+    width: 4px;
+    height: 4px;
+    border-radius: 2px;
+    background: rgba(217, 180, 143, 0.25);
+    transition: width 0.5s ease, background 0.5s ease;
+}
+
+#dots span.on {
+    width: 16px;
+    background: var(--gold);
+}
+
+/* --- Floating Hearts (tap / hold) ---
+   The rAF loop in functions.js drives each one via transform + opacity. */
+#heartLayer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
     pointer-events: none;
+    z-index: 30;
+}
+
+.heart {
+    position: absolute;
+    top: -9px;
+    left: -10px;
     width: 20px;
     height: 18px;
+    pointer-events: none;
+    will-change: transform, opacity;
 }
 
 .heart::before,
@@ -433,8 +824,8 @@ body::before {
     width: 10px;
     height: 16px;
     border-radius: 10px 10px 0 0;
-    background: linear-gradient(135deg, #e87d7d, #cf4a6e);
-    box-shadow: 0 0 10px rgba(207, 74, 110, 0.4);
+    background: linear-gradient(135deg, #f08a94, #d9507a);
+    box-shadow: 0 0 10px rgba(217, 80, 122, 0.45);
 }
 
 .heart::before {
@@ -457,14 +848,14 @@ body::before {
     position: absolute;
     top: 100px;
     left: 0;
-    color: #cf6679;
+    color: var(--rose);
 }
 
 /* --- Smooth entrance animation --- */
 @keyframes fadeInUp {
     from {
         opacity: 0;
-        transform: translateY(30px);
+        transform: translateY(18px);
     }
     to {
         opacity: 1;
@@ -472,175 +863,89 @@ body::before {
     }
 }
 
-/* --- Responsive --- */
+/* --- Responsive ---
+   Phone portrait is the design; these only adjust around it. */
 
-/* Stack to vertical at tablets and below */
-@media (max-width: 1200px) {
-    #content {
-        flex-direction: column;
-        align-items: center;
-        gap: 40px;
-    }
-
-    #code {
-        flex: none;
-        max-width: 90vw;
-        width: 520px;
-        order: 1;
-    }
-
-    #heartCol {
-        max-width: 580px;
-        width: 90vw;
-        order: 2;
-    }
-}
-
-/* Timer: wrap to two rows on narrow screens */
-@media (max-width: 640px) {
-    #elapseClock {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: flex-end;
-        gap: 2px 0;
-    }
-
-    #elapseClock .digit {
-        font-size: 24px;
-    }
-
-    #elapseClock .time-label {
-        font-size: 11px;
-        margin: 0 4px 0 1px;
-    }
-}
-
-/* Main mobile breakpoint */
+/* Narrow phones */
 @media (max-width: 520px) {
-    #mainDiv {
-        padding: 20px 8px;
-        /* Safe area for notch / home indicator */
-        padding-top: max(20px, env(safe-area-inset-top));
-        padding-bottom: max(20px, env(safe-area-inset-bottom));
-        padding-left: max(8px, env(safe-area-inset-left));
-        padding-right: max(8px, env(safe-area-inset-right));
+    .cover-name {
+        font-size: 68px;
     }
 
-    #code {
-        width: calc(100vw - 16px);
-        max-width: none;
-        padding: 20px 16px;
-        font-size: 11.5px;
-        line-height: 1.75;
-        border-radius: 10px;
-        max-height: 75vh;
-        /* Reduce backdrop blur on mobile for GPU savings */
-        backdrop-filter: blur(4px);
-        -webkit-backdrop-filter: blur(4px);
-    }
-
-    #code .comments {
-        /* Allow long comments to wrap */
-        word-break: break-word;
-        hyphens: auto;
-        -webkit-hyphens: auto;
-    }
-
-    #code .prose {
-        font-size: 13px;
-    }
-
-    #code .prose.finale {
-        font-size: 14px;
-    }
-
-    #code .daivik-name {
-        font-size: 20px;
-    }
-
-    #code .baby-name {
-        font-size: 20px;
-    }
-
-    #code .divider {
-        font-size: 9px;
-    }
-
-    #skipBtn {
-        bottom: 16px;
-        right: 16px;
+    .cover-note {
         font-size: 12px;
-        padding: 6px 12px;
+        letter-spacing: 0.24em;
     }
 
-    #heartCol {
-        width: calc(100vw - 16px);
-        max-width: none;
-    }
-
-    #words {
-        font-size: 14px;
-    }
-
-    #loveu {
-        font-size: 16px;
-    }
-
-    #loveu .signature {
-        font-size: 15px;
-    }
-
-    /* Smaller floating hearts on mobile */
-    .heart {
-        width: 14px;
-        height: 13px;
-    }
-
-    .heart::before,
-    .heart::after {
-        width: 7px;
-        height: 11px;
-        border-radius: 7px 7px 0 0;
-    }
-
-    .heart::before {
-        left: 7px;
+    #content {
+        padding-left: max(16px, env(safe-area-inset-left));
+        padding-right: max(16px, env(safe-area-inset-right));
     }
 }
 
 /* Very small phones (iPhone SE, etc.) */
 @media (max-width: 375px) {
-    #code {
-        padding: 16px 12px;
-        font-size: 10.5px;
-        line-height: 1.7;
+    .cover-name {
+        font-size: 58px;
     }
 
-    #code .prose {
+    #stage .eyebrow {
         font-size: 12px;
+        letter-spacing: 0.24em;
     }
 
-    #code .prose.finale {
-        font-size: 13px;
+    #family .stat-label {
+        letter-spacing: 0.12em;
+    }
+}
+
+/* Short screens: give the words more of the height */
+@media (max-height: 620px) {
+    #loveHeart {
+        max-width: calc(40vh * 1.069);
+        max-width: calc(40svh * 1.069);
+    }
+}
+
+/* Phone on its side: heart and words sit side by side */
+@media (orientation: landscape) and (max-height: 520px) {
+    #content {
+        flex-direction: row;
+        align-items: center;
+        max-width: none;
+        gap: 24px;
     }
 
-    #code .daivik-name {
-        font-size: 18px;
+    #heartCol {
+        width: auto;
     }
 
-    #code .baby-name {
-        font-size: 18px;
+    #loveHeart {
+        width: 46vw;
+        max-width: calc(88vh * 1.069);
+        max-width: calc(88svh * 1.069);
     }
 
-    #words {
-        font-size: 13px;
+    #storyCol {
+        height: 100%;
+    }
+}
+
+/* --- Reduced motion: keep the story, drop the ambient movement --- */
+@media (prefers-reduced-motion: reduce) {
+    body::before,
+    .cover-heart,
+    #hint.show,
+    #loveHeart.complete #garden {
+        animation: none;
     }
 
-    #elapseClock .digit {
-        font-size: 18px;
+    .cover-heart path {
+        animation: none;
+        stroke-dashoffset: 0;
     }
 
-    #loveu {
-        font-size: 13px;
+    #heartPhoto .photo-layer.show {
+        transform: scale(1);
     }
 }

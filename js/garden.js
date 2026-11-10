@@ -60,7 +60,7 @@ Petal.prototype = {
 		b = d.clone().mult(this.stretchB);
 
 		ctx.strokeStyle = this.bloom.c;
-		ctx.lineWidth = 1.2;
+		ctx.lineWidth = Garden.options.lineWidth;
 		ctx.shadowColor = this.bloom.glowColor || this.bloom.c;
 		/* Reduce GPU-heavy shadowBlur on mobile */
 		ctx.shadowBlur = (typeof isMobile !== 'undefined' && isMobile) ? 2 : 6;
@@ -153,7 +153,7 @@ Garden.prototype = {
 		var glowColor = Garden.randomGlowColor();
 		this.createBloom(
 			a, b,
-			Garden.randomInt(Garden.options.bloomRadius.min, Garden.options.bloomRadius.max),
+			Garden.random(Garden.options.bloomRadius.min, Garden.options.bloomRadius.max),
 			color,
 			Garden.randomInt(Garden.options.petalCount.min, Garden.options.petalCount.max),
 			glowColor
@@ -165,6 +165,19 @@ Garden.prototype = {
 	clear: function () {
 		this.blooms = [];
 		this.ctx.clearRect(0, 0, this.element.width, this.element.height);
+	},
+	/* Keep blooms that are still growing in place when the canvas is resized */
+	rescale: function (k) {
+		var bloom;
+		for (var a = 0; a < this.blooms.length; a++) {
+			bloom = this.blooms[a];
+			bloom.p.x *= k;
+			bloom.p.y *= k;
+			bloom.r *= k;
+			for (var c = 0; c < bloom.petals.length; c++) {
+				bloom.petals[c].r *= k;
+			}
+		}
 	}
 };
 
@@ -173,6 +186,7 @@ Garden.options = {
 	petalStretch: { min: 0.1, max: 3 },
 	growFactor: { min: 0.1, max: 1 },
 	bloomRadius: { min: 8, max: 12 },
+	lineWidth: 1.2,
 	density: 10,
 	growSpeed: 1000 / 60,
 	color: {

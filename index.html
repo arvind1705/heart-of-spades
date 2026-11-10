@@ -7,25 +7,23 @@
         <link rel="icon" type="image/png" sizes="16x16" href="images/favicon-16x16.png" />
         <link rel="manifest" href="images/site.webmanifest" />
         <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
         <meta name="description" content="A love story written in code — Aravind &amp; Sanjana, forever." />
         <meta property="og:title" content="Aravind &hearts; Sanjana" />
         <meta property="og:description" content="A love story written in code — our forever." />
         <meta property="og:type" content="website" />
-        <meta property="og:image" content="images/apple-touch-icon.png" />
-        <meta name="theme-color" content="#1a0a14" />
+        <meta property="og:image" content="images/android-chrome-512x512.png" />
+        <meta name="theme-color" content="#0b0509" />
 
-        <!-- Google Fonts: Elegant serif + Code font -->
+        <!-- Google Fonts: serif for prose, mono for code, script for the names -->
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-        <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Fira+Code:wght@300;400&display=swap" rel="stylesheet" />
+        <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Fira+Code:wght@300;400;500&family=Pinyon+Script&display=swap" rel="stylesheet" />
 
-        <style type="text/css">
-            @font-face {
-                font-family: digit;
-                src: url("digital.ttf") format("truetype");
-            }
-        </style>
+        <script type="text/javascript">
+            /* Lets the stylesheet hide the story until it is opened */
+            document.documentElement.className = "js";
+        </script>
 
         <link href="css/default.css" type="text/css" rel="stylesheet" />
         <script type="text/javascript" src="js/jquery.js"></script>
@@ -37,229 +35,177 @@
         <!-- Background sparkle particles -->
         <canvas id="particleCanvas" aria-hidden="true"></canvas>
 
-        <!-- Skip / Replay button -->
-        <button id="skipBtn" aria-label="Skip to end">&#8595; Skip</button>
+        <!-- Cover: the story starts when she opens it -->
+        <div id="cover">
+            <div class="cover-inner">
+                <svg class="cover-heart" viewBox="0 0 100 90" aria-hidden="true">
+                    <path pathLength="1" d="M50 84 C20 62 4 44 4 27 C4 13 15 4 27 4 C37 4 45 9 50 19 C55 9 63 4 73 4 C85 4 96 13 96 27 C96 44 80 62 50 84 Z" />
+                </svg>
+                <p id="coverNote" class="cover-note">A love story, written in code</p>
+                <h1 class="cover-name">For Sanjana</h1>
+                <button id="openBtn" type="button">Open</button>
+            </div>
+        </div>
 
         <div id="mainDiv">
             <div id="content">
-                <div id="code">
-                    <span class="comments">##</span> <br />
-                    <span class="comments"># I am a software engineer,</span> <br />
-                    <span class="comments"># so I write code to celebrate our love story in engineer's way.</span> <br />
-                    <span class="comments">##</span> <br />
-                    <br />
-                    i = Boy(<span class="string">"Aravind"</span>); <br />
-                    u = Girl(<span class="string">"Sanjana"</span>); <br />
-                    <br />
-                    <span class="comments"># Jan 20, 2022, I met you. </span> <br />
-                    i.meet(u) <br />
-                    <span class="comments"># Then, I fell for you. </span> <br />
-                    i.confess(u) <br />
-                    <br />
-                    <span class="comments"># Jan 27, 2022, I said I love you.</span> <br />
-                    u.accepted(i) <br />
-                    <span class="comments"># Since then, I've seen happiness in life every day.</span> <br />
-                    happy(u, i) <br />
-                    <br />
-                    <span class="comments"># We enjoy talking to each other.</span> <br />
-                    talk(u, i) <br />
-                    <span class="comments"># Feb 11, 2022, The moment I held your hand, I knew you were the one.</span> <br />
-                    hold_hands(u, i) <br />
-                    <br />
-                    <span class="comments"># We are falling in love with each other over and over again.</span> <br />
-                    u.falling_in_love_with(i) <br />
-                    i.falling_in_love_with(u)
-                    <br />
-                    <br />
-                    <span id="whileTrue" class="comments"># You are the greatest love of my life.</span> <br />
-                    while <span class="keyword">True</span>: <br />
-                    <span class="placeholder"></span><span class="keyword">if</span> u.with(i): <br />
-                    <span class="placeholder"></span><span class="placeholder"></span>u = everything <br />
-                    <span class="placeholder"></span><span class="keyword">else</span>: <br />
-                    <span class="placeholder"></span><span class="placeholder"></span>everything = u <br />
-                    <br />
-                    <span class="divider">&mdash;&mdash;&mdash;</span> <br />
-                    <br />
-                    <span class="comments"># Dec 4, 2022 &mdash; She said yes.</span> <br />
-                    <span id="proposeReveal"></span>i.propose(u, ring=<span class="keyword">True</span>) <br />
-                    u.said(<span class="string">"Yes!"</span>) <br />
-                    <span class="comments"># My heart has never beaten this fast.</span> <br />
-                    our_future = <span class="keyword">Promise</span>(forever) <br />
-                    <br />
-                    <span class="divider">&mdash;&mdash;&mdash;</span> <br />
-                    <br />
-                    <span class="comments"># Jan 26, 2023 &mdash; The most beautiful day.</span> <br />
-                    <span class="prose">We stood together, hand in hand,</span> <br />
-                    <span class="prose">and made promises that will last a lifetime.</span> <br />
-                    <span id="marryReveal"></span>i.marry(u) <br />
-                    <span class="prose">You were the most beautiful bride</span> <br />
-                    <span class="prose">I had ever seen.</span> <br />
-                    us = Family(<span class="string">"Aravind"</span>, <span class="string">"Sanjana"</span>) <br />
-                    <br />
-                    <span class="divider">&mdash;&mdash;&mdash;</span> <br />
-                    <br />
-                    <span class="comments"># Aug 3, 2024 &mdash; And then, a miracle.</span> <br />
-                    <span class="prose daivik-line">A tiny heartbeat. A new beginning.</span> <br />
-                    <span class="prose daivik-line">The universe gave us the greatest gift &mdash;</span> <br />
-                    <span id="daivikReveal" class="daivik-name">Daivik</span> <br />
-                    <span class="prose daivik-line">Our son. Our whole world.</span> <br />
-                    us.add(<span class="string">"Daivik"</span>) <br />
-                    <span class="prose daivik-line">In that moment, love multiplied infinitely.</span> <br />
-                    <br />
-                    <span class="divider">&mdash;&mdash;&mdash;</span> <br />
-                    <br />
-                    <span class="comments"># Coming soon &mdash; Another miracle, already on their way.</span> <br />
-                    <span class="prose baby-line">The universe isn't done surprising us.</span> <br />
-                    <span class="prose baby-line">We haven't met you yet &mdash; but we already love you.</span> <br />
-                    <span id="babyReveal" class="baby-name">Baby #2</span> <br />
-                    <span class="prose baby-line">A chapter we are writing one heartbeat at a time.</span> <br />
-                    us.expecting(<span class="string">"Baby #2"</span>) <br />
-                    <span class="prose baby-line">Love doesn't split &mdash; it only grows.</span> <br />
-                    <br />
-                    <span class="divider">&mdash;&mdash;&mdash;</span> <br />
-                    <br />
-                    <span id="finaleReveal" class="prose finale">From two strangers to soulmates,</span> <br />
-                    <span class="prose finale">from soulmates to a family &mdash;</span> <br />
-                    <span class="prose finale">this is our forever, Sanjana.</span> <br />
-                </div>
                 <div id="heartCol">
                     <div id="loveHeart">
+                        <!-- Optional photos (images/photos/*.jpg) show inside the heart -->
+                        <div id="heartPhoto" aria-hidden="true">
+                            <div class="photo-layer"></div>
+                            <div class="photo-layer"></div>
+                        </div>
                         <canvas id="garden" aria-hidden="true"></canvas>
+                        <div id="heartDate" aria-hidden="true">
+                            <div id="dateDay"></div>
+                            <div id="dateYear"></div>
+                        </div>
                         <div id="words">
-                            <div id="messages" aria-live="polite">
-                                Sanjana, I have been in love with you for
-                                <div id="elapseClock"></div>
+                            <div id="messages">
+                                <div class="lead">Sanjana, I have loved you for</div>
+                                <div id="elapseDays"></div>
+                                <div class="days-label">days</div>
+                                <div id="elapseClock">
+                                    <span id="elapseHrs" class="digit"></span><span class="time-label">hrs</span>
+                                    <span id="elapseMin" class="digit"></span><span class="time-label">min</span>
+                                    <span id="elapseSec" class="digit"></span><span class="time-label">sec</span>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    <div id="loveu" aria-live="polite">
-                        Our little family &mdash; Daivik, Baby #2, and you &mdash;
-                        <br />my entire world.
-                        <br />
-                        <div class="signature">&mdash; Aravind</div>
+                </div>
+
+                <div id="storyCol">
+                    <!-- One .scene per moment. data-day / data-year show inside the heart;
+                         data-photo="name" shows images/photos/name.jpg there if the file exists. -->
+                    <div id="stage" aria-live="polite">
+                        <div class="scene">
+                            <h2 class="headline">I'm a software engineer,</h2>
+                            <p class="body">so I wrote our love story<br />the only way I know how.</p>
+                            <div class="code"><div>i = Boy(<span class="string">"Aravind"</span>)</div><div>u = Girl(<span class="string">"Sanjana"</span>)</div></div>
+                        </div>
+
+                        <div class="scene" data-day="Jan 20" data-year="2022" data-photo="met">
+                            <h2 class="headline">I met you.</h2>
+                            <p class="body">And just like that, I fell for you.</p>
+                            <div class="code"><div>i.meet(u)</div></div>
+                        </div>
+
+                        <div class="scene" data-day="Jan 27" data-year="2022" data-photo="love">
+                            <h2 class="headline">I said &ldquo;I love you.&rdquo;</h2>
+                            <p class="body">Since then, I have found happiness<br />in every single day.</p>
+                            <div class="code"><div>i.confess(u)</div><div>u.accepted(i)</div></div>
+                        </div>
+
+                        <div class="scene" data-day="Feb 11" data-year="2022" data-photo="hands">
+                            <h2 class="headline">I held your hand.</h2>
+                            <p class="body">And in that moment,<br />I knew you were the one.</p>
+                            <div class="code"><div>hold_hands(u, i)</div></div>
+                        </div>
+
+                        <div class="scene" data-day="Every day" data-year="&infin;" data-photo="us">
+                            <h2 class="headline">You are the greatest love of my life.</h2>
+                            <p class="body">We keep falling in love with each other,<br />over and over again.</p>
+                            <div class="code"><div><span class="keyword">while</span> <span class="keyword">True</span>:</div><div><span class="indent"></span><span class="keyword">if</span> u.with(i):</div><div><span class="indent"></span><span class="indent"></span>u = everything</div><div><span class="indent"></span><span class="keyword">else</span>:</div><div><span class="indent"></span><span class="indent"></span>everything = u</div></div>
+                        </div>
+
+                        <div class="scene" data-day="Dec 4" data-year="2022" data-photo="proposal">
+                            <h2 class="headline">I asked. You said yes.</h2>
+                            <p class="body">My heart has never beaten this fast.</p>
+                            <div class="code"><div>i.propose(u, ring=<span class="keyword">True</span>)</div><div>our_future = <span class="keyword">Promise</span>(forever)</div></div>
+                        </div>
+
+                        <div class="scene" data-day="Jan 26" data-year="2023" data-photo="wedding">
+                            <h2 class="headline">The most beautiful day.</h2>
+                            <p class="body">We stood together, hand in hand, and made promises that will last a lifetime.</p>
+                            <p class="body">You were the most beautiful bride<br />I had ever seen.</p>
+                            <div class="code"><div>us = Family(<span class="string">"Aravind"</span>, <span class="string">"Sanjana"</span>)</div></div>
+                        </div>
+
+                        <div class="scene" data-day="Aug 3" data-year="2024" data-photo="daivik">
+                            <p class="eyebrow">And then, a miracle</p>
+                            <h2 id="daivikReveal" class="name daivik-name" data-reveal="daivik">Daivik</h2>
+                            <p class="body">A tiny heartbeat. A new beginning.<br />Our son. Our whole world.</p>
+                            <div class="code"><div>us.add(<span class="string">"Daivik"</span>)</div></div>
+                        </div>
+
+                        <div class="scene" data-day="Sep 9" data-year="2026" data-photo="deeyan">
+                            <p class="eyebrow">And then, there were four</p>
+                            <h2 id="deeyanReveal" class="name deeyan-name" data-reveal="deeyan">Deeyan</h2>
+                            <p class="body">We loved you long before we met you.<br />Love didn't divide &mdash; it only grew.</p>
+                            <div class="code"><div>us.add(<span class="string">"Deeyan"</span>)</div></div>
+                        </div>
+
+                        <div class="scene" data-photo="family">
+                            <p class="body finale">From two strangers to soulmates,</p>
+                            <p class="body finale">from soulmates to a family of four &mdash;</p>
+                            <h2 class="headline">this is our forever, Sanjana.</h2>
+                        </div>
+
+                        <div class="scene" data-photo="family">
+                            <div id="loveu">
+                                You, Daivik and Deeyan &mdash;
+                                <br />my entire world.
+                                <div class="signature">Aravind</div>
+                            </div>
+                            <div id="family">
+                                <div class="stat">
+                                    <div class="stat-label">Married for</div>
+                                    <div id="statMarried" class="stat-value"></div>
+                                </div>
+                                <div class="stat">
+                                    <div class="stat-label">Daivik is</div>
+                                    <div id="statDaivik" class="stat-value"></div>
+                                </div>
+                                <div class="stat">
+                                    <div class="stat-label">Deeyan is</div>
+                                    <div id="statDeeyan" class="stat-value"></div>
+                                </div>
+                            </div>
+                            <button id="replayBtn" type="button">Read it again</button>
+                        </div>
+                    </div>
+
+                    <div id="stageFoot">
+                        <div id="hint"></div>
+                        <div id="dots" aria-hidden="true"></div>
                     </div>
                 </div>
             </div>
         </div>
 
         <script type="text/javascript">
-            /* offsetX, offsetY, heartScaleX, heartScaleY are now computed
-               dynamically in functions.js via computeHeartMetrics() */
-            var together = new Date();
-            together.setFullYear(2022, 0, 20);
-            together.setHours(13);
-            together.setMinutes(30);
-            together.setSeconds(0);
-            together.setMilliseconds(0);
+            /* --- Our dates (months are 0-based: 0 = January) --- */
+            var together = new Date(2022, 0, 20, 13, 30, 0);
+            var milestones = [
+                { id: "statMarried", date: new Date(2023, 0, 26) },
+                { id: "statDaivik", date: new Date(2024, 7, 3) },
+                { id: "statDeeyan", date: new Date(2026, 8, 9) }
+            ];
+            /* The cover greets her differently on these days (month is 1-12 here) */
+            var specialDays = [
+                { month: 1, day: 20, note: "It all began on this day" },
+                { month: 1, day: 26, note: "Happy anniversary, my love" },
+                { month: 2, day: 14, note: "Happy Valentine's Day, my love" }
+            ];
 
             if (!document.createElement("canvas").getContext) {
                 var msg = document.createElement("div");
                 msg.id = "errorMsg";
                 msg.innerHTML = "Your browser doesn't support HTML5!<br/>Please use a modern browser.";
                 document.body.appendChild(msg);
-                $("#code").css("display", "none");
+                $("#cover, #mainDiv").css("display", "none");
             } else {
                 timeElapse(together);
+                updateMilestones(milestones);
                 setInterval(function () {
                     timeElapse(together);
+                    updateMilestones(milestones);
                 }, 500);
-                $("#code").typewriter();
+                initStory();
+                initCover(specialDays, startStory);
             }
-
-            /* --- Floating Hearts on Click/Touch + Idle --- */
-            var brd = document.createElement("DIV");
-            brd.style.cssText = "position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:998;";
-            document.body.appendChild(brd);
-
-            var hearts = [];
-            var down = false;
-            var heartEvent = null;
-            var heartFrameRunning = false;
-
-            function generateHeart(x, y, xBound, xStart, scale) {
-                var heart = document.createElement("DIV");
-                heart.setAttribute('class', 'heart');
-                heart.style.setProperty('--heart-scale', scale);
-                brd.appendChild(heart);
-                heart.time = 3500;
-                heart.x = x;
-                heart.y = y;
-                heart.bound = xBound;
-                heart.direction = xStart;
-                heart.style.left = heart.x + "px";
-                heart.style.top = heart.y + "px";
-                heart.scale = scale;
-                heart.style.transform = "scale(" + scale + "," + scale + ")";
-                hearts.push(heart);
-                if (!heartFrameRunning) {
-                    heartFrameRunning = true;
-                    requestAnimationFrame(heartFrame);
-                }
-                return heart;
-            }
-
-            document.addEventListener('mousedown', function(e) { down = true; heartEvent = e; });
-            document.addEventListener('mouseup', function(e) { down = false; });
-            document.addEventListener('mousemove', function(e) { heartEvent = e; });
-            document.addEventListener('touchstart', function(e) { down = true; heartEvent = e.touches[0]; }, { passive: true });
-            document.addEventListener('touchend', function(e) { down = false; });
-            document.addEventListener('touchmove', function(e) { heartEvent = e.touches[0]; }, { passive: true });
-
-            var heartBefore = Date.now();
-
-            function heartFrame() {
-                var current = Date.now();
-                var deltaTime = current - heartBefore;
-                heartBefore = current;
-                for (var i = hearts.length - 1; i >= 0; i--) {
-                    var heart = hearts[i];
-                    heart.time -= deltaTime;
-                    if (heart.time > 0) {
-                        heart.y -= 0.6;
-                        heart.style.top = heart.y + "px";
-                        heart.style.left = heart.x + heart.direction * heart.bound * Math.sin(heart.y * heart.scale / 30) / heart.y * 200 + "px";
-                        heart.style.opacity = Math.max(0, heart.time / 3500);
-                    } else {
-                        heart.parentNode.removeChild(heart);
-                        hearts.splice(i, 1);
-                    }
-                }
-                if (hearts.length > 0 || down) {
-                    requestAnimationFrame(heartFrame);
-                } else {
-                    heartFrameRunning = false;
-                }
-            }
-
-            /* Generate click/hold hearts */
-            setInterval(function() {
-                if (down && heartEvent) {
-                    var start = 1 - Math.round(Math.random()) * 2;
-                    var scale = Math.random() * Math.random() * 0.6 + 0.3;
-                    var bound = 25 + Math.random() * 20;
-                    generateHeart(heartEvent.pageX, heartEvent.pageY - 5, bound, start, scale);
-                }
-            }, 100);
-
-            /* Idle ambient hearts — one every ~10 seconds from a random edge */
-            setInterval(function() {
-                var edge = Math.floor(Math.random() * 3); // 0=bottom, 1=left, 2=right
-                var x, y;
-                if (edge === 0) {
-                    x = Math.random() * window.innerWidth;
-                    y = window.innerHeight - 10;
-                } else if (edge === 1) {
-                    x = 10;
-                    y = Math.random() * window.innerHeight;
-                } else {
-                    x = window.innerWidth - 10;
-                    y = Math.random() * window.innerHeight;
-                }
-                var scale = Math.random() * 0.4 + 0.2;
-                var start = 1 - Math.round(Math.random()) * 2;
-                var bound = 20 + Math.random() * 15;
-                generateHeart(x, y, bound, start, scale);
-            }, 10000);
         </script>
     </body>
 </html>
