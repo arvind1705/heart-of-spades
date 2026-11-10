@@ -1,184 +1,184 @@
 /* ============================================
    HEART OF SPADES — A love story, written in code
-   Night-sky romantic theme
+   Celestial Rose & Starlight theme
    ============================================ */
 
 /* --- Google Fonts loaded in HTML --- */
 
 :root {
-    --bg: #0b0509;
-    --ink: #eadbcb;
-    --ink-soft: #b5a294;
-    --gold: #d9b48f;
-    --gold-bright: #f4dcbc;
-    --rose: #d9667f;
-    --lavender: #c9b3e6;
-    --sage: #9db09a;
-    --panel: rgba(15, 7, 17, 0.74);
-    --hairline: rgba(217, 180, 143, 0.16);
-    --code-string: #efb088;
-    --code-keyword: #e5718a;
-    --heart-a: #f08a94;
-    --heart-b: #d9507a;
-    --heart-glow: rgba(217, 80, 122, 0.45);
+    --bg: #070816;
+    --ink: #f8eff6;
+    --ink-soft: #b8a8cc;
+    --gold: #f0b8c8;
+    --gold-bright: #ffe8f0;
+    --rose: #ff5c8a;
+    --lavender: #c8adff;
+    --sage: #a2c4b8;
+    --panel: rgba(14, 13, 34, 0.74);
+    --hairline: rgba(240, 184, 200, 0.22);
+    --code-string: #ff9ebb;
+    --code-keyword: #b99aff;
+    --heart-a: #ff7aa2;
+    --heart-b: #e03e73;
+    --heart-glow: rgba(255, 92, 138, 0.55);
     --serif: 'Cormorant Garamond', 'Georgia', serif;
     --mono: 'Fira Code', 'Source Code Pro', 'Consolas', monospace;
     --script: 'Pinyon Script', 'Cormorant Garamond', cursive;
-    /* Ambient glow, re-graded per chapter by body[data-tint] below */
-    --glow-a: rgba(150, 40, 82, 0.34);
-    --glow-b: rgba(92, 52, 150, 0.26);
-    --glow-c: rgba(214, 130, 90, 0.10);
+    /* Ambient aurora glow, re-graded per chapter by body[data-tint] below */
+    --glow-a: rgba(214, 56, 116, 0.36);
+    --glow-b: rgba(88, 62, 196, 0.34);
+    --glow-c: rgba(56, 118, 210, 0.16);
 }
 
 /* Registered so the ambient glow can crossfade between chapters */
 @property --glow-a {
     syntax: '<color>';
     inherits: true;
-    initial-value: rgba(150, 40, 82, 0.34);
+    initial-value: rgba(214, 56, 116, 0.36);
 }
 
 @property --glow-b {
     syntax: '<color>';
     inherits: true;
-    initial-value: rgba(92, 52, 150, 0.26);
+    initial-value: rgba(88, 62, 196, 0.34);
 }
 
 @property --glow-c {
     syntax: '<color>';
     inherits: true;
-    initial-value: rgba(214, 130, 90, 0.10);
+    initial-value: rgba(56, 118, 210, 0.16);
 }
 
 /* --- Chapter colour grades (set from each scene's data-tint) --- */
 body[data-tint="met"] {
-    --glow-a: rgba(168, 92, 40, 0.32);
-    --glow-b: rgba(120, 52, 96, 0.22);
-    --glow-c: rgba(232, 168, 100, 0.16);
+    --glow-a: rgba(236, 72, 138, 0.38);
+    --glow-b: rgba(116, 68, 208, 0.32);
+    --glow-c: rgba(246, 182, 140, 0.18);
 }
 
 body[data-tint="love"] {
-    --glow-a: rgba(178, 44, 82, 0.38);
-    --glow-b: rgba(104, 44, 118, 0.24);
-    --glow-c: rgba(224, 110, 96, 0.12);
+    --glow-a: rgba(244, 52, 112, 0.44);
+    --glow-b: rgba(128, 48, 176, 0.32);
+    --glow-c: rgba(255, 140, 176, 0.20);
 }
 
 body[data-tint="hands"] {
-    --glow-a: rgba(172, 84, 62, 0.32);
-    --glow-b: rgba(110, 56, 110, 0.22);
-    --glow-c: rgba(236, 164, 102, 0.16);
+    --glow-a: rgba(218, 82, 146, 0.36);
+    --glow-b: rgba(76, 82, 198, 0.32);
+    --glow-c: rgba(244, 176, 198, 0.18);
 }
 
 body[data-tint="everyday"] {
-    --glow-a: rgba(164, 66, 76, 0.34);
-    --glow-b: rgba(96, 56, 132, 0.24);
-    --glow-c: rgba(232, 150, 92, 0.15);
+    --glow-a: rgba(192, 68, 158, 0.38);
+    --glow-b: rgba(68, 92, 210, 0.34);
+    --glow-c: rgba(255, 168, 204, 0.18);
 }
 
 body[data-tint="proposal"] {
-    --glow-a: rgba(186, 42, 84, 0.40);
-    --glow-b: rgba(108, 42, 116, 0.26);
-    --glow-c: rgba(228, 118, 92, 0.13);
+    --glow-a: rgba(248, 64, 122, 0.44);
+    --glow-b: rgba(136, 68, 212, 0.34);
+    --glow-c: rgba(255, 210, 156, 0.22);
 }
 
 body[data-tint="wedding"] {
-    --glow-a: rgba(176, 104, 52, 0.32);
-    --glow-b: rgba(128, 62, 104, 0.22);
-    --glow-c: rgba(244, 196, 120, 0.18);
+    --glow-a: rgba(238, 128, 158, 0.40);
+    --glow-b: rgba(118, 74, 196, 0.30);
+    --glow-c: rgba(255, 216, 162, 0.24);
 }
 
 body[data-tint="daivik"] {
-    --glow-a: rgba(180, 78, 62, 0.34);
-    --glow-b: rgba(116, 52, 108, 0.23);
-    --glow-c: rgba(240, 182, 104, 0.17);
+    --glow-a: rgba(242, 148, 108, 0.38);
+    --glow-b: rgba(196, 68, 128, 0.30);
+    --glow-c: rgba(255, 220, 150, 0.24);
 }
 
 body[data-tint="deeyan"] {
-    --glow-a: rgba(112, 66, 138, 0.32);
-    --glow-b: rgba(72, 52, 128, 0.28);
-    --glow-c: rgba(196, 144, 178, 0.12);
+    --glow-a: rgba(142, 92, 232, 0.40);
+    --glow-b: rgba(72, 112, 224, 0.34);
+    --glow-c: rgba(228, 176, 255, 0.22);
 }
 
 body[data-tint="finale"] {
-    --glow-a: rgba(182, 56, 82, 0.38);
-    --glow-b: rgba(102, 50, 128, 0.25);
-    --glow-c: rgba(238, 166, 98, 0.17);
+    --glow-a: rgba(242, 64, 126, 0.42);
+    --glow-b: rgba(108, 68, 214, 0.36);
+    --glow-c: rgba(255, 202, 168, 0.22);
 }
 
-/* --- Champagne Dawn theme (anniversary; set via data-theme) ---
-   Midnight Rose above is the default. This block only overrides the
+/* --- Champagne Starlight theme (anniversary; set via data-theme) ---
+   Celestial Rose above is the default. This block only overrides the
    tokens, so every rule and chapter grade below it follows along. */
 body[data-theme="champagne"] {
-    --bg: #170c0a;
-    --ink: #f3e2cf;
-    --ink-soft: #c4a88f;
-    --gold: #e6b87e;
-    --gold-bright: #f7e3b8;
-    --rose: #e08a6d;
-    --panel: rgba(26, 12, 8, 0.74);
-    --hairline: rgba(230, 184, 126, 0.18);
-    --code-string: #f4c48a;
-    --code-keyword: #e88a6a;
-    --heart-a: #f2a284;
-    --heart-b: #dd7355;
-    --heart-glow: rgba(221, 115, 85, 0.45);
-    --glow-a: rgba(190, 110, 58, 0.32);
-    --glow-b: rgba(140, 70, 60, 0.22);
-    --glow-c: rgba(244, 196, 120, 0.16);
+    --bg: #0c0918;
+    --ink: #faefe8;
+    --ink-soft: #cab6c8;
+    --gold: #f4cda2;
+    --gold-bright: #fff0db;
+    --rose: #f0829c;
+    --panel: rgba(20, 14, 32, 0.74);
+    --hairline: rgba(244, 205, 162, 0.22);
+    --code-string: #f9cfa0;
+    --code-keyword: #f09bb4;
+    --heart-a: #f7a8b8;
+    --heart-b: #e26888;
+    --heart-glow: rgba(240, 130, 156, 0.50);
+    --glow-a: rgba(220, 124, 142, 0.36);
+    --glow-b: rgba(112, 72, 180, 0.28);
+    --glow-c: rgba(250, 206, 142, 0.20);
 }
 
 /* Champagne chapter grades (win over the rose grades by specificity) */
 body[data-theme="champagne"][data-tint="met"] {
-    --glow-a: rgba(198, 118, 52, 0.34);
-    --glow-b: rgba(146, 74, 62, 0.22);
-    --glow-c: rgba(248, 204, 124, 0.18);
+    --glow-a: rgba(226, 134, 146, 0.36);
+    --glow-b: rgba(118, 76, 186, 0.28);
+    --glow-c: rgba(252, 212, 148, 0.20);
 }
 
 body[data-theme="champagne"][data-tint="love"] {
-    --glow-a: rgba(204, 96, 62, 0.36);
-    --glow-b: rgba(150, 70, 66, 0.23);
-    --glow-c: rgba(242, 168, 104, 0.14);
+    --glow-a: rgba(236, 98, 136, 0.38);
+    --glow-b: rgba(128, 68, 178, 0.28);
+    --glow-c: rgba(250, 192, 144, 0.18);
 }
 
 body[data-theme="champagne"][data-tint="hands"] {
-    --glow-a: rgba(200, 112, 56, 0.33);
-    --glow-b: rgba(144, 74, 62, 0.22);
-    --glow-c: rgba(250, 192, 116, 0.17);
+    --glow-a: rgba(224, 128, 148, 0.35);
+    --glow-b: rgba(112, 78, 188, 0.28);
+    --glow-c: rgba(252, 206, 146, 0.19);
 }
 
 body[data-theme="champagne"][data-tint="everyday"] {
-    --glow-a: rgba(196, 104, 60, 0.34);
-    --glow-b: rgba(142, 72, 64, 0.23);
-    --glow-c: rgba(246, 184, 110, 0.16);
+    --glow-a: rgba(214, 112, 156, 0.36);
+    --glow-b: rgba(104, 82, 194, 0.30);
+    --glow-c: rgba(250, 198, 148, 0.18);
 }
 
 body[data-theme="champagne"][data-tint="proposal"] {
-    --glow-a: rgba(208, 92, 60, 0.38);
-    --glow-b: rgba(152, 68, 64, 0.24);
-    --glow-c: rgba(244, 160, 100, 0.15);
+    --glow-a: rgba(242, 96, 138, 0.40);
+    --glow-b: rgba(132, 72, 196, 0.30);
+    --glow-c: rgba(255, 216, 152, 0.22);
 }
 
 body[data-theme="champagne"][data-tint="wedding"] {
-    --glow-a: rgba(206, 128, 58, 0.34);
-    --glow-b: rgba(150, 80, 62, 0.22);
-    --glow-c: rgba(252, 214, 132, 0.20);
+    --glow-a: rgba(238, 146, 142, 0.38);
+    --glow-b: rgba(122, 78, 188, 0.28);
+    --glow-c: rgba(255, 224, 158, 0.24);
 }
 
 body[data-theme="champagne"][data-tint="daivik"] {
-    --glow-a: rgba(202, 112, 60, 0.35);
-    --glow-b: rgba(148, 74, 64, 0.23);
-    --glow-c: rgba(250, 198, 118, 0.18);
+    --glow-a: rgba(236, 142, 112, 0.37);
+    --glow-b: rgba(168, 76, 142, 0.28);
+    --glow-c: rgba(255, 218, 148, 0.22);
 }
 
 body[data-theme="champagne"][data-tint="deeyan"] {
-    --glow-a: rgba(158, 92, 84, 0.32);
-    --glow-b: rgba(116, 66, 70, 0.25);
-    --glow-c: rgba(226, 158, 120, 0.13);
+    --glow-a: rgba(154, 102, 224, 0.36);
+    --glow-b: rgba(88, 104, 212, 0.30);
+    --glow-c: rgba(236, 186, 248, 0.18);
 }
 
 body[data-theme="champagne"][data-tint="finale"] {
-    --glow-a: rgba(206, 100, 60, 0.37);
-    --glow-b: rgba(148, 72, 62, 0.24);
-    --glow-c: rgba(250, 200, 118, 0.18);
+    --glow-a: rgba(236, 108, 142, 0.39);
+    --glow-b: rgba(118, 74, 196, 0.30);
+    --glow-c: rgba(254, 214, 152, 0.22);
 }
 
 *, *::before, *::after {
@@ -195,6 +195,7 @@ html {
 html,
 body {
     height: 100%;
+    height: 100dvh;
     overflow: hidden;
 }
 
@@ -282,12 +283,13 @@ body::after {
     left: 0;
     width: 100%;
     height: 100%;
+    height: 100dvh;
     z-index: 20;
     align-items: center;
     justify-content: center;
     padding: 24px;
     text-align: center;
-    transition: opacity 1.2s ease, transform 1.2s ease;
+    transition: opacity 1.2s ease, transform 1.2s ease, filter 1.2s ease;
 }
 
 .js #cover {
@@ -297,39 +299,58 @@ body::after {
 .opened #cover {
     opacity: 0;
     transform: scale(1.06);
+    filter: blur(8px);
     pointer-events: none;
 }
 
 .cover-inner {
+    position: relative;
     display: flex;
     flex-direction: column;
     align-items: center;
+    max-width: 100%;
+}
+
+.cover-inner::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: min(360px, 88vw);
+    height: min(360px, 88vw);
+    background: radial-gradient(circle, var(--glow-a) 0%, transparent 70%);
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    z-index: -1;
 }
 
 .cover-heart {
-    width: 64px;
-    height: 58px;
+    width: 68px;
+    height: 62px;
     overflow: visible;
-    filter: drop-shadow(0 0 12px rgba(217, 102, 127, 0.55));
+    filter: drop-shadow(0 0 16px rgba(255, 92, 138, 0.65));
     animation: coverBeat 1.8s ease-in-out 2.6s infinite;
 }
 
 .cover-heart path {
-    fill: none;
+    fill: rgba(255, 92, 138, 0);
     stroke: var(--rose);
     stroke-width: 2.5;
     stroke-linecap: round;
     stroke-linejoin: round;
     stroke-dasharray: 1;
     stroke-dashoffset: 1;
-    animation: coverDraw 2.4s ease-in-out 0.3s forwards;
+    animation:
+        coverDraw 2.4s ease-in-out 0.3s forwards,
+        coverFill 1.6s ease 2.1s forwards;
 }
 
 .cover-note {
-    margin-top: 34px;
+    margin-top: 32px;
     font-size: 14px;
     font-weight: 500;
     letter-spacing: 0.3em;
+    text-indent: 0.3em;
     text-transform: uppercase;
     color: var(--gold);
     animation: fadeInUp 1.4s ease-out 0.9s both;
@@ -337,22 +358,37 @@ body::after {
 
 .cover-name {
     margin-top: 6px;
+    padding: 0 12px;
     font-family: var(--script);
     font-size: 104px;
+    font-size: clamp(60px, 16.5vw, 104px);
     font-weight: 400;
-    line-height: 1.25;
+    line-height: 1.22;
     color: var(--gold-bright);
-    text-shadow: 0 0 40px rgba(217, 150, 110, 0.35);
-    animation: fadeInUp 1.6s ease-out 1.4s both;
+    background: linear-gradient(120deg, #f3bfd0 0%, #ffffff 38%, #ffd1e0 55%, #f6d5b8 75%, #f3bfd0 100%);
+    background-size: 220% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 0 34px rgba(236, 96, 152, 0.42));
+    animation:
+        fadeInUp 1.6s ease-out 1.4s both,
+        foilShimmer 7s ease-in-out 3.2s infinite;
 }
 
 #openBtn {
     margin-top: 28px;
-    min-width: 168px;
-    padding: 14px 40px;
-    background: rgba(217, 180, 143, 0.06);
-    border: 1px solid rgba(217, 180, 143, 0.5);
+    min-width: 174px;
+    padding: 14px 42px;
+    background: linear-gradient(160deg, rgba(240, 184, 200, 0.16), rgba(142, 92, 232, 0.12));
+    border: 1px solid rgba(255, 220, 234, 0.52);
     border-radius: 999px;
+    box-shadow:
+        0 8px 28px rgba(4, 5, 16, 0.5),
+        0 0 26px rgba(236, 96, 152, 0.22),
+        inset 0 1px 0 rgba(255, 240, 248, 0.3);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
     color: var(--gold-bright);
     font-family: var(--serif);
     font-size: 17px;
@@ -361,20 +397,36 @@ body::after {
     text-indent: 0.32em;
     text-transform: uppercase;
     cursor: pointer;
-    transition: background 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
+    transition: background 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease, transform 0.2s ease;
     animation: fadeInUp 1.6s ease-out 2.3s both;
 }
 
 #openBtn:hover,
 #openBtn:focus-visible {
-    background: rgba(217, 180, 143, 0.16);
+    background: linear-gradient(160deg, rgba(240, 184, 200, 0.26), rgba(142, 92, 232, 0.2));
     border-color: var(--gold-bright);
-    box-shadow: 0 0 36px rgba(217, 150, 110, 0.3);
+    box-shadow:
+        0 10px 32px rgba(4, 5, 16, 0.58),
+        0 0 38px rgba(236, 96, 152, 0.38),
+        inset 0 1px 0 rgba(255, 244, 250, 0.42);
     outline: none;
+}
+
+#openBtn:active {
+    transform: scale(0.96);
 }
 
 @keyframes coverDraw {
     to { stroke-dashoffset: 0; }
+}
+
+@keyframes coverFill {
+    to { fill: rgba(255, 92, 138, 0.16); }
+}
+
+@keyframes foilShimmer {
+    0%, 100% { background-position: 0% 50%; }
+    50%      { background-position: 100% 50%; }
 }
 
 @keyframes coverBeat {
@@ -394,6 +446,7 @@ body::after {
     left: 0;
     width: 100%;
     height: 100%;
+    height: 100dvh;
     z-index: 1;
     /* iOS Safari only delivers taps on non-buttons that look clickable */
     cursor: pointer;
@@ -416,8 +469,8 @@ body::after {
     max-width: 600px;
     height: 100%;
     margin: 0 auto;
-    padding: 14px 20px 10px;
-    padding-top: max(14px, env(safe-area-inset-top));
+    padding: 12px 20px 10px;
+    padding-top: max(12px, env(safe-area-inset-top));
     padding-bottom: max(10px, env(safe-area-inset-bottom));
     padding-left: max(20px, env(safe-area-inset-left));
     padding-right: max(20px, env(safe-area-inset-right));
@@ -441,9 +494,9 @@ body::after {
 /* --- Heart Panel --- */
 #loveHeart {
     position: relative;
-    width: min(90vw, 540px);
-    max-width: calc(46vh * 1.069);
-    max-width: calc(46svh * 1.069);
+    width: min(88vw, 520px);
+    max-width: calc(45vh * 1.069);
+    max-width: calc(45svh * 1.069);
     aspect-ratio: 620 / 580;
 }
 
@@ -451,13 +504,13 @@ body::after {
 #loveHeart::before {
     content: '';
     position: absolute;
-    top: 8%;
-    left: 8%;
-    right: 8%;
-    bottom: 14%;
-    background: radial-gradient(ellipse at 50% 45%, var(--glow-a), rgba(217, 140, 110, 0.08) 45%, transparent 70%);
-    opacity: 0;
-    transition: opacity 3s ease;
+    top: 6%;
+    left: 6%;
+    right: 6%;
+    bottom: 12%;
+    background: radial-gradient(ellipse at 50% 45%, var(--glow-a), rgba(142, 92, 232, 0.16) 48%, transparent 72%);
+    opacity: 0.26;
+    transition: opacity 2.6s ease;
     pointer-events: none;
 }
 
@@ -504,7 +557,7 @@ body::after {
     left: 50%;
     width: 42%;
     aspect-ratio: 1;
-    border: 1px solid rgba(240, 190, 150, 0.55);
+    border: 1px solid rgba(255, 190, 214, 0.58);
     border-radius: 50%;
     pointer-events: none;
     animation: heartRing 0.9s ease-out forwards;
@@ -521,7 +574,7 @@ body::after {
 #words {
     position: absolute;
     left: 50%;
-    width: 62%;
+    width: 64%;
     transform: translateX(-50%);
     font-size: 17px;
     line-height: 1.3;
@@ -531,39 +584,54 @@ body::after {
 }
 
 #heartDate {
-    top: 27%;
-    transition: opacity 0.45s ease, top 0.9s ease;
+    top: 29%;
+    transition: opacity 0.45s ease, transform 0.5s ease, filter 0.45s ease;
 }
 
 #heartDate.changing,
 .finished #heartDate {
     opacity: 0;
+    transform: translateX(-50%) translateY(5px) scale(0.96);
+    filter: blur(4px);
 }
 
 #dateDay {
-    font-size: 0.95em;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.55em;
+    font-size: 0.92em;
     font-weight: 500;
     font-variant-numeric: lining-nums;
-    letter-spacing: 0.42em;
-    text-indent: 0.42em;
+    letter-spacing: 0.38em;
+    text-indent: 0.38em;
     text-transform: uppercase;
     color: var(--gold);
 }
 
+#dateDay:not(:empty)::before,
+#dateDay:not(:empty)::after {
+    content: '';
+    display: inline-block;
+    width: 1.1em;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(240, 184, 200, 0.6), transparent);
+}
+
 #dateYear {
-    font-size: 4.4em;
+    font-size: 4.3em;
     font-weight: 300;
     font-variant-numeric: lining-nums;
-    line-height: 1.1;
+    line-height: 1.08;
     letter-spacing: 0.03em;
     color: var(--gold-bright);
-    text-shadow: 0 0 30px rgba(232, 180, 130, 0.4);
+    text-shadow: 0 0 34px rgba(240, 110, 164, 0.48);
     transition: font-size 0.9s ease;
 }
 
 /* --- The running count (finale) --- */
 #words {
-    top: 25%;
+    top: 27%;
 }
 
 #messages {
@@ -588,7 +656,7 @@ body::after {
     line-height: 1.1;
     letter-spacing: 0.02em;
     color: var(--gold-bright);
-    text-shadow: 0 0 30px rgba(232, 180, 130, 0.45);
+    text-shadow: 0 0 34px rgba(240, 110, 164, 0.52);
 }
 
 #messages .days-label {
@@ -689,7 +757,7 @@ body::after {
     line-height: 1.2;
     letter-spacing: 0.01em;
     color: var(--gold-bright);
-    text-shadow: 0 0 34px rgba(217, 150, 110, 0.3);
+    text-shadow: 0 0 36px rgba(236, 96, 152, 0.36);
     text-wrap: balance;
 }
 
@@ -733,45 +801,53 @@ body::after {
 }
 
 #stage .daivik-name {
-    color: #c79f7a;
+    color: #d6b69e;
 }
 
 #stage .daivik-name.revealed {
-    color: var(--gold-bright);
+    color: #fff2de;
     text-shadow:
-        0 0 18px rgba(240, 200, 150, 0.6),
-        0 0 44px rgba(232, 180, 130, 0.4),
-        0 0 80px rgba(217, 102, 127, 0.25);
+        0 0 18px rgba(255, 214, 156, 0.68),
+        0 0 44px rgba(242, 148, 108, 0.45),
+        0 0 84px rgba(255, 92, 138, 0.32);
 }
 
-/* Deeyan — lavender, distinct from Daivik's gold */
+/* Deeyan — celestial wisteria-lavender, distinct from Daivik's starlight gold */
 #stage .deeyan-name {
-    color: #a48ec4;
+    color: #b49ee0;
 }
 
 #stage .deeyan-name.revealed {
-    color: #e6d8f8;
+    color: #f0e8ff;
     text-shadow:
-        0 0 18px rgba(201, 179, 230, 0.65),
-        0 0 44px rgba(190, 160, 230, 0.4),
-        0 0 80px rgba(170, 120, 220, 0.3);
+        0 0 18px rgba(208, 180, 255, 0.72),
+        0 0 44px rgba(154, 112, 242, 0.48),
+        0 0 84px rgba(112, 138, 255, 0.35);
 }
 
 /* --- Code: his signature on every moment --- */
 #stage .code {
     display: inline-block;
+    max-width: calc(100vw - 32px);
     min-height: 2.2em;
-    padding: 8px 16px;
-    background: rgba(15, 7, 17, 0.6);
-    border: 1px solid var(--hairline);
-    border-radius: 10px;
+    padding: 10px 18px;
+    background: linear-gradient(160deg, rgba(22, 18, 48, 0.74), rgba(9, 8, 24, 0.86));
+    border: 1px solid rgba(240, 184, 200, 0.24);
+    border-radius: 12px;
+    box-shadow:
+        0 12px 32px rgba(3, 4, 14, 0.52),
+        0 0 24px rgba(142, 92, 232, 0.1),
+        inset 0 1px 0 rgba(255, 230, 242, 0.16);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     font-family: var(--mono);
     font-size: 13px;
     font-size: clamp(11.5px, 1.75svh, 14px);
     line-height: 1.6;
     text-align: left;
     white-space: nowrap;
-    color: #d6c5b6;
+    overflow-x: auto;
+    color: #e6dbed;
 }
 
 #stage .code > div {
@@ -780,16 +856,18 @@ body::after {
 
 #stage .code .string {
     color: var(--code-string);
+    text-shadow: 0 0 14px rgba(255, 158, 187, 0.3);
 }
 
 #stage .code .keyword {
     color: var(--code-keyword);
     font-weight: 500;
+    text-shadow: 0 0 14px rgba(185, 154, 255, 0.3);
 }
 
 #stage .code .indent {
     display: inline-block;
-    width: 2.4em;
+    width: 2.2em;
 }
 
 #stage .code .cursor {
@@ -797,7 +875,8 @@ body::after {
     width: 2px;
     height: 1.1em;
     margin-left: 2px;
-    background: var(--gold);
+    background: var(--gold-bright);
+    box-shadow: 0 0 8px var(--rose);
     vertical-align: text-bottom;
     animation: cursorBlink 1s steps(1) infinite;
 }
@@ -810,7 +889,7 @@ body::after {
 /* --- Sign-off scene --- */
 #loveu {
     font-size: 22px;
-    font-size: clamp(19px, 3svh, 26px);
+    font-size: clamp(18px, 2.9svh, 26px);
     font-style: italic;
     line-height: 1.35;
     color: var(--ink);
@@ -819,11 +898,11 @@ body::after {
 #loveu .signature {
     margin-top: 2px;
     font-family: var(--script);
-    font-size: 2em;
+    font-size: 2.15em;
     font-style: normal;
-    line-height: 1.2;
+    line-height: 1.15;
     color: var(--gold-bright);
-    text-shadow: 0 0 24px rgba(217, 150, 110, 0.3);
+    text-shadow: 0 0 28px rgba(236, 96, 152, 0.42);
 }
 
 #family {
@@ -831,12 +910,21 @@ body::after {
     justify-content: center;
     width: 100%;
     max-width: 440px;
-    padding-top: 14px;
-    border-top: 1px solid var(--hairline);
+    padding: 12px 6px;
+    background: linear-gradient(160deg, rgba(22, 18, 48, 0.62), rgba(9, 8, 24, 0.76));
+    border: 1px solid var(--hairline);
+    border-radius: 16px;
+    box-shadow:
+        0 10px 28px rgba(3, 4, 14, 0.45),
+        inset 0 1px 0 rgba(255, 230, 242, 0.14);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
 }
 
 #family .stat {
     flex: 1 1 0;
+    min-width: 0;
+    padding: 0 4px;
     text-align: center;
     opacity: 0;
     transform: translateY(10px);
@@ -863,32 +951,37 @@ body::after {
 #family .stat-label {
     font-size: 11px;
     font-weight: 500;
-    letter-spacing: 0.18em;
+    letter-spacing: 0.16em;
+    text-indent: 0.16em;
     text-transform: uppercase;
     color: var(--ink-soft);
 }
 
 #family .stat-value {
     margin-top: 2px;
-    font-size: 15px;
-    letter-spacing: 0.04em;
+    font-size: 14px;
+    font-size: clamp(12px, 3.5vw, 15px);
+    letter-spacing: 0.03em;
+    white-space: nowrap;
     color: var(--ink-soft);
 }
 
 #family .stat-value b {
     font-variant-numeric: lining-nums;
-    font-size: 26px;
+    font-size: 24px;
+    font-size: clamp(19px, 5.4vw, 26px);
     font-weight: 500;
     color: var(--gold-bright);
-    text-shadow: 0 0 18px rgba(232, 180, 130, 0.35);
+    text-shadow: 0 0 18px rgba(240, 110, 164, 0.42);
 }
 
-#replayBtn {
-    padding: 8px 20px;
-    background: transparent;
-    border: 1px solid rgba(217, 180, 143, 0.3);
+.js #stage #replayBtn {
+    padding: 9px 24px;
+    background: linear-gradient(160deg, rgba(240, 184, 200, 0.12), rgba(142, 92, 232, 0.08));
+    border: 1px solid rgba(240, 184, 200, 0.38);
     border-radius: 999px;
-    color: var(--gold);
+    box-shadow: 0 4px 18px rgba(3, 4, 14, 0.38);
+    color: var(--gold-bright);
     font-family: var(--serif);
     font-size: 13px;
     font-weight: 500;
@@ -896,15 +989,20 @@ body::after {
     text-indent: 0.2em;
     text-transform: uppercase;
     cursor: pointer;
-    transition: opacity 1s ease, transform 1s ease, background 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+    transition: opacity 1s ease, transform 1s ease, filter 1s ease, background 0.3s ease, border-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
 }
 
-#replayBtn:hover,
-#replayBtn:focus-visible {
-    background: rgba(217, 180, 143, 0.14);
-    border-color: rgba(217, 180, 143, 0.6);
+.js #stage #replayBtn:hover,
+.js #stage #replayBtn:focus-visible {
+    background: linear-gradient(160deg, rgba(240, 184, 200, 0.22), rgba(142, 92, 232, 0.16));
+    border-color: rgba(255, 224, 238, 0.72);
+    box-shadow: 0 0 26px rgba(236, 96, 152, 0.32);
     color: var(--gold-bright);
     outline: none;
+}
+
+.js #stage #replayBtn:active {
+    transform: scale(0.96);
 }
 
 /* --- Footer: hint + progress dots --- */
@@ -914,14 +1012,14 @@ body::after {
     flex-direction: column;
     align-items: center;
     justify-content: flex-end;
-    height: 56px;
+    height: 52px;
 }
 
 #hint {
-    font-size: 12px;
+    font-size: 11.5px;
     font-weight: 500;
-    letter-spacing: 0.26em;
-    text-indent: 0.26em;
+    letter-spacing: 0.24em;
+    text-indent: 0.24em;
     text-transform: uppercase;
     color: var(--ink-soft);
     opacity: 0;
@@ -943,9 +1041,9 @@ body::after {
 #progress {
     width: min(180px, 50vw);
     height: 2px;
-    margin-top: 10px;
+    margin-top: 9px;
     border-radius: 2px;
-    background: rgba(217, 180, 143, 0.16);
+    background: rgba(240, 184, 200, 0.18);
 }
 
 #progressFill {
@@ -953,7 +1051,7 @@ body::after {
     width: 0;
     height: 100%;
     border-radius: 2px;
-    background: var(--gold);
+    background: linear-gradient(90deg, var(--rose), var(--gold-bright));
     transition: width 0.7s ease;
 }
 
@@ -966,7 +1064,7 @@ body::after {
     height: 6px;
     border-radius: 50%;
     background: var(--gold-bright);
-    box-shadow: 0 0 8px rgba(240, 190, 150, 0.8);
+    box-shadow: 0 0 8px rgba(255, 138, 182, 0.85);
     transform: translateY(-50%);
 }
 
@@ -978,16 +1076,28 @@ body::after {
 }
 
 #dots span {
-    width: 4px;
-    height: 4px;
-    border-radius: 2px;
-    background: rgba(217, 180, 143, 0.25);
-    transition: width 0.5s ease, background 0.5s ease;
+    position: relative;
+    width: 5px;
+    height: 5px;
+    border-radius: 3px;
+    background: rgba(240, 184, 200, 0.26);
+    cursor: pointer;
+    transition: width 0.5s ease, background 0.5s ease, box-shadow 0.5s ease;
+}
+
+#dots span::before {
+    content: '';
+    position: absolute;
+    top: -8px;
+    bottom: -8px;
+    left: -3px;
+    right: -3px;
 }
 
 #dots span.on {
-    width: 16px;
-    background: var(--gold);
+    width: 18px;
+    background: var(--gold-bright);
+    box-shadow: 0 0 8px rgba(255, 138, 182, 0.6);
 }
 
 /* --- Floating Hearts (tap / hold) ---
@@ -1065,42 +1175,72 @@ body::after {
 
 /* Narrow phones */
 @media (max-width: 520px) {
-    .cover-name {
-        font-size: 68px;
-    }
-
     .cover-note {
         font-size: 12px;
         letter-spacing: 0.24em;
+        text-indent: 0.24em;
     }
 
     #content {
         padding-left: max(16px, env(safe-area-inset-left));
         padding-right: max(16px, env(safe-area-inset-right));
     }
+
+    #stage .code {
+        padding: 9px 14px;
+    }
 }
 
 /* Very small phones (iPhone SE, etc.) */
 @media (max-width: 375px) {
-    .cover-name {
-        font-size: 58px;
+    #stage .eyebrow {
+        font-size: 11.5px;
+        letter-spacing: 0.22em;
+        text-indent: 0.22em;
     }
 
-    #stage .eyebrow {
-        font-size: 12px;
-        letter-spacing: 0.24em;
+    #stage .code {
+        padding: 8px 12px;
+        font-size: 11.5px;
+    }
+
+    #family {
+        padding: 10px 4px;
     }
 
     #family .stat-label {
-        letter-spacing: 0.12em;
+        font-size: 10px;
+        letter-spacing: 0.1em;
+        text-indent: 0.1em;
     }
 }
 
-/* Short screens: give the words more of the height */
+/* Standard & compact mobile viewports (e.g. iPhone SE 667px or in-app browsers) */
+@media (max-height: 740px) {
+    #loveHeart {
+        max-width: calc(42vh * 1.069);
+        max-width: calc(42svh * 1.069);
+    }
+
+    #stage .piece + .piece {
+        margin-top: clamp(6px, 1.4svh, 14px);
+    }
+
+    #stageFoot {
+        height: 46px;
+    }
+}
+
+/* Very short screens: give the words even more of the height */
 @media (max-height: 620px) {
     #loveHeart {
-        max-width: calc(40vh * 1.069);
-        max-width: calc(40svh * 1.069);
+        max-width: calc(38vh * 1.069);
+        max-width: calc(38svh * 1.069);
+    }
+
+    #stage .code {
+        padding: 6px 12px;
+        line-height: 1.45;
     }
 }
 
@@ -1132,6 +1272,7 @@ body::after {
 @media (prefers-reduced-motion: reduce) {
     body::before,
     .cover-heart,
+    .cover-name,
     #hint.show,
     #loveHeart.complete #garden,
     #loveHeart.thump,
@@ -1142,6 +1283,7 @@ body::after {
     .cover-heart path {
         animation: none;
         stroke-dashoffset: 0;
+        fill: rgba(255, 92, 138, 0.16);
     }
 
     .js #stage .piece,

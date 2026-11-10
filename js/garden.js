@@ -108,16 +108,23 @@ Bloom.prototype = {
 			this.garden.removeBloom(this);
 		}
 	},
-	/* One soft glow at the heart of each finished bloom */
+	/* One soft glow + warm stamen core at the heart of each finished bloom */
 	drawCentre: function () {
 		var ctx = this.garden.ctx;
+		var isMob = (typeof isMobile !== 'undefined' && isMobile);
 		ctx.save();
 		ctx.translate(this.p.x, this.p.y);
 		ctx.beginPath();
-		ctx.arc(0, 0, Math.max(1.2, this.r * 0.16), 0, Garden.circle);
+		ctx.arc(0, 0, Math.max(1.4, this.r * 0.2), 0, Garden.circle);
 		ctx.fillStyle = this.glowColor;
 		ctx.shadowColor = this.glowColor;
-		ctx.shadowBlur = (typeof isMobile !== 'undefined' && isMobile) ? 3 : 8;
+		ctx.shadowBlur = isMob ? 3 : 8;
+		ctx.fill();
+
+		ctx.beginPath();
+		ctx.arc(0, 0, Math.max(0.8, this.r * 0.09), 0, Garden.circle);
+		ctx.fillStyle = "rgba(255, 242, 250, 0.68)";
+		ctx.shadowBlur = 0;
 		ctx.fill();
 		ctx.restore();
 	},
@@ -190,6 +197,7 @@ Garden.prototype = {
 			bloom.r *= k;
 			for (var c = 0; c < bloom.petals.length; c++) {
 				bloom.petals[c].r *= k;
+				bloom.petals[c].growFactor *= k;
 			}
 		}
 	}
@@ -234,14 +242,14 @@ Garden.rgba = function (f, e, c, d) {
 	return "rgba(" + f + "," + e + "," + c + "," + d + ")";
 };
 
-/* Enhanced color palette for dark romantic theme */
+/* Celestial Rose & Starlight palette — sakura pink, ruby-rose, pearl & wisteria */
 Garden.romanticPalette = [
-	{ r: [180, 230], g: [80, 130], b: [100, 150], o: 0.30 },   // rose pink
-	{ r: [200, 245], g: [120, 170], b: [100, 140], o: 0.25 },   // peach / rose gold
-	{ r: [190, 240], g: [60, 100], b: [90, 140], o: 0.28 },     // deep rose
-	{ r: [210, 255], g: [140, 190], b: [130, 170], o: 0.20 },   // soft blush
-	{ r: [170, 220], g: [90, 130], b: [120, 170], o: 0.24 },    // mauve
-	{ r: [215, 255], g: [165, 205], b: [95, 135], o: 0.22 },    // warm gold
+	{ r: [235, 255], g: [115, 165], b: [165, 210], o: 0.28 },   // sakura pink
+	{ r: [220, 255], g: [65, 110],  b: [125, 170], o: 0.30 },   // ruby rose
+	{ r: [245, 255], g: [185, 225], b: [210, 245], o: 0.22 },   // pearl blush
+	{ r: [185, 230], g: [110, 160], b: [210, 250], o: 0.25 },   // celestial wisteria
+	{ r: [245, 255], g: [155, 195], b: [155, 190], o: 0.24 },   // rose gold
+	{ r: [210, 245], g: [75, 125],  b: [155, 200], o: 0.27 }    // berry magenta
 ];
 
 /* Bloom palettes per theme (mirrors body[data-theme] in default.css) */
@@ -250,28 +258,28 @@ Garden.theme = "rose";
 Garden.palettes = {
 	rose: Garden.romanticPalette,
 	champagne: [
-		{ r: [225, 255], g: [170, 205], b: [110, 150], o: 0.28 },   // champagne gold
-		{ r: [210, 245], g: [130, 170], b: [95, 130], o: 0.26 },     // peach coral
-		{ r: [235, 255], g: [190, 220], b: [140, 175], o: 0.22 },    // cream blush
-		{ r: [200, 240], g: [110, 150], b: [90, 125], o: 0.27 },     // coral
-		{ r: [220, 250], g: [160, 195], b: [105, 140], o: 0.24 }     // apricot
+		{ r: [235, 255], g: [180, 215], b: [130, 175], o: 0.28 },   // starlight champagne
+		{ r: [235, 255], g: [140, 180], b: [160, 200], o: 0.26 },   // rose champagne
+		{ r: [245, 255], g: [205, 235], b: [185, 220], o: 0.22 },   // pearl cream
+		{ r: [220, 250], g: [115, 155], b: [145, 185], o: 0.27 },   // blush rose
+		{ r: [205, 240], g: [150, 195], b: [215, 250], o: 0.24 }    // twilight lilac
 	]
 };
 
 Garden.glowPalettes = {
 	rose: [
-		"rgba(232, 168, 124, 0.45)",
-		"rgba(212, 175, 140, 0.38)",
-		"rgba(207, 102, 121, 0.45)",
-		"rgba(200, 140, 160, 0.38)",
-		"rgba(230, 180, 150, 0.32)"
+		"rgba(255, 138, 182, 0.50)",
+		"rgba(255, 214, 232, 0.44)",
+		"rgba(236, 82, 136, 0.48)",
+		"rgba(202, 158, 255, 0.42)",
+		"rgba(255, 192, 176, 0.40)"
 	],
 	champagne: [
-		"rgba(247, 227, 184, 0.45)",
-		"rgba(244, 196, 120, 0.42)",
-		"rgba(232, 138, 106, 0.42)",
-		"rgba(240, 178, 132, 0.38)",
-		"rgba(250, 214, 150, 0.34)"
+		"rgba(255, 232, 198, 0.48)",
+		"rgba(250, 196, 212, 0.44)",
+		"rgba(244, 168, 188, 0.42)",
+		"rgba(218, 182, 255, 0.38)",
+		"rgba(255, 216, 176, 0.40)"
 	]
 };
 

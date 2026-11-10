@@ -50,18 +50,42 @@ function resizeParticleCanvas() {
 	particleCtx.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
 }
 
+/* Return ambient particle hues tuned to the active chapter and theme */
+function getChapterHues() {
+	var tint = document.body ? (document.body.getAttribute("data-tint") || "intro") : "intro";
+	var isChampagne = document.body && document.body.getAttribute("data-theme") === "champagne";
+	if (isChampagne) {
+		if (tint === "deeyan") return [265, 280, 340, 38];
+		return [335, 348, 25, 38, 275];
+	}
+	if (tint === "love" || tint === "proposal") return [332, 342, 352, 280, 15];
+	if (tint === "wedding") return [338, 350, 22, 38, 275];
+	if (tint === "daivik") return [342, 16, 28, 40, 325];
+	if (tint === "deeyan") return [248, 264, 280, 300, 332];
+	if (tint === "finale") return [334, 348, 268, 290, 22];
+	return [334, 346, 262, 284, 18];
+}
+
+function pickChapterHue() {
+	var hues = getChapterHues();
+	return hues[Math.floor(Math.random() * hues.length)] + (Math.random() - 0.5) * 10;
+}
+
 function createParticle(options) {
-	var types = ['circle', 'star'];
+	var r = Math.random();
+	var type = r < 0.16 ? 'petal' : (r < 0.58 ? 'star' : 'circle');
 	var defaults = {
 		x: Math.random() * viewW,
 		y: Math.random() * viewH,
-		size: Math.random() * 2.2 + 0.4,
+		size: type === 'petal' ? (Math.random() * 2.8 + 2.2) : (Math.random() * 2.2 + 0.4),
 		speedX: (Math.random() - 0.5) * 0.3,
-		speedY: -Math.random() * 0.4 - 0.1,
-		opacity: Math.random() * 0.5 + 0.1,
+		speedY: type === 'petal' ? (-Math.random() * 0.28 - 0.08) : (-Math.random() * 0.4 - 0.1),
+		opacity: type === 'petal' ? (Math.random() * 0.32 + 0.12) : (Math.random() * 0.5 + 0.1),
 		opacitySpeed: (Math.random() - 0.5) * 0.008,
-		type: types[Math.floor(Math.random() * types.length)],
-		hue: Math.random() * 40 + 15, // warm gold range (15-55)
+		type: type,
+		hue: pickChapterHue(),
+		angle: Math.random() * Math.PI * 2,
+		spin: (Math.random() - 0.5) * 0.025,
 		life: -1, // -1 = infinite
 		drag: 0.985,
 		isBurst: false
@@ -94,7 +118,7 @@ function triggerBurstAt(x, y, hueOptions, shimmerHueBase) {
 			speedY: Math.sin(angle) * speed - 0.5,
 			opacity: 0.8 + Math.random() * 0.2,
 			opacitySpeed: -0.008 - Math.random() * 0.006,
-			type: Math.random() > 0.4 ? 'star' : 'circle',
+			type: Math.random() > 0.35 ? 'star' : (Math.random() > 0.3 ? 'circle' : 'petal'),
 			hue: hue,
 			life: 3000 + Math.random() * 2000,
 			isBurst: true
@@ -147,9 +171,36 @@ function triggerDeeyanBurst() {
 	triggerRevealBurst("deeyanReveal", [250, 262, 275, 288, 300, 315], 265);
 }
 
+/* Soft chapter celebration shimmer (used for proposal & wedding milestones) */
+function triggerMilestoneShimmer(hueOpts) {
+	if (reducedMotion) return;
+	var count = isMobile ? 18 : 36;
+	for (var i = 0; i < count; i++) {
+		(function () {
+			setTimeout(function () {
+				var hue = hueOpts[Math.floor(Math.random() * hueOpts.length)] + (Math.random() - 0.5) * 10;
+				particles.push(createParticle({
+					x: viewW * (0.15 + Math.random() * 0.7),
+					y: viewH * (0.2 + Math.random() * 0.65),
+					size: Math.random() * 2.4 + 0.9,
+					speedX: (Math.random() - 0.5) * 0.5,
+					speedY: -Math.random() * 0.7 - 0.25,
+					opacity: 0.75 + Math.random() * 0.25,
+					opacitySpeed: -0.004 - Math.random() * 0.003,
+					type: Math.random() > 0.25 ? 'star' : 'petal',
+					hue: hue,
+					life: 3600 + Math.random() * 2000,
+					isBurst: true
+				}));
+			}, Math.random() * 1100);
+		})();
+	}
+}
+
 /* --- Finale shimmer: gentle gold-rose shower across the full screen --- */
 function triggerFinaleShimmer() {
-	var shimmerCount = isMobile ? 30 : 70;
+	if (reducedMotion) return;
+	var shimmerCount = isMobile ? 32 : 70;
 	for (var i = 0; i < shimmerCount; i++) {
 		setTimeout(function () {
 			var hueOpts = [340, 350, 0, 20, 40, 300, 310];
@@ -162,7 +213,7 @@ function triggerFinaleShimmer() {
 				speedY: -Math.random() * 0.6 - 0.2,
 				opacity: 0.7 + Math.random() * 0.3,
 				opacitySpeed: -0.003 - Math.random() * 0.003,
-				type: 'star',
+				type: Math.random() > 0.25 ? 'star' : 'petal',
 				hue: hue,
 				life: 5000 + Math.random() * 3000,
 				isBurst: true
@@ -175,16 +226,17 @@ function triggerFinaleShimmer() {
 function spawnComet() {
 	if (!document.hidden) {
 		var dir = Math.random() > 0.5 ? 1 : -1;
+		var cometHues = [338, 265, 225, 350];
 		particles.push(createParticle({
 			x: viewW * (0.5 - dir * (0.1 + Math.random() * 0.4)),
 			y: Math.random() * viewH * 0.3,
 			size: 1.4,
 			speedX: dir * (7 + Math.random() * 4),
 			speedY: 2.5 + Math.random() * 2,
-			opacity: 0.9,
+			opacity: 0.92,
 			opacitySpeed: -0.014,
 			type: 'comet',
-			hue: 35,
+			hue: cometHues[Math.floor(Math.random() * cometHues.length)],
 			life: 1500,
 			drag: 1,
 			isBurst: true
@@ -202,11 +254,34 @@ function animateParticles(timestamp) {
 
 	particleCtx.clearRect(0, 0, viewW, viewH);
 
+	// Subtle firefly twinkles along the already-bloomed heart wreath
+	if (!reducedMotion && storyStarted && heartPoints.length > 4 && gardenCanvas && Math.random() < (isMobile ? 0.035 : 0.065)) {
+		var hp = heartPoints[Math.floor(Math.random() * heartPoints.length)];
+		var gRect = gardenCanvas.getBoundingClientRect();
+		particles.push(createParticle({
+			x: gRect.left + hp[0] + (Math.random() - 0.5) * 10,
+			y: gRect.top + hp[1] + (Math.random() - 0.5) * 10,
+			size: Math.random() * 1.6 + 0.7,
+			speedX: (Math.random() - 0.5) * 0.25,
+			speedY: -Math.random() * 0.35 - 0.08,
+			opacity: 0.75,
+			opacitySpeed: -0.012,
+			type: 'star',
+			hue: pickChapterHue(),
+			life: 1400 + Math.random() * 900,
+			isBurst: true
+		}));
+	}
+
 	for (var i = particles.length - 1; i >= 0; i--) {
 		var p = particles[i];
 
 		p.x += p.speedX * step;
 		p.y += p.speedY * step;
+		if (p.type === 'petal') {
+			p.angle += p.spin * step;
+			p.x += Math.sin(p.angle * 0.7) * 0.15 * step;
+		}
 
 		// Burst particles decelerate and fade using real delta time
 		if (p.isBurst) {
@@ -222,13 +297,18 @@ function animateParticles(timestamp) {
 			}
 		} else {
 			p.opacity += p.opacitySpeed;
-			if (p.opacity <= 0.05 || p.opacity >= 0.6) {
+			var maxOp = p.type === 'petal' ? 0.42 : 0.6;
+			if (p.opacity <= 0.05 || p.opacity >= maxOp) {
 				p.opacitySpeed *= -1;
 			}
-			// Wrap around
-			if (p.y < -10) { p.y = viewH + 10; p.x = Math.random() * viewW; }
-			if (p.x < -10) p.x = viewW + 10;
-			if (p.x > viewW + 10) p.x = -10;
+			// Wrap around and refresh hue to match current chapter
+			if (p.y < -12) {
+				p.y = viewH + 12;
+				p.x = Math.random() * viewW;
+				p.hue = pickChapterHue();
+			}
+			if (p.x < -12) p.x = viewW + 12;
+			if (p.x > viewW + 12) p.x = -12;
 		}
 
 		// Draw
@@ -237,13 +317,15 @@ function animateParticles(timestamp) {
 
 		if (p.type === 'star') {
 			drawStar(particleCtx, p.x, p.y, p.size, p.hue);
+		} else if (p.type === 'petal') {
+			drawPetal(particleCtx, p);
 		} else if (p.type === 'comet') {
 			drawComet(particleCtx, p);
 		} else {
 			particleCtx.beginPath();
 			particleCtx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-			particleCtx.fillStyle = 'hsla(' + p.hue + ', 50%, 75%, 1)';
-			particleCtx.shadowColor = 'hsla(' + p.hue + ', 50%, 75%, 0.5)';
+			particleCtx.fillStyle = 'hsla(' + p.hue + ', 68%, 82%, 1)';
+			particleCtx.shadowColor = 'hsla(' + p.hue + ', 72%, 78%, 0.55)';
 			particleCtx.shadowBlur = isMobile ? (p.isBurst ? 6 : 3) : (p.isBurst ? 14 : 8);
 			particleCtx.fill();
 		}
@@ -273,9 +355,22 @@ function drawStar(ctx, x, y, size, hue) {
 
 	ctx.lineTo(x, y - outerRadius);
 	ctx.closePath();
-	ctx.fillStyle = 'hsla(' + hue + ', 45%, 80%, 1)';
-	ctx.shadowColor = 'hsla(' + hue + ', 45%, 80%, 0.6)';
+	ctx.fillStyle = 'hsla(' + hue + ', 65%, 86%, 1)';
+	ctx.shadowColor = 'hsla(' + hue + ', 70%, 82%, 0.65)';
 	ctx.shadowBlur = isMobile ? 4 : 10;
+	ctx.fill();
+}
+
+function drawPetal(ctx, p) {
+	var s = p.size;
+	ctx.translate(p.x, p.y);
+	ctx.rotate(p.angle);
+	ctx.beginPath();
+	ctx.moveTo(0, -s);
+	ctx.bezierCurveTo(s * 0.95, -s * 0.35, s * 0.85, s * 0.75, 0, s);
+	ctx.bezierCurveTo(-s * 0.85, s * 0.75, -s * 0.95, -s * 0.35, 0, -s);
+	ctx.closePath();
+	ctx.fillStyle = 'hsla(' + p.hue + ', 72%, 80%, 0.85)';
 	ctx.fill();
 }
 
@@ -357,10 +452,12 @@ function sizeCanvas() {
 	gardenCtx.globalCompositeOperation = "lighter";
 	computeHeartMetrics();
 
-	// Keep the flowers in proportion to the heart
-	var bloomScale = Math.max(0.5, w / HEART_REF_WIDTH);
-	Garden.options.bloomRadius.min = 7 * bloomScale;
-	Garden.options.bloomRadius.max = 15 * bloomScale;
+	// Keep the flowers in proportion to the heart and preserve petal stroke density on mobile
+	var bloomScale = Math.max(0.58, w / HEART_REF_WIDTH);
+	Garden.options.bloomRadius.min = 7.5 * bloomScale;
+	Garden.options.bloomRadius.max = 15.5 * bloomScale;
+	Garden.options.growFactor.min = 0.09 * bloomScale;
+	Garden.options.growFactor.max = 0.85 * bloomScale;
 	Garden.options.lineWidth = Math.max(1.0, 1.5 * bloomScale);
 
 	if (snapshot) {
@@ -394,7 +491,7 @@ var heartComplete = false;
 
 function plantBloom(b) {
 	var h = getHeartPoint(b);
-	var minGap = Garden.options.bloomRadius.max * 0.85;
+	var minGap = Garden.options.bloomRadius.max * 0.82;
 	for (var i = 0; i < heartPoints.length; i++) {
 		var g = heartPoints[i];
 		if (Math.sqrt(Math.pow(g[0] - h[0], 2) + Math.pow(g[1] - h[1], 2)) < minGap) {
@@ -402,7 +499,41 @@ function plantBloom(b) {
 		}
 	}
 	heartPoints.push(h);
-	garden.createRandomBloom(h[0], h[1]);
+	var jitterX = (Math.random() - 0.5) * 2.2;
+	var jitterY = (Math.random() - 0.5) * 2.2;
+	garden.createRandomBloom(h[0] + jitterX, h[1] + jitterY);
+
+	// Occasional delicate accent bud beside the main bloom for a fuller garland
+	if (Math.random() < 0.38) {
+		var budOffset = Garden.options.bloomRadius.min * 0.55;
+		var budAngle = Math.random() * Math.PI * 2;
+		garden.createBloom(
+			h[0] + Math.cos(budAngle) * budOffset,
+			h[1] + Math.sin(budAngle) * budOffset,
+			Garden.options.bloomRadius.min * 0.72,
+			Garden.randomRomanticColor(),
+			Garden.randomInt(6, 9),
+			Garden.randomGlowColor()
+		);
+	}
+
+	// Trailing stardust at the growing tips as the two sides climb
+	if (!reducedMotion && storyStarted && gardenCanvas && Math.random() < 0.65) {
+		var rect = gardenCanvas.getBoundingClientRect();
+		particles.push(createParticle({
+			x: rect.left + h[0] + (Math.random() - 0.5) * 8,
+			y: rect.top + h[1] + (Math.random() - 0.5) * 8,
+			size: Math.random() * 1.8 + 0.8,
+			speedX: (Math.random() - 0.5) * 0.6,
+			speedY: -Math.random() * 0.6 - 0.15,
+			opacity: 0.85,
+			opacitySpeed: -0.015,
+			type: 'star',
+			hue: pickChapterHue(),
+			life: 1100 + Math.random() * 700,
+			isBurst: true
+		}));
+	}
 }
 
 function heartTick() {
@@ -430,10 +561,11 @@ function growHeartTo(target) {
 }
 
 function completeHeart() {
-	// A burst where the two sides meet
+	// A burst where the two sides meet + full-screen celebratory shimmer
 	var rect = gardenCanvas.getBoundingClientRect();
 	var top = getHeartPoint(0);
 	triggerBurstAt(rect.left + top[0], rect.top + top[1], [340, 350, 0, 15, 30, 45], 20);
+	triggerFinaleShimmer();
 	$loveHeart.addClass("complete");
 	showMessages();
 }
@@ -511,6 +643,17 @@ function initCover(specialDays, onOpen) {
 	$("#openBtn").click(function () {
 		if (opened) return;
 		opened = true;
+		if (!reducedMotion) {
+			var heartEl = document.querySelector ? document.querySelector(".cover-heart") : null;
+			var bx = viewW / 2;
+			var by = viewH * 0.35;
+			if (heartEl) {
+				var r = heartEl.getBoundingClientRect();
+				bx = r.left + r.width / 2;
+				by = r.top + r.height / 2;
+			}
+			triggerBurstAt(bx, by, [340, 350, 15, 30, 42], 25);
+		}
 		$("body").addClass("opened");
 		// The heart column may have been laid out differently behind the cover
 		sizeCanvas();
@@ -625,6 +768,8 @@ function showHint() {
 	clearTimeout(hintTimer);
 	if (sceneIndex >= storyScenes.length - 1) {
 		$("#hint").text("hold anywhere to send hearts");
+	} else if (sceneIndex === 0) {
+		$("#hint").text(isMobile ? "tap or swipe to continue" : "click or press space to continue");
 	} else {
 		$("#hint").text(isMobile ? "tap to continue" : "click to continue");
 	}
@@ -700,12 +845,25 @@ function goToScene(index) {
 
 	sceneIndex = index;
 	var scene = storyScenes[index];
+	var tint = scene.getAttribute("data-tint") || "intro";
 	resetScene(scene);
 	$(scene).removeClass("leaving").addClass("active");
 	$("#dots span").removeClass("on").eq(index).addClass("on");
 	$("#progressFill").css("width", (storyScenes.length > 1 ? index / (storyScenes.length - 1) * 100 : 100) + "%");
-	document.body.setAttribute("data-tint", scene.getAttribute("data-tint") || "intro");
+	document.body.setAttribute("data-tint", tint);
 	thumpHeart();
+
+	// If the heart is already complete and the user goes back to a dated scene, show its date
+	if (heartComplete) {
+		var isFinaleScene = index >= storyScenes.length - 2;
+		$("body").toggleClass("finished", isFinaleScene);
+	}
+
+	if (tint === "proposal") {
+		triggerMilestoneShimmer([338, 348, 356, 20, 35]);
+	} else if (tint === "wedding") {
+		triggerMilestoneShimmer([28, 34, 40, 46, 350]);
+	}
 
 	setHeartDate(scene.getAttribute("data-day"), scene.getAttribute("data-year"));
 	// The heart closes on the second-to-last scene; the last one is the sign-off
@@ -745,9 +903,78 @@ function initStory() {
 		setCode(this, false);
 	});
 
-	// Anywhere on the page moves the story on (buttons look after themselves)
+	// Tapping a progress dot jumps directly to that chapter
+	$("#dots span").each(function (idx) {
+		$(this).click(function (e) {
+			e.stopPropagation();
+			if (!storyStarted) return;
+			goToScene(idx);
+		});
+	});
+
+	// Distinguish quick taps from long-press heart streams and horizontal swipes
+	var gestureStartX = 0;
+	var gestureStartY = 0;
+	var gestureStartTime = 0;
+	var suppressNextClick = false;
+	var mainEl = document.getElementById("mainDiv");
+
+	if (mainEl) {
+		mainEl.addEventListener("touchstart", function (e) {
+			if (!e.touches || !e.touches.length) return;
+			gestureStartX = e.touches[0].clientX;
+			gestureStartY = e.touches[0].clientY;
+			gestureStartTime = Date.now();
+		}, { passive: true });
+
+		mainEl.addEventListener("touchend", function (e) {
+			if (!storyStarted || !e.changedTouches || !e.changedTouches.length) return;
+			var dx = e.changedTouches[0].clientX - gestureStartX;
+			var dy = e.changedTouches[0].clientY - gestureStartY;
+			var dt = Date.now() - gestureStartTime;
+
+			// Horizontal swipe: left advances, right goes back a scene
+			if (Math.abs(dx) > 42 && Math.abs(dx) > Math.abs(dy) * 1.3 && dt < 650) {
+				suppressNextClick = true;
+				if (dx < 0) {
+					advanceStory();
+				} else if (sceneBusy) {
+					rushScene();
+				} else if (sceneIndex > 0) {
+					goToScene(sceneIndex - 1);
+				}
+				return;
+			}
+
+			// Long-press (holding to send hearts) should not advance the scene on release
+			if (dt >= 280 || Math.abs(dx) > 20 || Math.abs(dy) > 20) {
+				suppressNextClick = true;
+			}
+		});
+
+		mainEl.addEventListener("mousedown", function (e) {
+			gestureStartX = e.clientX;
+			gestureStartY = e.clientY;
+			gestureStartTime = Date.now();
+		});
+
+		mainEl.addEventListener("mouseup", function (e) {
+			var dt = Date.now() - gestureStartTime;
+			var dx = e.clientX - gestureStartX;
+			var dy = e.clientY - gestureStartY;
+			if (dt >= 280 || Math.abs(dx) > 20 || Math.abs(dy) > 20) {
+				suppressNextClick = true;
+			}
+		});
+	}
+
+	// Anywhere on the page moves the story on (buttons and dots look after themselves)
 	$("#mainDiv").click(function (e) {
-		if ($(e.target).closest("button").length) return;
+		if (suppressNextClick) {
+			suppressNextClick = false;
+			return;
+		}
+		if ($(e.target).closest("button, #dots").length) return;
 		advanceStory();
 	});
 	$(document).keydown(function (e) {
@@ -927,6 +1154,8 @@ function initFloatingHearts() {
 	heartLayer.id = "heartLayer";
 	document.body.appendChild(heartLayer);
 
+	var lastTouchTime = 0;
+
 	function press(point) {
 		pointerDown = true;
 		pointerX = point.clientX;
@@ -941,13 +1170,34 @@ function initFloatingHearts() {
 		pointerDown = false;
 	}
 
-	document.addEventListener("mousedown", press);
-	document.addEventListener("mousemove", move);
-	document.addEventListener("mouseup", release);
-	document.addEventListener("touchstart", function (e) { press(e.touches[0]); }, { passive: true });
-	document.addEventListener("touchmove", function (e) { move(e.touches[0]); }, { passive: true });
-	document.addEventListener("touchend", release);
-	document.addEventListener("touchcancel", release);
+	document.addEventListener("mousedown", function (e) {
+		if (Date.now() - lastTouchTime < 650) return;
+		press(e);
+	});
+	document.addEventListener("mousemove", function (e) {
+		if (Date.now() - lastTouchTime < 650) return;
+		move(e);
+	});
+	document.addEventListener("mouseup", function () {
+		if (Date.now() - lastTouchTime < 650) return;
+		release();
+	});
+	document.addEventListener("touchstart", function (e) {
+		lastTouchTime = Date.now();
+		if (e.touches && e.touches[0]) press(e.touches[0]);
+	}, { passive: true });
+	document.addEventListener("touchmove", function (e) {
+		lastTouchTime = Date.now();
+		if (e.touches && e.touches[0]) move(e.touches[0]);
+	}, { passive: true });
+	document.addEventListener("touchend", function () {
+		lastTouchTime = Date.now();
+		release();
+	});
+	document.addEventListener("touchcancel", function () {
+		lastTouchTime = Date.now();
+		release();
+	});
 
 	// A stream of hearts while holding down
 	setInterval(function () {
