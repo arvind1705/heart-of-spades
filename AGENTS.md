@@ -45,6 +45,7 @@ js/garden.js         Canvas bloom engine (Vector, Petal, Bloom, Garden construct
 js/functions.js      App logic: particles, cover, story engine, heart, timers, floating hearts
 digital.ttf          Legacy font, no longer referenced
 images/              Favicons, PWA manifest, icons
+video/               Stop-motion film renderers (Python, not site code) and clay.html player
 ```
 
 **Script load order** (defined in `<head>`): `jquery.js` → `garden.js` → `functions.js`.
@@ -155,7 +156,9 @@ bloom palettes, never rules.
 - **Remote**: `git@github.com:arvind1705/heart-of-spades.git`
 - **Commit messages**: imperative mood, capitalized first word. No conventional
   commits prefix. Examples: "Add initial README", "Enhance romantic theme"
-- **No `.gitignore`** currently exists
+- **`.gitignore`** excludes `.DS_Store`, Python caches, and rendered `video/*.mp4`,
+  `video/*.png`, `video/*.wav` files. `video/clay.html` plays only after
+  `video/generate_clay_stop_motion.py` has rendered its MP4 and poster locally.
 - **No pre-commit hooks** or automated checks
 
 ## Key Gotchas
