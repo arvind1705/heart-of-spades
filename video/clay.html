@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sculpted in Clay — For Sanjana</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            background: #0d0907;
+            color: #f3e4c6;
+            font-family: Georgia, "Times New Roman", serif;
+            overflow: hidden;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        #viewport {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: radial-gradient(circle at 50% 50%, #1c130f 0%, #090605 100%);
+        }
+
+        #frame {
+            position: relative;
+            width: min(100vw, calc(100vh * (16 / 9)));
+            height: min(100vh, calc(100vw * (9 / 16)));
+            background: #140d0a;
+            box-shadow: 0 24px 80px rgba(0, 0, 0, 0.85);
+            overflow: hidden;
+        }
+
+        video {
+            width: 100%;
+            height: 100%;
+            display: block;
+            object-fit: contain;
+        }
+
+        #pauseBadge {
+            position: absolute;
+            top: 18px;
+            right: 22px;
+            padding: 6px 12px;
+            border-radius: 4px;
+            background: rgba(24, 16, 12, 0.78);
+            border: 1px solid rgba(212, 160, 72, 0.45);
+            font-family: Avenir, Helvetica, sans-serif;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: #f5dfba;
+            opacity: 0;
+            transition: opacity 180ms ease;
+            pointer-events: none;
+        }
+
+        #viewport.is-paused #pauseBadge {
+            opacity: 1;
+        }
+
+        #scrubWrap {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            padding: 22px 24px 12px;
+            background: linear-gradient(to top, rgba(10, 6, 5, 0.82), rgba(10, 6, 5, 0));
+            opacity: 0;
+            transition: opacity 200ms ease;
+        }
+
+        #viewport:hover #scrubWrap,
+        #viewport.is-paused #scrubWrap {
+            opacity: 1;
+        }
+
+        #scrubTrack {
+            position: relative;
+            width: 100%;
+            height: 5px;
+            background: rgba(243, 228, 198, 0.22);
+            border-radius: 999px;
+            cursor: pointer;
+        }
+
+        #scrubFill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #c85646, #e5a948);
+            border-radius: 999px;
+            pointer-events: none;
+        }
+
+        .milestone-tick {
+            position: absolute;
+            top: -3px;
+            width: 3px;
+            height: 11px;
+            border-radius: 2px;
+            background: rgba(245, 200, 100, 0.75);
+            transform: translateX(-50%);
+            pointer-events: none;
+        }
+
+        #scrubMeta {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 6px;
+            font-family: Avenir, Helvetica, sans-serif;
+            font-size: 10px;
+            letter-spacing: 0.11em;
+            text-transform: uppercase;
+            color: rgba(243, 228, 198, 0.72);
+        }
+    </style>
+</head>
+<body>
+    <div id="viewport">
+        <div id="frame">
+            <video id="film" src="heart-of-spades-clay-stop-motion.mp4" poster="heart-of-spades-clay-poster.png" autoplay muted loop playsinline></video>
+            <div id="pauseBadge">Paused · Space to Play</div>
+            <div id="scrubWrap">
+                <div id="scrubTrack" aria-label="Film timeline">
+                    <div id="scrubFill"></div>
+                    <span class="milestone-tick" style="left: 0%;" title="20 Jan 2022 · First Met"></span>
+                    <span class="milestone-tick" style="left: 12.5%;" title="27 Jan & 11 Feb 2022 · First Love"></span>
+                    <span class="milestone-tick" style="left: 25%;" title="04 Dec 2022 · Engaged"></span>
+                    <span class="milestone-tick" style="left: 37.5%;" title="26 Jan 2023 · Married"></span>
+                    <span class="milestone-tick" style="left: 50%;" title="03 Aug 2024 · Daivik"></span>
+                    <span class="milestone-tick" style="left: 62.5%;" title="09 Sep 2026 · Deeyan"></span>
+                    <span class="milestone-tick" style="left: 75%;" title="Our Home Forever"></span>
+                </div>
+                <div id="scrubMeta">
+                    <span id="chapterLabel">Sculpted in Clay · 12 FPS on Twos</span>
+                    <span id="timeLabel">00.0s / 24.0s · Space to Pause</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function () {
+            var film = document.getElementById("film");
+            var viewport = document.getElementById("viewport");
+            var track = document.getElementById("scrubTrack");
+            var fill = document.getElementById("scrubFill");
+            var timeLabel = document.getElementById("timeLabel");
+            var chapterLabel = document.getElementById("chapterLabel");
+            var chapters = [
+                "01 · 20 Jan 2022 — First Met",
+                "02 · 27 Jan & 11 Feb 2022 — First Love & Held Hands",
+                "03 · 04 Dec 2022 — Engaged",
+                "04 · 26 Jan 2023 — Married",
+                "05 · 03 Aug 2024 — Daivik Arrived",
+                "06 · 09 Sep 2026 — Deeyan Arrived",
+                "07 · Always & Again — For Sanjana",
+                "08 · Endless Loop — Back to One"
+            ];
+
+            function togglePlay() {
+                if (film.paused) {
+                    film.play();
+                    viewport.classList.remove("is-paused");
+                } else {
+                    film.pause();
+                    viewport.classList.add("is-paused");
+                }
+            }
+
+            function syncScrub() {
+                var dur = film.duration || 24;
+                var cur = film.currentTime || 0;
+                var pct = Math.max(0, Math.min(100, (cur / dur) * 100));
+                fill.style.width = pct.toFixed(2) + "%";
+                var idx = Math.min(chapters.length - 1, Math.floor((cur / dur) * chapters.length));
+                chapterLabel.textContent = chapters[idx];
+                timeLabel.textContent = cur.toFixed(1) + "s / " + dur.toFixed(1) + "s · Space to Pause";
+                requestAnimationFrame(syncScrub);
+            }
+
+            function seekFromEvent(e) {
+                var rect = track.getBoundingClientRect();
+                var ratio = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+                if (film.duration) {
+                    film.currentTime = ratio * film.duration;
+                }
+            }
+
+            window.addEventListener("keydown", function (e) {
+                if (e.code === "Space" || e.key === " ") {
+                    e.preventDefault();
+                    togglePlay();
+                } else if (e.code === "ArrowRight") {
+                    film.currentTime = Math.min(film.duration || 24, (film.currentTime || 0) + 1 / 6);
+                } else if (e.code === "ArrowLeft") {
+                    film.currentTime = Math.max(0, (film.currentTime || 0) - 1 / 6);
+                }
+            });
+
+            film.addEventListener("click", togglePlay);
+            track.addEventListener("pointerdown", function (e) {
+                seekFromEvent(e);
+                function onMove(ev) {
+                    seekFromEvent(ev);
+                }
+                function onUp() {
+                    window.removeEventListener("pointermove", onMove);
+                    window.removeEventListener("pointerup", onUp);
+                }
+                window.addEventListener("pointermove", onMove);
+                window.addEventListener("pointerup", onUp);
+            });
+
+            requestAnimationFrame(syncScrub);
+        })();
+    </script>
+</body>
+</html>

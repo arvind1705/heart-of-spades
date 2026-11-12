@@ -23,6 +23,14 @@ The words live in `index.html` as `.scene` blocks; the dates are in the small sc
 
 Pure vanilla HTML/CSS/JavaScript with jQuery. No build tools or frameworks.
 
+## Stop-motion films
+
+The project includes two 24-second silent 12 fps stop-motion films in `video/`:
+- **The House We Made** (`video/heart-of-spades-stop-motion.mp4` & `video/heart-of-spades-poster.png`) — a multi-plane handcrafted paper-diorama film.
+- **Sculpted in Clay** (`video/heart-of-spades-clay-stop-motion.mp4`, `video/heart-of-spades-clay-poster.png` & live browser player `video/clay.html`) — a 3D plasticine claymation desk-morph film on an animator's cutting mat.
+
+Their source renderers and regeneration notes are in `video/README.md`.
+
 ```
 index.html          - Cover, scenes and dates
 css/default.css     - All styles
@@ -30,4 +38,5 @@ js/functions.js     - Particles, story engine, heart growth, timers
 js/garden.js        - Canvas bloom engine (Vector, Petal, Bloom, Garden)
 js/jquery.js        - Vendored jQuery
 images/             - Favicons, PWA manifest, icons
+video/              - Stop-motion film, poster and frame renderer
 ```
