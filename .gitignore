@@ -1,0 +1,11 @@
+# macOS
+.DS_Store
+
+# Python
+__pycache__/
+*.pyc
+
+# Rendered films, posters and audio (regenerate with the scripts in video/)
+video/*.mp4
+video/*.png
+video/*.wav
