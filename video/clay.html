@@ -3,7 +3,10 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Sculpted in Clay — For Sanjana</title>
+    <title>Sculpted in Clay — Plasticine Stop-Motion by Code</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet" />
     <style>
         * {
             box-sizing: border-box;
@@ -11,33 +14,65 @@
             padding: 0;
         }
 
+        :root {
+            --bg-dark: #0a0605;
+            --bg-panel: #110b08;
+            --border-gold: rgba(212, 160, 72, 0.28);
+            --gold-bright: #f5dfba;
+            --gold-accent: #e5a948;
+            --terracotta: #cc5846;
+            --code-bg: #0d0806;
+            --code-fg: #d6cbbe;
+            --font-serif: "Cormorant Garamond", Georgia, serif;
+            --font-mono: "Fira Code", monospace;
+        }
+
         html, body {
             width: 100%;
             height: 100%;
-            background: #0d0907;
-            color: #f3e4c6;
-            font-family: Georgia, "Times New Roman", serif;
+            margin: 0;
+            padding: 0;
+            background: var(--bg-dark);
+            color: var(--gold-bright);
+            font-family: var(--font-serif);
             overflow: hidden;
             user-select: none;
             -webkit-user-select: none;
         }
 
-        #viewport {
+        #app {
+            position: fixed;
+            inset: 0;
+            display: flex;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 40% 50%, #1a100b 0%, #080504 100%);
+            transition: all 260ms cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        /* --- Left Pane: Film Player --- */
+        #filmPane {
+            flex: 1;
+            height: 100%;
             position: relative;
-            width: 100vw;
-            height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            background: radial-gradient(circle at 50% 50%, #1c130f 0%, #090605 100%);
+            padding: 24px;
+            overflow: hidden;
+            transition: flex 260ms ease;
         }
 
         #frame {
             position: relative;
-            width: min(100vw, calc(100vh * (16 / 9)));
-            height: min(100vh, calc(100vw * (9 / 16)));
+            width: 100%;
+            height: auto;
+            max-width: 100%;
+            max-height: 100%;
+            aspect-ratio: 16 / 9;
             background: #140d0a;
-            box-shadow: 0 24px 80px rgba(0, 0, 0, 0.85);
+            box-shadow: 0 28px 90px rgba(0, 0, 0, 0.92), 0 0 0 1px rgba(212, 160, 72, 0.18);
+            border-radius: 4px;
             overflow: hidden;
         }
 
@@ -46,51 +81,136 @@
             height: 100%;
             display: block;
             object-fit: contain;
+            background: #000;
+        }
+
+        /* --- Top Bar & Controls --- */
+        #topBar {
+            position: absolute;
+            top: 16px;
+            left: 20px;
+            right: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 10;
+            pointer-events: none;
+        }
+
+        #filmTitle {
+            display: flex;
+            flex-direction: column;
+            pointer-events: auto;
+        }
+
+        #filmTitle h1 {
+            font-size: 15px;
+            font-weight: 600;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            color: var(--gold-bright);
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.9);
+        }
+
+        #filmTitle span {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            font-size: 10px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: rgba(243, 228, 198, 0.65);
+            margin-top: 2px;
+        }
+
+        #topControls {
+            display: flex;
+            gap: 10px;
+            pointer-events: auto;
+        }
+
+        .btn {
+            background: rgba(22, 14, 10, 0.82);
+            border: 1px solid var(--border-gold);
+            color: var(--gold-bright);
+            padding: 6px 14px;
+            border-radius: 3px;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.10em;
+            text-transform: uppercase;
+            cursor: pointer;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            transition: all 180ms ease;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+        }
+
+        .btn:hover {
+            background: rgba(45, 28, 20, 0.92);
+            border-color: var(--gold-accent);
+            color: #fff;
+            transform: translateY(-1px);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn.active {
+            background: var(--terracotta);
+            border-color: #e87b6a;
+            color: #fff;
         }
 
         #pauseBadge {
             position: absolute;
-            top: 18px;
-            right: 22px;
-            padding: 6px 12px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 10px 20px;
             border-radius: 4px;
-            background: rgba(24, 16, 12, 0.78);
-            border: 1px solid rgba(212, 160, 72, 0.45);
-            font-family: Avenir, Helvetica, sans-serif;
-            font-size: 11px;
+            background: rgba(18, 11, 8, 0.88);
+            border: 1px solid var(--border-gold);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            font-size: 12px;
             font-weight: 700;
-            letter-spacing: 0.14em;
+            letter-spacing: 0.16em;
             text-transform: uppercase;
-            color: #f5dfba;
+            color: var(--gold-bright);
             opacity: 0;
             transition: opacity 180ms ease;
             pointer-events: none;
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.8);
         }
 
-        #viewport.is-paused #pauseBadge {
+        #app.is-paused #pauseBadge {
             opacity: 1;
         }
 
+        /* --- Scrub Bar --- */
         #scrubWrap {
             position: absolute;
             left: 0;
             right: 0;
             bottom: 0;
-            padding: 22px 24px 12px;
-            background: linear-gradient(to top, rgba(10, 6, 5, 0.82), rgba(10, 6, 5, 0));
+            padding: 24px 20px 14px;
+            background: linear-gradient(to top, rgba(8, 4, 3, 0.92) 0%, rgba(8, 4, 3, 0) 100%);
             opacity: 0;
-            transition: opacity 200ms ease;
+            transition: opacity 220ms ease;
+            z-index: 10;
         }
 
-        #viewport:hover #scrubWrap,
-        #viewport.is-paused #scrubWrap {
+        #frame:hover #scrubWrap,
+        #app.is-paused #scrubWrap {
             opacity: 1;
         }
 
         #scrubTrack {
             position: relative;
             width: 100%;
-            height: 5px;
+            height: 6px;
             background: rgba(243, 228, 198, 0.22);
             border-radius: 999px;
             cursor: pointer;
@@ -99,16 +219,16 @@
         #scrubFill {
             height: 100%;
             width: 0%;
-            background: linear-gradient(90deg, #c85646, #e5a948);
+            background: linear-gradient(90deg, var(--terracotta), var(--gold-accent));
             border-radius: 999px;
             pointer-events: none;
         }
 
         .milestone-tick {
             position: absolute;
-            top: -3px;
+            top: -4px;
             width: 3px;
-            height: 11px;
+            height: 14px;
             border-radius: 2px;
             background: rgba(245, 200, 100, 0.75);
             transform: translateX(-50%);
@@ -118,34 +238,322 @@
         #scrubMeta {
             display: flex;
             justify-content: space-between;
-            margin-top: 6px;
-            font-family: Avenir, Helvetica, sans-serif;
-            font-size: 10px;
-            letter-spacing: 0.11em;
+            margin-top: 8px;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            font-size: 11px;
+            letter-spacing: 0.10em;
             text-transform: uppercase;
-            color: rgba(243, 228, 198, 0.72);
+            color: rgba(243, 228, 198, 0.75);
+        }
+
+        /* --- Right Pane: Code Viewer --- */
+        #codePane {
+            width: 44vw;
+            min-width: 380px;
+            max-width: 680px;
+            height: 100%;
+            background: var(--code-bg);
+            border-left: 1px solid var(--border-gold);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            transition: all 260ms cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        body.code-hidden #codePane {
+            width: 0;
+            min-width: 0;
+            border-left-width: 0;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        #codeHeader {
+            padding: 14px 18px;
+            background: rgba(20, 12, 9, 0.95);
+            border-bottom: 1px solid rgba(212, 160, 72, 0.20);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        #codeTitle {
+            font-family: var(--font-mono);
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--gold-accent);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        #codeTitle::before {
+            content: "";
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #4ade80;
+            box-shadow: 0 0 8px #4ade80;
+        }
+
+        #activeSectionBadge {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            font-size: 10px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--gold-bright);
+            padding: 3px 8px;
+            border-radius: 3px;
+            background: rgba(204, 88, 70, 0.28);
+            border: 1px solid rgba(204, 88, 70, 0.5);
+        }
+
+        #codeContent {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding: 16px 0;
+            font-family: var(--font-mono);
+            font-size: 11.5px;
+            line-height: 1.62;
+            color: var(--code-fg);
+            scroll-behavior: smooth;
+        }
+
+        #codeContent::-webkit-scrollbar {
+            width: 6px;
+        }
+        #codeContent::-webkit-scrollbar-thumb {
+            background: rgba(212, 160, 72, 0.25);
+            border-radius: 3px;
+        }
+
+        .code-block {
+            padding: 8px 18px;
+            margin: 4px 0;
+            border-left: 3px solid transparent;
+            border-radius: 0 4px 4px 0;
+            cursor: pointer;
+            transition: all 180ms ease;
+            position: relative;
+        }
+
+        .code-block:hover {
+            background: rgba(204, 88, 70, 0.08);
+            border-left-color: rgba(212, 160, 72, 0.45);
+        }
+
+        .code-block.active {
+            background: rgba(204, 88, 70, 0.14);
+            border-left-color: var(--gold-accent);
+        }
+
+        .code-block.active .section-title {
+            color: #ffdda1;
+            font-weight: 600;
+        }
+
+        .section-title {
+            color: rgba(245, 200, 100, 0.85);
+            margin-bottom: 4px;
+            font-size: 11px;
+            letter-spacing: 0.06em;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .jump-hint {
+            font-size: 9px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: rgba(245, 200, 100, 0.65);
+            opacity: 0;
+            transition: opacity 140ms ease;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+
+        .code-block:hover .jump-hint {
+            opacity: 1;
+        }
+
+        #scrubTooltip {
+            position: absolute;
+            bottom: 36px;
+            padding: 5px 10px;
+            background: rgba(20, 13, 10, 0.95);
+            border: 1px solid var(--border-gold);
+            border-radius: 3px;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            font-size: 10px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--gold-bright);
+            pointer-events: none;
+            opacity: 0;
+            transform: translateX(-50%);
+            transition: opacity 120ms ease;
+            white-space: nowrap;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.85);
+        }
+
+        .kw { color: #f472b6; }
+        .fn { color: #60a5fa; }
+        .str { color: #34d399; }
+        .num { color: #f59e0b; }
+        .cmt { color: #78716c; font-style: italic; }
+        .var { color: #e2e8f0; }
+
+        @media (max-width: 900px) {
+            #app { flex-direction: column; }
+            #codePane { width: 100%; height: 45%; max-width: none; border-left: none; border-top: 1px solid var(--border-gold); }
+            body.code-hidden #codePane { height: 0; }
         }
     </style>
 </head>
 <body>
-    <div id="viewport">
-        <div id="frame">
-            <video id="film" src="heart-of-spades-clay-stop-motion.mp4" poster="heart-of-spades-clay-poster.png" autoplay muted loop playsinline></video>
-            <div id="pauseBadge">Paused · Space to Play</div>
-            <div id="scrubWrap">
-                <div id="scrubTrack" aria-label="Film timeline">
-                    <div id="scrubFill"></div>
-                    <span class="milestone-tick" style="left: 0%;" title="20 Jan 2022 · First Met"></span>
-                    <span class="milestone-tick" style="left: 12.5%;" title="27 Jan & 11 Feb 2022 · First Love"></span>
-                    <span class="milestone-tick" style="left: 25%;" title="04 Dec 2022 · Engaged"></span>
-                    <span class="milestone-tick" style="left: 37.5%;" title="26 Jan 2023 · Married"></span>
-                    <span class="milestone-tick" style="left: 50%;" title="03 Aug 2024 · Daivik"></span>
-                    <span class="milestone-tick" style="left: 62.5%;" title="09 Sep 2026 · Deeyan"></span>
-                    <span class="milestone-tick" style="left: 75%;" title="Our Home Forever"></span>
+    <div id="app">
+        <!-- Film Player -->
+        <div id="filmPane">
+            <div id="topBar">
+                <div id="filmTitle">
+                    <h1>Sculpted in Clay</h1>
+                    <span>12 FPS Plasticine Stop-Motion on Twos · Cycles SDF</span>
                 </div>
-                <div id="scrubMeta">
-                    <span id="chapterLabel">Sculpted in Clay · 12 FPS on Twos</span>
-                    <span id="timeLabel">00.0s / 24.0s · Space to Pause</span>
+                <div id="topControls">
+                    <button id="soundBtn" class="btn" type="button" title="Toggle audio (M)">Sound Off</button>
+                    <button id="codeToggleBtn" class="btn active" type="button" title="Toggle code panel (C)">Code [C]</button>
+                </div>
+            </div>
+
+            <div id="frame">
+                <video id="film" src="heart-of-spades-clay-stop-motion.mp4" poster="heart-of-spades-clay-poster.png" autoplay muted loop playsinline></video>
+                <audio id="soundtrack" src="heart-of-spades-clay-soundscape.wav" preload="auto" loop></audio>
+                <div id="pauseBadge">Paused · Space to Play</div>
+                <div id="scrubWrap">
+                    <div id="scrubTooltip"></div>
+                    <div id="scrubTrack" aria-label="Film timeline">
+                        <div id="scrubFill"></div>
+                        <span class="milestone-tick" style="left: 0%;" title="Intro · Sculptor's Desk"></span>
+                        <span class="milestone-tick" style="left: 6.25%;" title="20 Jan 2022 · First Met"></span>
+                        <span class="milestone-tick" style="left: 17.5%;" title="27 Jan & 11 Feb 2022 · First Love & Held Hands"></span>
+                        <span class="milestone-tick" style="left: 29.5%;" title="04 Dec 2022 · Engaged"></span>
+                        <span class="milestone-tick" style="left: 40.0%;" title="26 Jan 2023 · Married"></span>
+                        <span class="milestone-tick" style="left: 54.0%;" title="03 Aug 2024 · Daivik Arrives"></span>
+                        <span class="milestone-tick" style="left: 66.5%;" title="09 Sep 2026 · Deeyan Arrives"></span>
+                        <span class="milestone-tick" style="left: 81.25%;" title="Forever Family · Always & Again"></span>
+                        <span class="milestone-tick" style="left: 92.0%;" title="Endless Loop · Kneaded Back"></span>
+                    </div>
+                    <div id="scrubMeta">
+                        <span id="chapterLabel">01 · Prologue — Animator's Workbench</span>
+                        <span id="timeLabel">00.0s / 24.0s</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Pane: Python Script Driving the Animation -->
+        <div id="codePane">
+            <div id="codeHeader">
+                <div id="codeTitle">generate_clay_stop_motion.py</div>
+                <div id="activeSectionBadge">Choreography Engine</div>
+            </div>
+            <div id="codeContent">
+                <!-- Section 0: Setup & Medium -->
+                <div class="code-block" id="block-intro" data-t0="0.0" data-t1="1.5">
+                    <div class="section-title"># --- Medium & Physical Workbench Setup ---</div>
+                    <pre><span class="cmt"># Plasticine stop-motion rendered with GPU SDF Raymarching</span>
+<span class="var">WIDTH</span>, <span class="var">HEIGHT</span> = <span class="num">1920</span>, <span class="num">1080</span>
+<span class="var">FPS</span> = <span class="num">12</span>  <span class="cmt"># animated on twos (12 pictures / second)</span>
+<span class="var">TERRA</span> = <span class="fn">srgb</span>(<span class="num">204</span>, <span class="num">88</span>, <span class="num">70</span>)    <span class="cmt"># Sanjana</span>
+<span class="var">SLATE</span> = <span class="fn">srgb</span>(<span class="num">58</span>, <span class="num">94</span>, <span class="num">142</span>)    <span class="cmt"># Aravind</span>
+<span class="var">IVORY</span> = <span class="fn">srgb</span>(<span class="num">236</span>, <span class="num">222</span>, <span class="num">190</span>)  <span class="cmt"># cottage walls</span>
+<span class="var">SAGE</span>  = <span class="fn">srgb</span>(<span class="num">104</span>, <span class="num">152</span>, <span class="num">116</span>)  <span class="cmt"># Daivik</span>
+<span class="var">MARIGOLD</span> = <span class="fn">srgb</span>(<span class="num">236</span>, <span class="num">142</span>, <span class="num">44</span>) <span class="cmt"># Deeyan</span>
+<span class="var">BRASS</span> = <span class="fn">srgb</span>(<span class="num">226</span>, <span class="num">176</span>, <span class="num">62</span>)   <span class="cmt"># ring, sash, ferrule</span></pre>
+                </div>
+
+                <!-- Section 1: Meeting (20 Jan 2022) -->
+                <div class="code-block" id="block-met" data-t0="1.5" data-t1="4.2">
+                    <div class="section-title"># --- Scene 1: 20 Jan 2022 · The Day We Met ---</div>
+                    <pre><span class="cmt"># Figures pinch up from the central marbled plasticine lump</span>
+<span class="var">a_form</span> = <span class="fn">kf</span>(t, [(<span class="num">1.5</span>, <span class="num">0</span>), (<span class="num">2.3</span>, <span class="num">1</span>)])
+<span class="var">s_form</span> = <span class="fn">kf</span>(t, [(<span class="num">1.67</span>, <span class="num">0</span>), (<span class="num">2.5</span>, <span class="num">1</span>)])
+<span class="var">ax</span> = <span class="fn">kf</span>(t, [(<span class="num">0.5</span>, -<span class="num">0.075</span>), (<span class="num">1.4</span>, -<span class="num">0.30</span>), (<span class="num">3.2</span>, -<span class="num">0.30</span>)])
+<span class="var">sx</span> = <span class="fn">kf</span>(t, [(<span class="num">0.5</span>, <span class="num">0.075</span>), (<span class="num">1.4</span>, <span class="num">0.25</span>), (<span class="num">3.2</span>, <span class="num">0.25</span>)])
+<span class="fn">figure</span>(P, sc, <span class="str">"A"</span>, ax, az, <span class="num">1.0</span>, a_form, <span class="var">SLATE</span>, <span class="str">"a"</span>, yaw=a_yaw)
+<span class="fn">figure</span>(P, sc, <span class="str">"S"</span>, sx, sz_, <span class="num">0.97</span>, s_form, <span class="var">TERRA</span>, <span class="str">"s"</span>, yaw=s_yaw)</pre>
+                </div>
+
+                <!-- Section 2: First Love & Hand Held -->
+                <div class="code-block" id="block-love" data-t0="4.2" data-t1="7.1">
+                    <div class="section-title"># --- Scene 2: 27 Jan & 11 Feb 2022 · First Love & Held Hands ---</div>
+                    <pre><span class="cmt"># Inner arms reach, hands join, and a red heart pinches between them</span>
+<span class="var">join</span> = <span class="fn">kf</span>(t, [(<span class="num">4.2</span>, <span class="num">0</span>), (<span class="num">4.83</span>, <span class="num">1</span>), (<span class="num">10.9</span>, <span class="num">1</span>)])
+<span class="var">raise_</span> = <span class="fn">kf</span>(t, [(<span class="num">4.83</span>, <span class="num">0</span>), (<span class="num">5.33</span>, <span class="num">1</span>), (<span class="num">10.5</span>, <span class="num">1</span>)])
+<span class="var">h_open</span> = <span class="fn">kf</span>(t, [(<span class="num">5.17</span>, <span class="num">0</span>), (<span class="num">5.67</span>, <span class="num">1</span>)])
+<span class="fn">heart</span>(P, <span class="str">"heart"</span>, h_pos, h_size, h_open, k=<span class="num">0.014</span>, mix=mixk)</pre>
+                </div>
+
+                <!-- Section 3: Proposal (04 Dec 2022) -->
+                <div class="code-block" id="block-propose" data-t0="7.1" data-t1="9.6">
+                    <div class="section-title"># --- Scene 3: 04 Dec 2022 · The Proposal ---</div>
+                    <pre><span class="cmt"># A thick golden-ochre brass ring coils upward, crowned with diamond</span>
+<span class="var">ring_an</span> = <span class="fn">kf</span>(t, [(<span class="num">7.17</span>, <span class="num">0.0</span>), (<span class="num">8.17</span>, math.pi)])
+<span class="fn">tor</span>(P, <span class="str">"ring"</span>, ring_c, ring_r, ring_tube, ring_an, <span class="var">BRASS</span>, k=<span class="num">0.010</span>)
+<span class="kw">if</span> <span class="fn">on</span>(t, <span class="num">8.33</span>, <span class="num">21.33</span>):
+    <span class="fn">box</span>(P, <span class="str">"diamond"</span>, dia_pos, (<span class="num">0.024</span>, <span class="num">0.024</span>, <span class="num">0.020</span>), <span class="num">0.010</span>, <span class="var">WHITE</span>, roll=math.pi/<span class="num">4</span>, glow=<span class="num">0.12</span>)</pre>
+                </div>
+
+                <!-- Section 4: Wedding Day & Cottage (26 Jan 2023) -->
+                <div class="code-block" id="block-wedding" data-t0="9.6" data-t1="13.0">
+                    <div class="section-title"># --- Scene 4: 26 Jan 2023 · Our Wedding Day ---</div>
+                    <pre><span class="cmt"># Earth base, ivory walls, slate pitched roof, and wedding garland</span>
+<span class="fn">box</span>(P, <span class="str">"base"</span>, base_pos, (<span class="num">0.70</span>, <span class="num">0.028</span>, <span class="num">0.37</span>), <span class="num">0.024</span>, <span class="var">EARTH</span>)
+<span class="fn">box</span>(P, <span class="str">"walls"</span>, wall_pos, (<span class="num">0.56</span>, <span class="num">0.26</span>, <span class="num">0.26</span>), <span class="num">0.035</span>, <span class="var">IVORY</span>, k=<span class="num">0.018</span>)
+<span class="fn">box</span>(P, <span class="str">"roof"</span>, roof_pos, (<span class="num">0.70</span>, <span class="num">0.24</span>, <span class="num">0.31</span>), <span class="num">0.035</span>, <span class="var">SLATE</span>, k=<span class="num">0.012</span>, tx=m)
+<span class="kw">for</span> g <span class="kw">in</span> <span class="fn">range</span>(<span class="num">9</span>):
+    <span class="fn">ball</span>(P, <span class="str">"bead%d"</span> % g, bead_pos, <span class="num">0.029</span>, <span class="var">MARIGOLD</span> <span class="kw">if</span> g%<span class="num">2</span>==<span class="num">0</span> <span class="kw">else</span> <span class="var">RED</span>)</pre>
+                </div>
+
+                <!-- Section 5: Daivik Arrives (03 Aug 2024) -->
+                <div class="code-block" id="block-daivik" data-t0="13.0" data-t1="16.0">
+                    <div class="section-title"># --- Scene 5: 03 Aug 2024 · Daivik Arrives ---</div>
+                    <pre><span class="cmt"># Daivik pinches up between his parents, happy and bouncing</span>
+<span class="var">d_form</span> = <span class="fn">kf</span>(t, [(<span class="num">13.0</span>, <span class="num">0</span>), (<span class="num">13.67</span>, <span class="num">1</span>)])
+<span class="var">d_lift</span>, <span class="var">d_sq</span> = <span class="fn">hop</span>(t, [(<span class="num">14.33</span>, <span class="num">14.83</span>, <span class="num">0.12</span>)])
+<span class="fn">figure</span>(P, sc, <span class="str">"D"</span>, d_pos[<span class="num">0</span>], d_pos[<span class="num">1</span>], <span class="num">0.62</span>, d_form, <span class="var">SAGE</span>, <span class="str">"k"</span>,
+       yaw=<span class="num">0.05</span>, lift=d_lift, sq=d_sq)</pre>
+                </div>
+
+                <!-- Section 6: Deeyan Arrives (09 Sep 2026) -->
+                <div class="code-block" id="block-deeyan" data-t0="16.0" data-t1="19.5">
+                    <div class="section-title"># --- Scene 6: 09 Sep 2026 · Deeyan Arrives ---</div>
+                    <pre><span class="cmt"># Deeyan arrives in warm marigold with a playful baby curl</span>
+<span class="var">y_form</span> = <span class="fn">kf</span>(t, [(<span class="num">16.0</span>, <span class="num">0</span>), (<span class="num">16.67</span>, <span class="num">1</span>)])
+<span class="var">y_lift</span>, <span class="var">y_sq</span> = <span class="fn">hop</span>(t, [(<span class="num">17.0</span>, <span class="num">17.45</span>, <span class="num">0.11</span>)])
+<span class="fn">figure</span>(P, sc, <span class="str">"Y"</span>, y_pos[<span class="num">0</span>], y_pos[<span class="num">1</span>], <span class="num">0.50</span>, y_form, <span class="var">MARIGOLD</span>, <span class="str">"b"</span>,
+       yaw=-<span class="num">0.08</span>, lift=y_lift, sq=y_sq)</pre>
+                </div>
+
+                <!-- Section 7: Always & Again Finale -->
+                <div class="code-block" id="block-finale" data-t0="19.5" data-t1="22.0">
+                    <div class="section-title"># --- Scene 7: Always & Again · Our Forever Family ---</div>
+                    <pre><span class="cmt"># Holds on the complete 4-person plasticine family sculpture</span>
+<span class="cmt"># Aravind waves happily on twos</span>
+<span class="kw">if</span> <span class="fn">on</span>(t, <span class="num">19.83</span>, <span class="num">20.83</span>):
+    <span class="var">flip</span> = <span class="fn">int</span>(<span class="fn">round</span>(t / <span class="var">PIC_DT</span>)) % <span class="num">2</span>
+    <span class="var">a_hand_l</span> = (ax - <span class="num">0.20</span> - <span class="num">0.04</span> * flip, <span class="num">0.56</span> + <span class="num">0.04</span> * flip, az + <span class="num">0.04</span>)</pre>
+                </div>
+
+                <!-- Section 8: Seamless Loop -->
+                <div class="code-block" id="block-loop" data-t0="22.0" data-t1="24.0">
+                    <div class="section-title"># --- Scene 8: Seamless Loop · Kneaded Back to Clay ---</div>
+                    <pre><span class="cmt"># Real clay logic: shapes soften and knead back into the lump</span>
+<span class="var">knead</span> = <span class="fn">max</span>(<span class="num">1.0</span> - <span class="fn">ss</span>(<span class="num">0.5</span>, <span class="num">1.3</span>, t), <span class="fn">ss</span>(<span class="num">22.9</span>, <span class="num">23.7</span>, t))
+<span class="var">kk</span> = <span class="fn">lerp</span>(<span class="num">0.016</span>, <span class="num">0.11</span>, knead)
+<span class="var">mixk</span> = <span class="fn">lerp</span>(<span class="num">0.25</span>, <span class="num">1.0</span>, knead)  <span class="cmt"># colors marble together</span></pre>
                 </div>
             </div>
         </div>
@@ -154,68 +562,205 @@
     <script>
         (function () {
             var film = document.getElementById("film");
-            var viewport = document.getElementById("viewport");
+            var soundtrack = document.getElementById("soundtrack");
+            var app = document.getElementById("app");
             var track = document.getElementById("scrubTrack");
             var fill = document.getElementById("scrubFill");
+            var tooltip = document.getElementById("scrubTooltip");
             var timeLabel = document.getElementById("timeLabel");
             var chapterLabel = document.getElementById("chapterLabel");
+            var soundBtn = document.getElementById("soundBtn");
+            var codeToggleBtn = document.getElementById("codeToggleBtn");
+            var codeContent = document.getElementById("codeContent");
+            var activeSectionBadge = document.getElementById("activeSectionBadge");
+            var codeBlocks = document.querySelectorAll(".code-block");
+
             var chapters = [
-                "01 · 20 Jan 2022 — First Met",
-                "02 · 27 Jan & 11 Feb 2022 — First Love & Held Hands",
-                "03 · 04 Dec 2022 — Engaged",
-                "04 · 26 Jan 2023 — Married",
-                "05 · 03 Aug 2024 — Daivik Arrived",
-                "06 · 09 Sep 2026 — Deeyan Arrived",
-                "07 · Always & Again — For Sanjana",
-                "08 · Endless Loop — Back to One"
+                { t: 0.0, label: "01 · Prologue — Animator's Workbench", name: "Studio Setup", id: "block-intro" },
+                { t: 1.5, label: "02 · 20 Jan 2022 — First Met", name: "Scene 1: Met", id: "block-met" },
+                { t: 4.2, label: "03 · 27 Jan & 11 Feb 2022 — First Love", name: "Scene 2: First Love", id: "block-love" },
+                { t: 7.1, label: "04 · 04 Dec 2022 — Engaged", name: "Scene 3: Proposal", id: "block-propose" },
+                { t: 9.6, label: "05 · 26 Jan 2023 — Married", name: "Scene 4: Wedding", id: "block-wedding" },
+                { t: 13.0, label: "06 · 03 Aug 2024 — Daivik Arrived", name: "Scene 5: Daivik", id: "block-daivik" },
+                { t: 16.0, label: "07 · 09 Sep 2026 — Deeyan Arrived", name: "Scene 6: Deeyan", id: "block-deeyan" },
+                { t: 19.5, label: "08 · Always & Again — For Sanjana", name: "Scene 7: Finale", id: "block-finale" },
+                { t: 22.0, label: "09 · Endless Loop — Back to Clay", name: "Loop: Knead", id: "block-loop" }
             ];
+
+            var currentActiveBlockId = null;
+            var isAudioActive = false;
+
+            // URL query parameters support: ?t=<sec> and ?code=<0|1>
+            var params = new URLSearchParams(window.location.search);
+            if (params.has("code") && params.get("code") === "0") {
+                document.body.classList.add("code-hidden");
+                codeToggleBtn.classList.remove("active");
+                codeToggleBtn.textContent = "Show Code [C]";
+            }
+
+            if (params.has("t")) {
+                var initialTime = parseFloat(params.get("t"));
+                if (!isNaN(initialTime)) {
+                    film.currentTime = Math.max(0, Math.min(24, initialTime));
+                    film.pause();
+                    app.classList.add("is-paused");
+                }
+            }
 
             function togglePlay() {
                 if (film.paused) {
                     film.play();
-                    viewport.classList.remove("is-paused");
+                    if (isAudioActive && soundtrack) {
+                        soundtrack.currentTime = film.currentTime;
+                        soundtrack.play().catch(function () {});
+                    }
+                    app.classList.remove("is-paused");
                 } else {
                     film.pause();
-                    viewport.classList.add("is-paused");
+                    if (soundtrack) soundtrack.pause();
+                    app.classList.add("is-paused");
                 }
             }
 
-            function syncScrub() {
+            function toggleCode() {
+                var isHidden = document.body.classList.toggle("code-hidden");
+                codeToggleBtn.classList.toggle("active", !isHidden);
+                codeToggleBtn.textContent = isHidden ? "Show Code [C]" : "Code [C]";
+            }
+
+            function toggleSound() {
+                if (!isAudioActive) {
+                    isAudioActive = true;
+                    film.muted = true; // keep film video element silent, play high-res soundtrack
+                    if (soundtrack) {
+                        soundtrack.currentTime = film.currentTime;
+                        if (!film.paused) soundtrack.play().catch(function () {});
+                    }
+                    soundBtn.textContent = "Sound On";
+                    soundBtn.classList.add("active");
+                } else {
+                    isAudioActive = false;
+                    if (soundtrack) soundtrack.pause();
+                    soundBtn.textContent = "Sound Off";
+                    soundBtn.classList.remove("active");
+                }
+            }
+
+            function syncUI() {
                 var dur = film.duration || 24;
                 var cur = film.currentTime || 0;
                 var pct = Math.max(0, Math.min(100, (cur / dur) * 100));
                 fill.style.width = pct.toFixed(2) + "%";
-                var idx = Math.min(chapters.length - 1, Math.floor((cur / dur) * chapters.length));
-                chapterLabel.textContent = chapters[idx];
-                timeLabel.textContent = cur.toFixed(1) + "s / " + dur.toFixed(1) + "s · Space to Pause";
-                requestAnimationFrame(syncScrub);
+
+                // Audio drift correction (<120ms tolerance)
+                if (isAudioActive && soundtrack && !film.paused) {
+                    if (Math.abs(soundtrack.currentTime - cur) > 0.14) {
+                        soundtrack.currentTime = cur;
+                    }
+                }
+
+                // Find active chapter
+                var activeChap = chapters[0];
+                for (var i = 0; i < chapters.length; i++) {
+                    if (cur >= chapters[i].t - 0.05) {
+                        activeChap = chapters[i];
+                    }
+                }
+
+                chapterLabel.textContent = activeChap.label;
+                timeLabel.textContent = cur.toFixed(1) + "s / " + dur.toFixed(1) + "s";
+                activeSectionBadge.textContent = activeChap.name;
+
+                // Highlight active code block and scroll if changed
+                if (activeChap.id !== currentActiveBlockId) {
+                    currentActiveBlockId = activeChap.id;
+                    codeBlocks.forEach(function (blk) {
+                        if (blk.id === activeChap.id) {
+                            blk.classList.add("active");
+                            var targetOffset = blk.offsetTop - codeContent.offsetTop - 30;
+                            codeContent.scrollTo({ top: targetOffset, behavior: "smooth" });
+                        } else {
+                            blk.classList.remove("active");
+                        }
+                    });
+                }
+
+                requestAnimationFrame(syncUI);
             }
 
             function seekFromEvent(e) {
                 var rect = track.getBoundingClientRect();
                 var ratio = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
-                if (film.duration) {
-                    film.currentTime = ratio * film.duration;
+                var dur = film.duration || 24;
+                var targetTime = ratio * dur;
+                film.currentTime = targetTime;
+                if (isAudioActive && soundtrack) {
+                    soundtrack.currentTime = targetTime;
                 }
             }
+
+            // Interactive clicking on code blocks seeks directly to that milestone
+            codeBlocks.forEach(function (blk) {
+                blk.addEventListener("click", function () {
+                    var t0 = parseFloat(blk.getAttribute("data-t0") || "0");
+                    film.currentTime = t0;
+                    if (isAudioActive && soundtrack) {
+                        soundtrack.currentTime = t0;
+                    }
+                    if (film.paused) {
+                        togglePlay();
+                    }
+                });
+            });
+
+            // Milestone hover tooltips along the timeline
+            track.addEventListener("mousemove", function (e) {
+                var rect = track.getBoundingClientRect();
+                var ratio = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+                var hoverTime = ratio * (film.duration || 24);
+                var chap = chapters[0];
+                for (var i = 0; i < chapters.length; i++) {
+                    if (hoverTime >= chapters[i].t - 0.1) {
+                        chap = chapters[i];
+                    }
+                }
+                tooltip.style.left = (e.clientX - rect.left) + "px";
+                tooltip.style.opacity = "1";
+                tooltip.textContent = chap.name + " (" + hoverTime.toFixed(1) + "s)";
+            });
+
+            track.addEventListener("mouseleave", function () {
+                tooltip.style.opacity = "0";
+            });
 
             window.addEventListener("keydown", function (e) {
                 if (e.code === "Space" || e.key === " ") {
                     e.preventDefault();
                     togglePlay();
+                } else if (e.code === "KeyC" || e.key === "c" || e.key === "C") {
+                    e.preventDefault();
+                    toggleCode();
+                } else if (e.code === "KeyM" || e.key === "m" || e.key === "M") {
+                    e.preventDefault();
+                    toggleSound();
                 } else if (e.code === "ArrowRight") {
-                    film.currentTime = Math.min(film.duration || 24, (film.currentTime || 0) + 1 / 6);
+                    var t = Math.min(film.duration || 24, (film.currentTime || 0) + 1 / 6);
+                    film.currentTime = t;
+                    if (isAudioActive && soundtrack) soundtrack.currentTime = t;
                 } else if (e.code === "ArrowLeft") {
-                    film.currentTime = Math.max(0, (film.currentTime || 0) - 1 / 6);
+                    var t = Math.max(0, (film.currentTime || 0) - 1 / 6);
+                    film.currentTime = t;
+                    if (isAudioActive && soundtrack) soundtrack.currentTime = t;
                 }
             });
 
             film.addEventListener("click", togglePlay);
+            codeToggleBtn.addEventListener("click", toggleCode);
+            soundBtn.addEventListener("click", toggleSound);
+
             track.addEventListener("pointerdown", function (e) {
                 seekFromEvent(e);
-                function onMove(ev) {
-                    seekFromEvent(ev);
-                }
+                function onMove(ev) { seekFromEvent(ev); }
                 function onUp() {
                     window.removeEventListener("pointermove", onMove);
                     window.removeEventListener("pointerup", onUp);
@@ -224,7 +769,7 @@
                 window.addEventListener("pointerup", onUp);
             });
 
-            requestAnimationFrame(syncScrub);
+            requestAnimationFrame(syncUI);
         })();
     </script>
 </body>

@@ -974,7 +974,7 @@ function initStory() {
 			suppressNextClick = false;
 			return;
 		}
-		if ($(e.target).closest("button, #dots").length) return;
+		if ($(e.target).closest("button, a, #dots").length) return;
 		advanceStory();
 	});
 	$(document).keydown(function (e) {

@@ -83,12 +83,14 @@ APERTURE = 0.017               # lens radius in world units
 KEY_POS = np.array([-2.5, 3.4, 3.0])
 KEY_AIM = np.array([0.15, 0.2, 0.1])
 KEY_RADIUS = 0.34
-KEY_COL = (1.00, 0.86, 0.70)
-KEY_POWER = 78.0
+KEY_COL = (1.00, 0.88, 0.72)
+KEY_POWER = 76.0
+FILL_DIR = np.array([0.68, 0.42, 0.60])     # soft studio bounce reflector from camera right
+FILL_COL = (0.52, 0.46, 0.40)              # warm luminous studio fill
 RIM_DIR = np.array([0.56, 0.52, -0.65])
-RIM_COL = (0.42, 0.56, 0.82)
-SKY_COL = (0.150, 0.185, 0.250)
-BOUNCE_COL = (0.060, 0.120, 0.085)
+RIM_COL = (0.38, 0.52, 0.76)
+SKY_COL = (0.180, 0.210, 0.260)
+BOUNCE_COL = (0.110, 0.200, 0.140)
 
 # --- Clay volume (signed-distance grid) ---
 VOX = 0.005
@@ -188,15 +190,15 @@ WALL_FRONT = HOUSE_Z + 0.26 + 0.035
 GABLE_FRONT = HOUSE_Z + 0.31 + 0.035
 LUMP = (0.0, 0.55)
 
-PILE_WALLS = (-1.22, 0.36, -0.58)
-PILE_ROOF = (-0.66, 0.30, -0.66)
-PILE_BASE = (-0.95, 0.17, -0.18)
-PILE_CHIM = (-0.28, 0.10, -0.52)
-PILE_DAIVIK = (-0.45, 0.124, -0.30)
-PILE_DEEYAN = (-0.42, 0.100, -0.02)
-GOLD_REST = (-0.48, 0.085, 0.90)
-RING_C = (0.64, 0.68)
-RING_R, RING_TUBE = 0.15, 0.034
+PILE_WALLS = (-1.18, 0.15, -0.52)
+PILE_ROOF = (-0.68, 0.13, -0.58)
+PILE_BASE = (-0.95, 0.11, -0.20)
+PILE_CHIM = (-0.34, 0.085, -0.48)
+PILE_DAIVIK = (-0.45, 0.115, -0.26)
+PILE_DEEYAN = (-0.42, 0.095, -0.02)
+GOLD_REST = (-0.46, 0.080, 0.86)
+RING_C = (0.48, 0.70)
+RING_R, RING_TUBE = 0.135, 0.030
 
 CARD_TIMES = [(0.0, 0), (1.3334, 1), (3.0, 2), (6.0, 3), (9.0, 4), (12.0, 5), (15.0, 6), (18.0, 0)]
 CARD_TEXT = [
@@ -323,24 +325,24 @@ def build_scene(t):
     s_yaw = float(kf(t, [(2.5, 0.0), (2.83, -0.42), (7.0, -0.42), (7.5, 0.50), (9.0, 0.50), (9.5, -0.12),
                          (21.5, -0.12), (22.0, 0.0)]))
     walk = [(3.2, 3.7, 0.07), (3.7, 4.2, 0.07), (11.33, 11.83, 0.08), (11.83, 12.17, 0.06)]
-    a_lift, a_sq = hop(t, walk + [(2.83, 3.17, 0.05), (8.33, 8.83, 0.12), (12.5, 13.0, 0.05), (18.5, 19.0, 0.13)])
-    s_lift, s_sq = hop(t, walk + [(8.5, 9.0, 0.14), (12.5, 13.0, 0.05), (19.0, 19.5, 0.13)])
+    a_lift, a_sq = hop(t, walk + [(2.83, 3.17, 0.05), (8.33, 8.83, 0.11), (12.5, 13.0, 0.05), (18.4, 18.9, 0.11)])
+    s_lift, s_sq = hop(t, walk + [(8.5, 9.0, 0.12), (12.5, 13.0, 0.05), (18.6, 19.1, 0.11)])
 
-    # joined inner hands: reach (4.2-4.8), lift the heart (4.8-5.3), let go (10.9-11.3)
+    # joined inner hands: reach (4.2-4.8), cradle the heart (4.8-5.3), let go (10.9-11.3)
     join = float(kf(t, [(4.2, 0), (4.83, 1), (10.9, 1), (11.3, 0)]))
     raise_ = float(kf(t, [(4.83, 0), (5.33, 1), (10.5, 1), (11.0, 0)]))
     mid = 0.5 * (ax + sx)
-    hands_y = lerp(0.27, 0.665, raise_) + 0.5 * (a_lift + s_lift)
-    hands = (mid, hands_y, 0.60 - 0.02 * raise_)
+    hands_y = lerp(0.22, 0.31, raise_) + 0.5 * (a_lift + s_lift)
+    hands = (mid, hands_y, 0.63 + 0.02 * raise_)
     a_rest_r = (ax + 0.150 * math.cos(a_yaw) + 0.035 * math.sin(a_yaw), 0.215 + a_lift, az + 0.035)
     s_rest_l = (sx - 0.150 * math.cos(s_yaw) + 0.035 * math.sin(s_yaw), 0.215 + s_lift, sz_ + 0.035)
-    a_hand_r = tuple(lerp(a_rest_r, (hands[0] - 0.022, hands[1], hands[2]), join)) if join > 0 else None
-    s_hand_l = tuple(lerp(s_rest_l, (hands[0] + 0.022, hands[1], hands[2]), join)) if join > 0 else None
+    a_hand_r = tuple(lerp(a_rest_r, (hands[0] - 0.028, hands[1], hands[2]), join)) if join > 0 else None
+    s_hand_l = tuple(lerp(s_rest_l, (hands[0] + 0.028, hands[1], hands[2]), join)) if join > 0 else None
     # finale: Aravind waves on twos
     a_hand_l = None
-    if on(t, 19.67, 20.67):
+    if on(t, 19.83, 20.83):
         flip = int(round(t / PIC_DT)) % 2
-        a_hand_l = (ax - 0.20 - 0.04 * flip, 0.60 + 0.04 * flip, az + 0.02)
+        a_hand_l = (ax - 0.20 - 0.04 * flip, 0.56 + 0.04 * flip, az + 0.04)
 
     figure(P, sc, "A", ax, az, 1.0, a_form, SLATE, "a", yaw=a_yaw, lift=a_lift, sq=a_sq, k=kk, mix=mixk,
            hand_l=a_hand_l, hand_r=a_hand_r, hair=on(t, 2.5, 21.83), eyes=on(t, 2.67, 21.67))
@@ -349,63 +351,70 @@ def build_scene(t):
 
     # ---------------- the heart ----------------
     h_open = float(kf(t, [(5.17, 0), (5.67, 1), (21.83, 1), (22.33, 0)]))
-    gable_h = (HOUSE_X, 0.895, GABLE_FRONT + 0.045)
-    h_pos = kf(t, [(0.5, (0.06, 0.16, 0.66)), (1.4, (sx, 0.19, sz_)), (4.67, (sx, 0.20, sz_)),
-                   (4.83, (0.5 * (-0.165 + 0.150), 0.27, 0.60)), (5.33, (-0.0075, 0.775, 0.58)),
-                   (10.5, (-0.0075, 0.775, 0.58)), (10.75, (0.33, 1.05, 0.42)), (11.0, gable_h),
-                   (21.5, gable_h), (21.75, (0.32, 0.80, 0.50)), (22.0, (0.10, 0.075, 0.70)),
-                   (22.9, (0.10, 0.075, 0.70)), (23.6, (0.06, 0.16, 0.66))])
+    gable_h = (HOUSE_X, 0.855, WALL_FRONT + 0.052)
+    h_pos = kf(t, [(0.5, (0.06, 0.15, 0.64)), (1.4, (sx, 0.19, sz_)), (4.67, (sx, 0.20, sz_)),
+                   (4.83, (0.5 * (-0.165 + 0.150), 0.28, 0.63)), (5.33, (-0.0075, 0.46, 0.65)),
+                   (10.5, (-0.0075, 0.46, 0.65)), (10.75, (0.33, 0.92, 0.42)), (11.0, gable_h),
+                   (21.5, gable_h), (21.75, (0.32, 0.74, 0.50)), (22.0, (0.10, 0.075, 0.70)),
+                   (22.9, (0.10, 0.075, 0.70)), (23.6, (0.06, 0.15, 0.64))])
     if on(t, 1.4, 4.67):
         h_pos = np.array([sx, 0.19, sz_])
-    h_size = float(kf(t, [(4.67, 0.062), (5.17, 0.088), (22.0, 0.088), (23.6, 0.062)]))
-    heart(P, "heart", h_pos, h_size, h_open, k=max(kk, 0.02) if (t < 4.67 or t > 22.9) else 0.016, mix=mixk)
+    h_size = float(kf(t, [(4.67, 0.060), (5.17, 0.078), (10.75, 0.078), (11.0, 0.068),
+                          (21.5, 0.068), (22.0, 0.078), (23.6, 0.060)]))
+    heart(P, "heart", h_pos, h_size, h_open, k=max(kk, 0.02) if (t < 4.67 or t > 22.9) else 0.014, mix=mixk)
 
     # ---------------- the ring ----------------
     ring_an = float(kf(t, [(7.17, 0.0), (8.17, math.pi), (21.83, math.pi), (22.5, 0.0)]))
-    ring_tube = float(kf(t, [(7.17, 0.085), (7.83, RING_TUBE), (22.0, RING_TUBE), (22.5, 0.085)]))
-    gable_r = (HOUSE_X, 0.895, GABLE_FRONT + 0.022)
-    floor_y = RING_R + ring_tube
+    ring_r = float(kf(t, [(10.8, RING_R), (11.5, 0.112), (21.33, 0.112), (21.83, RING_R)]))
+    ring_tube = float(kf(t, [(7.17, 0.080), (7.83, RING_TUBE), (10.8, RING_TUBE), (11.5, 0.025),
+                             (21.33, 0.025), (21.83, RING_TUBE), (22.0, RING_TUBE), (22.5, 0.080)]))
+    gable_r = (HOUSE_X, 0.855, WALL_FRONT + 0.032)
+    floor_y = ring_r + ring_tube
     r_back = (0.32, 0.75)
-    ring_c = kf(t, [(0.5, (-0.01, 0.30 - RING_R, 0.62)), (1.4, (GOLD_REST[0], 0.085 - RING_R, GOLD_REST[2])),
-                    (6.33, (GOLD_REST[0], 0.085 - RING_R, GOLD_REST[2])), (7.17, (RING_C[0], 0.085 - RING_R, RING_C[1])),
+    ring_c = kf(t, [(0.5, (-0.01, 0.25 - ring_r, 0.60)), (1.4, (GOLD_REST[0], 0.080 - ring_r, GOLD_REST[2])),
+                    (6.33, (GOLD_REST[0], 0.080 - ring_r, GOLD_REST[2])), (7.17, (RING_C[0], 0.080 - ring_r, RING_C[1])),
                     (8.17, (RING_C[0], floor_y, RING_C[1])), (11.0, (RING_C[0], floor_y, RING_C[1])),
-                    (11.25, (0.66, 1.05, 0.45)), (11.5, gable_r), (21.33, gable_r), (21.58, (0.45, 1.0, 0.5)),
-                    (21.83, (r_back[0], floor_y, r_back[1])), (22.5, (r_back[0], 0.085 - RING_R, r_back[1])),
-                    (22.9, (r_back[0], 0.085 - RING_R, r_back[1])), (23.6, (-0.01, 0.30 - RING_R, 0.62))])
+                    (11.25, (0.60, 0.96, 0.45)), (11.5, gable_r), (21.33, gable_r), (21.58, (0.45, 0.92, 0.5)),
+                    (21.83, (r_back[0], floor_y, r_back[1])), (22.5, (r_back[0], 0.080 - ring_r, r_back[1])),
+                    (22.9, (r_back[0], 0.080 - ring_r, r_back[1])), (23.6, (-0.01, 0.25 - ring_r, 0.60))])
     if ring_an < 0.02:
-        ball(P, "ring", (ring_c[0], ring_c[1] + RING_R, ring_c[2]), ring_tube, BRASS, k=max(kk, 0.02), mix=mixk)
+        ball(P, "ring", (ring_c[0], ring_c[1] + ring_r, ring_c[2]), ring_tube, BRASS, k=max(kk, 0.02), mix=mixk)
     else:
-        tor(P, "ring", ring_c, RING_R, ring_tube, ring_an, BRASS, k=0.012)
+        tor(P, "ring", ring_c, ring_r, ring_tube, ring_an, BRASS, k=0.010)
     if on(t, 8.33, 21.33):
         dia_sq = 0.3 if t < 8.5 else 0.0
-        box(P, "diamond", (ring_c[0], ring_c[1] + RING_R + RING_TUBE + 0.030 - 0.01 * dia_sq, ring_c[2]),
-            (0.028 * (1 + dia_sq), 0.028 * (1 - dia_sq), 0.024), 0.012, WHITE, k=0.004, roll=math.pi / 4, glow=0.10)
+        box(P, "diamond", (ring_c[0], ring_c[1] + ring_r + ring_tube + 0.024 - 0.008 * dia_sq, ring_c[2]),
+            (0.024 * (1 + dia_sq), 0.024 * (1 - dia_sq), 0.020), 0.010, WHITE, k=0.004, roll=math.pi / 4, glow=0.12)
 
     # ---------------- the house ----------------
     hx, hz = HOUSE_X, HOUSE_Z
-    # base slab
+    # base slab (waiting as a hand-pressed earth loaf)
     m = float(kf(t, [(9.67, 0), (10.0, 1), (22.33, 1), (22.67, 0)]))
-    pos = kf(t, [(9.0, PILE_BASE), (9.67, (hx, 0.17, hz)), (22.67, (hx, 0.17, hz)), (23.33, PILE_BASE)])
-    box(P, "base", (pos[0], lerp(pos[1], 0.050, m), pos[2]), lerp((0, 0, 0), (0.70, 0.028, 0.37), m),
-        lerp(0.17, 0.024, m), EARTH)
-    # walls
+    pos = kf(t, [(9.0, PILE_BASE), (9.67, (hx, 0.11, hz)), (22.67, (hx, 0.11, hz)), (23.33, PILE_BASE)])
+    box(P, "base", (pos[0], lerp(pos[1], 0.050, m), pos[2]), lerp((0.08, 0.02, 0.05), (0.70, 0.028, 0.37), m),
+        lerp(0.09, 0.024, m), EARTH)
+    # walls (waiting as a compact ivory block)
     m = float(kf(t, [(10.0, 0), (10.5, 1), (22.0, 1), (22.4, 0)]))
-    pos = kf(t, [(9.17, PILE_WALLS), (9.83, (hx - 0.55, 0.36, hz - 0.1)), (10.0, (hx, 0.42, hz)),
-                 (22.4, (hx, 0.42, hz)), (22.57, (hx - 0.55, 0.36, hz - 0.1)), (23.25, PILE_WALLS)])
-    box(P, "walls", (pos[0], lerp(pos[1], 0.375, m), pos[2]), lerp((0, 0, 0), (0.56, 0.26, 0.26), m),
-        lerp(0.36, 0.035, m), IVORY, k=0.02)
-    # roof
+    pos = kf(t, [(9.17, PILE_WALLS), (9.83, (hx - 0.55, 0.18, hz - 0.1)), (10.0, (hx, 0.38, hz)),
+                 (22.4, (hx, 0.38, hz)), (22.57, (hx - 0.55, 0.18, hz - 0.1)), (23.25, PILE_WALLS)])
+    box(P, "walls", (pos[0], lerp(pos[1], 0.375, m), pos[2]), lerp((0.11, 0.04, 0.08), (0.56, 0.26, 0.26), m),
+        lerp(0.11, 0.035, m), IVORY, k=0.018)
+    # roof (waiting as a compact slate loaf, then pitched overhang)
     m = float(kf(t, [(10.67, 0), (11.0, 1), (21.67, 1), (22.0, 0)]))
-    pos = kf(t, [(9.67, PILE_ROOF), (10.33, (hx - 0.85, 0.30, hz - 0.15)), (10.67, (hx, 0.98, hz)),
-                 (22.0, (hx, 0.98, hz)), (22.25, (hx - 0.85, 0.30, hz - 0.15)), (22.9, PILE_ROOF)])
-    box(P, "roof", (pos[0], lerp(pos[1], 0.925, m), pos[2]), lerp((0, 0, 0), (0.70, 0.24, 0.31), m),
-        lerp(0.30, 0.035, m), SLATE, k=0.012, tx=m)
+    pos = kf(t, [(9.67, PILE_ROOF), (10.33, (hx - 0.80, 0.16, hz - 0.15)), (10.67, (hx, 0.96, hz)),
+                 (22.0, (hx, 0.96, hz)), (22.25, (hx - 0.80, 0.16, hz - 0.15)), (22.9, PILE_ROOF)])
+    box(P, "roof", (pos[0], lerp(pos[1], 0.925, m), pos[2]), lerp((0.09, 0.03, 0.07), (0.70, 0.24, 0.31), m),
+        lerp(0.10, 0.035, m), SLATE, k=0.012, tx=m)
+    if m > 0.25:
+        gf = (m - 0.25) / 0.75
+        box(P, "gable", (hx, 0.855, WALL_FRONT - 0.008), (0.50 * gf, 0.185 * gf, 0.018), 0.022 * gf,
+            IVORY, k=0.008, tx=1.0)
     # chimney
     m = float(kf(t, [(11.0, 0), (11.33, 1), (21.33, 1), (21.67, 0)]))
     chim = (hx + 0.40, 1.12, hz - 0.06)
-    pos = kf(t, [(10.33, PILE_CHIM), (10.75, (hx - 0.2, 0.10, hz + 0.45)), (11.0, chim),
-                 (21.67, chim), (21.92, (hx - 0.2, 0.10, hz + 0.45)), (22.5, PILE_CHIM)])
-    box(P, "chimney", pos, lerp((0, 0, 0), (0.068, 0.17, 0.068), m), lerp(0.10, 0.02, m), TERRA, k=0.012)
+    pos = kf(t, [(10.33, PILE_CHIM), (10.75, (hx - 0.2, 0.085, hz + 0.45)), (11.0, chim),
+                 (21.67, chim), (21.92, (hx - 0.2, 0.085, hz + 0.45)), (22.5, PILE_CHIM)])
+    box(P, "chimney", pos, lerp((0.04, 0.02, 0.03), (0.068, 0.17, 0.068), m), lerp(0.065, 0.02, m), TERRA, k=0.012)
 
     built = on(t, 10.5, 22.0)
     D = PIC_DT
@@ -464,12 +473,12 @@ def build_scene(t):
     del built
 
     # ---------------- Daivik ----------------
-    d_home = (0.535, 0.74)
+    d_home = (0.50, 0.70)
     d_form = float(kf(t, [(13.0, 0), (13.67, 1), (21.17, 1), (21.83, 0)]))
     d_pos = kf(t, [(12.17, (PILE_DAIVIK[0], PILE_DAIVIK[2])), (12.5, (-0.30, 0.42)), (12.75, (0.0, 0.90)),
                    (13.0, d_home), (21.83, d_home), (22.1, (0.0, 0.90)), (22.35, (-0.30, 0.42)),
                    (22.7, (PILE_DAIVIK[0], PILE_DAIVIK[2]))])
-    d_lift, d_sq = hop(t, [(14.33, 14.83, 0.13), (18.75, 19.25, 0.15)])
+    d_lift, d_sq = hop(t, [(14.33, 14.83, 0.12), (18.65, 19.15, 0.12)])
     figure(P, sc, "D", d_pos[0], d_pos[1], 0.62, d_form, SAGE, "k", yaw=0.05, lift=d_lift, sq=d_sq,
            hair=on(t, 13.83, 21.0), eyes=on(t, 14.0, 21.17))
 
@@ -479,9 +488,25 @@ def build_scene(t):
     y_pos = kf(t, [(15.17, (PILE_DEEYAN[0], PILE_DEEYAN[2])), (15.4, (-0.30, 0.50)), (15.6, (0.20, 0.93)),
                    (15.8, (0.82, 0.93)), (16.0, y_home), (22.0, y_home), (22.2, (0.82, 0.93)),
                    (22.4, (0.20, 0.93)), (22.6, (-0.30, 0.50)), (22.85, (PILE_DEEYAN[0], PILE_DEEYAN[2]))])
-    y_lift, y_sq = hop(t, [(17.33, 17.83, 0.12), (19.25, 19.75, 0.15)])
+    y_lift, y_sq = hop(t, [(17.0, 17.45, 0.11), (18.80, 19.25, 0.12)])
     figure(P, sc, "Y", y_pos[0], y_pos[1], 0.50, y_form, MARIGOLD, "b", yaw=-0.08, lift=y_lift, sq=y_sq,
            hair=on(t, 16.83, 21.17), eyes=on(t, 17.0, 21.33))
+
+    # ---------------- Animator's studio tools & tactile desk details ----------------
+    # Left desk props: boxwood sculpting spatula with carved bevel, plus small rolled clay pieces
+    cap(P, "tool.spatula.h", (-0.80, 0.026, 0.92), (-0.66, 0.022, 0.70), 0.022, srgb(192, 142, 88), k=0.005)
+    box(P, "tool.spatula.b", (-0.62, 0.016, 0.62), (0.040, 0.007, 0.060), 0.008, srgb(208, 160, 102), k=0.004, yaw=0.55)
+    cap(P, "spare.coil1", (-0.88, 0.022, 0.54), (-0.76, 0.022, 0.44), 0.020, TERRA, k=0.006)
+    ball(P, "spare.ball1", (-0.92, 0.030, 0.38), 0.032, SLATE, k=0.006)
+    ball(P, "spare.ball2", (-0.80, 0.024, 0.32), 0.024, MARIGOLD, k=0.006)
+    # Right desk props: wire-loop ribbon tool resting along the right foreground of the mat
+    cap(P, "tool.handle", (1.64, 0.036, 0.92), (1.42, 0.028, 0.86), 0.026, srgb(172, 118, 70), k=0.005)
+    cap(P, "tool.neck", (1.42, 0.028, 0.86), (1.35, 0.024, 0.84), 0.020, srgb(158, 106, 60), k=0.004)
+    cap(P, "tool.ferrule", (1.35, 0.024, 0.84), (1.28, 0.022, 0.82), 0.016, BRASS, k=0.004)
+    cap(P, "tool.wireL", (1.28, 0.022, 0.82), (1.20, 0.028, 0.78), 0.011, srgb(215, 222, 232), k=0.004)
+    cap(P, "tool.wireTip", (1.20, 0.028, 0.78), (1.16, 0.030, 0.82), 0.011, srgb(225, 230, 242), k=0.004)
+    cap(P, "tool.wireR", (1.16, 0.030, 0.82), (1.22, 0.025, 0.86), 0.011, srgb(215, 222, 232), k=0.004)
+    cap(P, "tool.wireClose", (1.22, 0.025, 0.86), (1.28, 0.022, 0.82), 0.011, srgb(215, 222, 232), k=0.004)
     return sc
 
 
@@ -759,12 +784,12 @@ class Renderer:
             lx, ly = c * lx + s * ly, -s * lx + c * ly
         hx, hy, hz = pr["h"]
         tx, tz = pr["tx"], pr["tz"]
-        corr = 1.0
         if (tx or tz) and hy > 1e-5:
             u = ((ly + hy) / (2.0 * hy)).clamp(0.0, 1.0)
-            qx = lx.abs() - hx * (1.0 - tx * u)
-            qz = lz.abs() - hz * (1.0 - tz * u)
-            corr = 1.0 / math.sqrt(1.0 + max(tx * hx, tz * hz) ** 2 / (4.0 * hy * hy))
+            cx = 1.0 / math.sqrt(1.0 + (tx * hx / (2.0 * hy)) ** 2)
+            cz = 1.0 / math.sqrt(1.0 + (tz * hz / (2.0 * hy)) ** 2)
+            qx = (lx.abs() - hx * (1.0 - tx * u)) * cx
+            qz = (lz.abs() - hz * (1.0 - tz * u)) * cz
         else:
             qx = lx.abs() - hx
             qz = lz.abs() - hz
@@ -772,7 +797,7 @@ class Renderer:
         ox, oy, oz = qx.clamp(min=0.0), qy.clamp(min=0.0), qz.clamp(min=0.0)
         outside = torch.sqrt(ox * ox + oy * oy + oz * oz + 1e-10)
         inside = torch.maximum(qx, torch.maximum(qy, qz)).clamp(max=0.0)
-        return (outside + inside) * corr - pr["r"]
+        return outside + inside - pr["r"]
 
     @staticmethod
     def prim_bounds(pr):
@@ -816,11 +841,12 @@ class Renderer:
             d = self.prim_dist(pr, self.xs[None, None, i0[0]:i1[0]], self.ys[None, i0[1]:i1[1], None],
                                self.zs[i0[2]:i1[2], None, None])
             dprev = D[sl]
-            m = (0.5 + 0.5 * (dprev - d) / k).clamp(0.0, 1.0)
-            D[sl] = dprev * (1.0 - m) + d * m - k * m * (1.0 - m)
+            diff = dprev - d
+            m = (0.5 + 0.5 * diff / k).clamp(0.0, 1.0)
             kc = max(0.0035, k * pr["mix"])
             marb = self.swirl[sl] * (kc * 1.6) if pr["mix"] > 0.5 else 0.0
-            mc = (0.5 + 0.5 * (dprev - d + marb) / kc).clamp(0.0, 1.0)
+            mc = (0.5 + 0.5 * (diff + marb) / kc).clamp(0.0, 1.0)
+            D[sl] = dprev * (1.0 - m) + d * m - k * m * (1.0 - m)
             vec = torch.tensor(list(pr["col"]) + [pr["act"], pr["glow"]], device=DEV, dtype=torch.float32)
             sub = M[(slice(None),) + sl]
             M[(slice(None),) + sl] = sub * (1.0 - mc) + vec[:, None, None, None] * mc
@@ -877,12 +903,13 @@ class Renderer:
     # ---------------- fine surface detail (evaluated at hit points) ----------------
     @staticmethod
     def hash3(ix, iy, iz, s):
-        return torch.frac(torch.sin(ix * 127.1 + iy * 311.7 + iz * 74.7 + s) * 43758.5453)
+        v = torch.sin(ix * 127.1 + iy * 311.7 + iz * 74.7 + s) * 43758.5453
+        return v - v.floor()
 
     def fingerprint(self, p):
         """Whorls of fingerprint ridges in patches where a thumb pressed."""
         hsum = torch.zeros(p.shape[0], device=DEV)
-        for cell, ang, s in ((0.150, 0.0, 1.3), (0.210, 0.9, 7.7)):
+        for cell, ang, s in ((0.120, 0.0, 1.3), (0.170, 0.9, 7.7)):
             c, sn = math.cos(ang), math.sin(ang)
             qx = (p[:, 0] * c + p[:, 2] * sn) / cell + s
             qy = p[:, 1] / cell + s * 0.37
@@ -898,14 +925,14 @@ class Renderer:
             rr = torch.sqrt(dx * dx + dy * dy + dz * dz + 1e-9)
             dist = torch.sqrt(dx * dx + (dy * (1.1 + 0.5 * r4)) ** 2 + dz * dz + 1e-9) * cell
             swirl = torch.atan2(dy, dx + dz + 1e-5)
-            ridge = torch.sin(dist * (2.0 * math.pi / 0.0080) + 1.3 * torch.sin(swirl * 2.0 + r1 * 6.28))
-            mask = ((0.44 - rr) / 0.20).clamp(0.0, 1.0)
-            mask = mask * mask * (3.0 - 2.0 * mask) * (r4 < 0.62).float()
+            ridge = torch.sin(dist * (2.0 * math.pi / 0.0032) + 1.2 * torch.sin(swirl * 2.0 + r1 * 6.28))
+            mask = ((0.42 - rr) / 0.18).clamp(0.0, 1.0)
+            mask = mask * mask * (3.0 - 2.0 * mask) * (r4 < 0.65).float()
             hsum = hsum + ridge * mask
         return hsum
 
     def detail_normal(self, p, n):
-        e = 0.0013
+        e = 0.0007
         h0 = self.fingerprint(p)
         ex = torch.tensor([e, 0.0, 0.0], device=DEV)
         ey = torch.tensor([0.0, e, 0.0], device=DEV)
@@ -916,7 +943,7 @@ class Renderer:
         gr = torch.stack([torch.sin(p[:, 1] * 517.0 + p[:, 2] * 331.0) * torch.sin(p[:, 0] * 433.0),
                           torch.sin(p[:, 2] * 487.0 + p[:, 0] * 293.0) * torch.sin(p[:, 1] * 389.0),
                           torch.sin(p[:, 0] * 541.0 + p[:, 1] * 311.0) * torch.sin(p[:, 2] * 463.0)], dim=1)
-        g = g * 0.00030 + gr * 0.045
+        g = g * 0.00012 + gr * 0.035
         g = g - (g * n).sum(1, keepdim=True) * n
         return F.normalize(n - g, dim=1), h0
 
@@ -993,23 +1020,25 @@ class Renderer:
             shift = torch.tensor([0.37 * (pic % 11) + 0.11, 0.23 * (pic % 7) + 0.05, 0.41 * (pic % 5)], device=DEV)
             pd = pc + (act > 0.3).float()[:, None] * shift
             n2, fp = self.detail_normal(pd, n)
-            # hand-kneaded pigment: slow value drift, dust flecks, dirt in the creases
+            # hand-kneaded pigment: slow organic value drift, fine lint fibers, soft contact shading
             v = torch.sin(pd[:, 0] * 7.3 + torch.sin(pd[:, 1] * 5.1 + pd[:, 2] * 6.7) * 1.7) * \
                 torch.sin(pd[:, 2] * 8.9 + torch.sin(pd[:, 0] * 4.3 + pd[:, 1] * 3.1) * 2.0)
-            a = a * (1.0 + 0.085 * v)[:, None]
-            a = a * (1.0 - 0.030 * fp)[:, None]
-            cq = pc / 0.026
+            a = a * (1.0 + 0.065 * v)[:, None]
+            a = a * (1.0 - 0.020 * fp)[:, None]
+            cq = pc / 0.0055
             ci = cq.floor()
             r1 = self.hash3(ci[:, 0], ci[:, 1], ci[:, 2], 2.2)
-            r2 = self.hash3(ci[:, 0], ci[:, 1], ci[:, 2], 5.6)
             cf = cq - ci - 0.5
-            sp = ((0.20 - torch.sqrt((cf * cf).sum(1) + 1e-9) / (0.45 + r2)) / 0.08).clamp(0.0, 1.0)
-            dust = sp * (r1 < 0.16).float() * 0.55
-            dark = sp * (r1 > 0.90).float() * 0.45
-            a = a * (1.0 - dust)[:, None] + torch.tensor([0.62, 0.60, 0.56], device=DEV) * dust[:, None]
-            a = a * (1.0 - dark)[:, None]
-            cav = (1.0 - self.sdf(pc + n * 0.016) / 0.016).clamp(0.0, 1.0)
-            a = a * (1.0 - 0.30 * cav)[:, None]
+            dist_sp = torch.sqrt((cf * cf).sum(1) + 1e-9)
+            speck = ((0.16 - dist_sp) / 0.08).clamp(0.0, 1.0) * (r1 < 0.06).float() * 0.28
+            a = a * (1.0 - speck)[:, None] + torch.tensor([0.72, 0.70, 0.66], device=DEV) * speck[:, None]
+            cav = (1.0 - self.sdf(pc + n * 0.012) / 0.012).clamp(0.0, 1.0) ** 2
+            # subtle hairline drying cracks in tight plasticine creases and bends
+            bend_stress = cav * (act < 0.4).float()
+            crack_grain = torch.sin(pc[:, 0] * 360.0 + torch.sin(pc[:, 1] * 280.0) * 1.6) * \
+                          torch.sin(pc[:, 2] * 340.0 + torch.sin(pc[:, 0] * 260.0) * 1.6)
+            crack = ((crack_grain.abs() - 0.88) / 0.09).clamp(0.0, 1.0) * bend_stress * 0.28
+            a = a * (1.0 - 0.22 * cav - crack)[:, None]
             rg = torch.full((ic.numel(),), 0.40, device=DEV) + 0.07 * v
             # faces: a pressed smile, rouge on the cheeks, a bindi
             for (hc, hr, yaw, style) in sc["faces"]:
@@ -1044,11 +1073,15 @@ class Renderer:
             v = (pg[:, 2] - MAT_Z0) / (MAT_Z1 - MAT_Z0) * 2.0 - 1.0
             tx = F.grid_sample(self.mat_tex, torch.stack([u, v], 1).view(1, 1, -1, 2), mode="bilinear",
                                padding_mode="border", align_corners=False).view(4, -1)
-            on_mat = ((u.abs() < 1.0) & (v.abs() < 1.0)).float()
-            grain = torch.sin(pg[:, 2] * 93.0 + torch.sin(pg[:, 0] * 2.1) * 6.0 + torch.sin(pg[:, 0] * 0.7) * 9.0)
-            wood = torch.tensor(srgb(96, 62, 40), device=DEV)[None, :] * (1.0 + 0.16 * grain)[:, None]
-            alb[ig] = tx[0:3].t() * on_mat[:, None] + wood * (1.0 - on_mat)[:, None]
-            rough[ig] = (0.62 - 0.30 * (tx[3] - 0.5)) * on_mat + 0.45 * (1.0 - on_mat)
+            edge_d = torch.maximum(u.abs(), v.abs())
+            on_mat = ((1.0 - edge_d) / 0.006).clamp(0.0, 1.0)
+            bevel = ((edge_d - 0.992) / 0.008).clamp(0.0, 1.0) * (edge_d < 1.006).float()
+            grain = torch.sin(pg[:, 2] * 85.0 + torch.sin(pg[:, 0] * 2.4) * 5.0 + torch.sin(pg[:, 0] * 0.8) * 8.0)
+            plank = torch.sin(pg[:, 2] * 14.0).abs() ** 0.25
+            wood = torch.tensor(srgb(58, 36, 24), device=DEV)[None, :] * ((0.85 + 0.15 * plank) * (1.0 + 0.14 * grain))[:, None]
+            mat_col = tx[0:3].t() * (1.0 - 0.45 * bevel)[:, None]
+            alb[ig] = mat_col * on_mat[:, None] + wood * (1.0 - on_mat)[:, None]
+            rough[ig] = (0.62 - 0.30 * (tx[3] - 0.5)) * on_mat + 0.48 * (1.0 - on_mat)
             f0[ig] = 0.045
 
         # --- tent card ---
@@ -1058,14 +1091,14 @@ class Renderer:
             tex = self.cards[sc["card"]]
             g = torch.stack([uv[:, 0] * 2.0 - 1.0, 1.0 - uv[:, 1] * 2.0], 1).view(1, 1, -1, 2)
             ca = F.grid_sample(tex, g, mode="bilinear", padding_mode="border", align_corners=False).view(3, -1).t()
-            blank = torch.tensor(srgb(226, 214, 190), device=DEV)[None, :].expand(iq.numel(), 3)
-            alb[iq] = torch.where((qid[iq] == 0)[:, None], ca, blank)
+            blank = torch.tensor(srgb(212, 198, 174), device=DEV)[None, :].expand(iq.numel(), 3)
+            alb[iq] = torch.where((qid[iq] == 0)[:, None], ca * 0.76, blank * 0.76)
             nq = qn[iq]
             facing = ((nq * rd[iq]).sum(1) > 0).float()[:, None]
             Nn[iq] = nq * (1.0 - 2.0 * facing)
-            rough[iq] = 0.85
-            f0[iq] = 0.02
-            sss[iq] = 0.25
+            rough[iq] = 0.90
+            f0[iq] = 0.015
+            sss[iq] = 0.05
 
         # --- bead eyes ---
         ie = torch.nonzero(kind == 4).squeeze(1)
@@ -1123,9 +1156,9 @@ class Renderer:
                 vis = vis * (~blk).float()
             # ambient occlusion from the distance field
             ao = torch.ones(il.numel(), device=DEV)
-            for dd, wgt in ((0.014, 0.42), (0.04, 0.34), (0.10, 0.26), (0.22, 0.20)):
+            for dd, wgt in ((0.014, 0.40), (0.04, 0.32), (0.10, 0.24), (0.22, 0.18)):
                 ao = ao - wgt * (1.0 - self.sdf(p + n * dd) / dd).clamp(0.0, 1.0)
-            ao = ao.clamp(0.06, 1.0)
+            ao = ao.clamp(0.16, 1.0)
             # diffuse with a waxy wrap: light bleeds past the terminator, redder than the surface
             lam = ndl.clamp(min=0.0) * vis
             wrap = ((ndl + 0.42) / 1.42).clamp(0.0, 1.0) ** 2
@@ -1138,6 +1171,10 @@ class Renderer:
             hemi = (0.5 + 0.5 * n[:, 1])[:, None]
             amb = torch.tensor(SKY_COL, device=DEV) * hemi + torch.tensor(BOUNCE_COL, device=DEV) * (1.0 - hemi) * 2.2
             diff = diff + a * amb * ao[:, None]
+            # soft studio fill from camera right (warm reflector bounce board)
+            fdir = torch.tensor(FILL_DIR / np.linalg.norm(FILL_DIR), device=DEV, dtype=torch.float32)
+            fndl = (n * fdir).sum(1).clamp(min=0.0)
+            diff = diff + a * torch.tensor(FILL_COL, device=DEV) * (fndl * ao)[:, None]
             # cool rim from the window behind
             rim = torch.tensor(RIM_DIR / np.linalg.norm(RIM_DIR), device=DEV, dtype=torch.float32)
             rv = torch.ones(il.numel(), device=DEV)
@@ -1227,7 +1264,7 @@ class Renderer:
         h, w, _ = img.shape
         rng = np.random.default_rng(31000 + pic)
         x = img.permute(2, 0, 1)[None]
-        small = F.avg_pool2d((x - 1.1).clamp(min=0.0), 4)
+        small = F.avg_pool2d((x - 1.65).clamp(min=0.0), 4)
         rad = max(3, int(h / 1080 * 9))
         ax = torch.arange(-3 * rad, 3 * rad + 1, device=DEV, dtype=torch.float32)
         kern = torch.exp(-ax * ax / (2.0 * rad * rad))
@@ -1237,11 +1274,14 @@ class Renderer:
         b = F.conv2d(F.pad(b, (0, 0, 3 * rad, 3 * rad), mode="replicate"), kern.transpose(2, 3))
         b = F.interpolate(b.view(1, 3, small.shape[2], small.shape[3]), size=(h, w), mode="bilinear",
                           align_corners=False)
-        x = x + 0.55 * b
+        x = x + 0.30 * b
         yy, xx = torch.meshgrid(torch.linspace(-1, 1, h, device=DEV), torch.linspace(-1, 1, w, device=DEV),
                                 indexing="ij")
         r2 = (xx * xx * (w / h) ** 2 + yy * yy) / (1.0 + (w / h) ** 2)
-        x = x * (1.0 - 0.42 * r2)[None, None] * float(0.94 * (1.0 + rng.uniform(-0.014, 0.014)))
+        lum_flicker = float(0.94 * (1.0 + rng.uniform(-0.014, 0.014)))
+        temp_shift = float(rng.uniform(-0.006, 0.006))    # subtle tungsten lamp spectral drift
+        color_tint = torch.tensor([1.0 + temp_shift, 1.0, 1.0 - temp_shift], device=DEV).view(1, 3, 1, 1)
+        x = x * (1.0 - 0.42 * r2)[None, None] * lum_flicker * color_tint
         x = (x * (2.51 * x + 0.03)) / (x * (2.43 * x + 0.59) + 0.14)      # filmic shoulder
         x = x.clamp(0.0, 1.0) ** (1.0 / 2.2)
         lum = x.mean(dim=1, keepdim=True)
@@ -1327,6 +1367,13 @@ def main():
             print(err, file=sys.stderr)
             raise SystemExit(1)
         Image.open(frames / ("pic_%04d_%dx%d.png" % (picture_for_time(POSTER_TIME), w, h))).save(POSTER_FILE)
+        audio_file = OUT_DIR / "heart-of-spades-clay-soundscape.wav"
+        if audio_file.exists():
+            out_audio = OUT_DIR / "heart-of-spades-clay-stop-motion-with-audio.mp4"
+            cmd_audio = [ffmpeg, "-y", "-i", str(OUT_FILE), "-i", str(audio_file), "-c:v", "copy",
+                         "-c:a", "aac", "-b:a", "192k", "-shortest", "-movflags", "+faststart", str(out_audio)]
+            subprocess.run(cmd_audio, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            print("wrote %s (with audio)" % out_audio)
         print("wrote %s\nwrote %s" % (OUT_FILE, POSTER_FILE))
 
 
