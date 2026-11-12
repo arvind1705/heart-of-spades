@@ -153,7 +153,7 @@ bloom palettes, never rules.
 ## Git Conventions
 
 - **Branch**: `main` (only branch)
-- **Remote**: `git@github.com:arvind1705/heart-of-spades.git`
+- **Remote**: `https://github.com/arvind1705/heart-of-spades.git`
 - **Commit messages**: imperative mood, capitalized first word. No conventional
   commits prefix. Examples: "Add initial README", "Enhance romantic theme"
 - **`.gitignore`** excludes `.DS_Store`, Python caches, and rendered `video/*.mp4`,
